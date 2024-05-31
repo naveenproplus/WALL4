@@ -1,0 +1,22 @@
+:root{
+	--primary:#c6a47e;
+	--secondary:#212529;
+	--primary-hover:#b68b5b;
+	--primary-dark:#775734;
+	
+	--rgba-primary-1:rgba(198,164,126,0.1);
+	--rgba-primary-2:rgba(198,164,126,0.2);
+	--rgba-primary-3:rgba(198,164,126,0.3);
+	--rgba-primary-4:rgba(198,164,126,0.4);
+	--rgba-primary-5:rgba(198,164,126,0.5);
+	--rgba-primary-6:rgba(198,164,126,0.6);
+	--rgba-primary-7:rgba(198,164,126,0.7);
+	--rgba-primary-8:rgba(198,164,126,0.8);
+	--rgba-primary-9:rgba(198,164,126,0.9);
+	
+	/* Other */
+	--secondary: #232323;
+	--theme-text-color: #fff;
+	--title: #232323;
+	
+}
