@@ -101,7 +101,7 @@ class ClientsController extends Controller
     public function Edit(Request $req, $ClientID = null)
     {
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
-            $sql = "Select UI.ClientID,UI.Name,UI.ClientType,UI.DOB,UI.GenderID,UI.Address,UI.Testimonial,UI.VideoURL,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,UI.ProfileImage,UI.ActiveStatus From tbl_client as UI";
+            $sql = "Select UI.ClientID,UI.Name,UI.ClientType,UI.DOB,UI.GenderID,UI.Address,UI.Testimonial,UI.VideoURL,UI.Thumbnail,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,UI.ProfileImage,UI.ActiveStatus From tbl_client as UI";
             $sql .= " Where UI.DFlag=0 and UI.ClientID='" . $ClientID . "'";
             $FormData = $this->general->UserInfo;
             $FormData['ActiveMenuName'] = $this->ActiveMenuName;
@@ -125,8 +125,7 @@ class ClientsController extends Controller
     {
         return DB::Table('tbl_user_roles')->where('ActiveStatus', 1)->where('DFlag', 0)->where('isShow', 1)->get();
     }
-    public function Save(Request $req)
-    {
+    public function Save(Request $req){
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
 
             if($req->PostalCode==$req->PostalCodeID){
@@ -186,20 +185,9 @@ class ClientsController extends Controller
             }
             DB::beginTransaction();
             $status = false;
-            $ProfileImage = "";
             try {
 
                 $ClientID = $this->DocNum->getDocNum("Clients");
-
-                if ($req->hasFile('ProfileImage')) {
-                    $dir = "uploads/admin/master/clients/";
-                    if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                    $file = $req->file('ProfileImage');
-                    $fileName = md5($file->getClientOriginalName() . time());
-                    $fileName1 = $fileName . "." . $file->getClientOriginalExtension();
-                    $file->move($dir, $fileName1);
-                    $ProfileImage = $dir . $fileName1;
-                }
 
                 $status = true;
                 if ($status) {
@@ -217,11 +205,34 @@ class ClientsController extends Controller
                         "PostalCodeID" => $req->PostalCode,
                         "Email" => $req->EMail,
                         "MobileNumber" => $req->MobileNumber,
-                        "ProfileImage" => $ProfileImage,
                         "ActiveStatus" => $req->ActiveStatus,
                         "CreatedOn" => date("Y-m-d H:i:s"),
                         "CreatedBy" => $this->UserID,
                     );
+                    $dir = "uploads/admin/master/clients/";
+                    if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+                    if($req->hasFile('ProfileImage')){
+                        $file = $req->file('ProfileImage');
+                        $fileName=md5($file->getClientOriginalName() . time());
+                        $fileName1 =  $fileName. "." . $file->getClientOriginalExtension();
+                        $file->move($dir, $fileName1);
+                        $data["ProfileImage"]=$dir.$fileName1;
+                    }elseif($req->ProfileImage){
+                        $Img=json_decode($req->ProfileImage);
+                        if(file_exists($Img->uploadPath)){
+                            $fileName1=$Img->fileName!=""?$Img->fileName:Helper::RandomString(10)."png";
+                            copy($Img->uploadPath,$dir.$fileName1);
+                            $data["ProfileImage"]=$dir.$fileName1;
+                            unlink($Img->uploadPath);
+                        }
+                    }
+                    if ($req->hasFile('Thumbnail')) {
+                        $Tdir = "uploads/admin/master/clients/thumbnail/";
+                        if (!file_exists($Tdir)) {mkdir($Tdir, 0777, true);}
+                        $fileName = md5($req->file('Thumbnail')->getClientOriginalName() . time()) . "." . $req->file('Thumbnail')->getClientOriginalExtension();
+                        $req->file('Thumbnail')->move($Tdir, $fileName);
+                        $data["Thumbnail"] = $Tdir . $fileName;
+                    }
 
                     Log::info('Received data:', $data);
 
@@ -249,8 +260,7 @@ class ClientsController extends Controller
         }
     }
 
-    public function Update(Request $req, $ClientID)
-    {
+    public function Update(Request $req, $ClientID){
         Log::info('Received Client ID: ' . $ClientID);
 
         if ($this->general->isCrudAllow($this->CRUD, "edit")) {
@@ -308,7 +318,6 @@ class ClientsController extends Controller
 
             DB::beginTransaction();
             $status = false;
-            $ProfileImage = "";
             try {
                 // Construct the data for update
                 $data = [
@@ -327,22 +336,45 @@ class ClientsController extends Controller
                     "ActiveStatus" => $req->ActiveStatus,
                     "UpdatedOn" => now(),
                 ];
-
-                // Check if there's a profile image and update accordingly
-                if ($req->hasFile('ProfileImage')) {
-                    $dir = "uploads/admin/master/clients/";
-                    $fileName = md5($req->file('ProfileImage')->getClientOriginalName() . time()) . "." . $req->file('ProfileImage')->getClientOriginalExtension();
-                    $req->file('ProfileImage')->move($dir, $fileName);
-                    $data["ProfileImage"] = $dir . $fileName;
+                
+                
+                $dir = "uploads/admin/master/clients/";
+                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+                if($req->hasFile('ProfileImage')){
+					$file = $req->file('ProfileImage');
+					$fileName=md5($file->getClientOriginalName() . time());
+					$fileName1 =  $fileName. "." . $file->getClientOriginalExtension();
+					$file->move($dir, $fileName1);
+                    $data["ProfileImage"]=$dir.$fileName1;
+				}elseif($req->ProfileImage){
+					$Img=json_decode($req->ProfileImage);
+					if(file_exists($Img->uploadPath)){
+						$fileName1=$Img->fileName!=""?$Img->fileName:Helper::RandomString(10)."png";
+						copy($Img->uploadPath,$dir.$fileName1);
+                        $data["ProfileImage"]=$dir.$fileName1;
+						unlink($Img->uploadPath);
+					}
+				}
+                if ($req->hasFile('Thumbnail')) {
+                    $Tdir = "uploads/admin/master/clients/thumbnail/";
+                    if (!file_exists($Tdir)) {mkdir($Tdir, 0777, true);}
+                    $fileName = md5($req->file('Thumbnail')->getClientOriginalName() . time()) . "." . $req->file('Thumbnail')->getClientOriginalExtension();
+                    $req->file('Thumbnail')->move($Tdir, $fileName);
+                    $data["Thumbnail"] = $Tdir . $fileName;
+                }elseif($req->isThumbnailRemoved){
+                    $data['Thumbnail'] = "";
                 }
 
                 // Update the record
-                DB::table('tbl_client')->where('ClientID', $ClientID)->update($data);
-
-                DB::commit();
-
-                return ['status' => true, 'message' => "Client Update Successfully"];
+                $status = DB::table('tbl_client')->where('ClientID', $ClientID)->update($data);
+                
             } catch (\Exception $e) {
+            }
+            if($status){
+                DB::commit();
+                return ['status' => true, 'message' => "Client Update Successfully"];
+                
+            }else{
                 DB::rollback();
                 Log::error('Client Update Failed: ' . $e->getMessage());
                 return ['status' => false, 'message' => "Client Update Failed"];

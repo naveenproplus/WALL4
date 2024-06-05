@@ -19,7 +19,7 @@
     <meta name="theme-color" content="#ffffff">
 
 
-    <title>error | {{ config('app.name', 'Rajam Snacks') }}</title> <link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i&amp;display=swap" rel="stylesheet">
+    <title>error | {{ config('app.name', 'Wall 4') }}</title> <link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{url('/')}}/assets/css/fontawesome.css">
     <link rel="stylesheet" type="text/css" href="{{url('/')}}/assets/css/icofont.css">

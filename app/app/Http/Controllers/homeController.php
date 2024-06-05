@@ -28,6 +28,10 @@ class homeController extends Controller
             "TopClients"=>DB::table('tbl_client')->where('ClientType','Company')->get(),
             "Services"=>DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
             "FAQ"=> DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
+            "Employees"=> DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_designation AS D', 'D.DesignationID', '=', 'UI.DesignationID')
+                            ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)
+                            ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'D.Designation', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
+                            ->inRandomOrder()->get(),
 
         ];
     }
@@ -40,9 +44,6 @@ class homeController extends Controller
     public function AboutUsView(Request $req){
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "About Us";
-        $FormData['Employees'] = DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->whereNot('UI.Designation',"Admin")->whereNot('UI.Designation',"CEO")
-        ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'UI.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
-        ->inRandomOrder()->get();
         $FormData['Clients'] = DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->whereNot('C.Testimonial',NULL)->inRandomOrder()->get();
         $FormData['Projects'] =  DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)
                                 ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();      
@@ -51,16 +52,15 @@ class homeController extends Controller
     
     public function TeamsView(Request $req){
         $FormData = $this->FormData;
-        $FormData['PageTitle'] = "Teams";
-
-        $allEmployees = DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->whereNot('UI.Designation',"Admin")
-        ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'UI.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
-        ->orderBy('UI.CreatedOn', 'DESC')
-        ->get();
-
-        $FormData['Employees'] = $allEmployees->where('Designation','!=','CEO');
-        $FormData['CEO'] = $allEmployees->where('Designation','CEO')->first();
+        $FormData['PageTitle'] = "Teams";   
         
+        $FormData['CEO'] = $FormData['Employees']->where('Designation','CEO')->first();
+        $FormattedEmployees = [];
+        foreach ($FormData['Employees']->sortBy('Level') as $item) {
+            $FormattedEmployees[$item->Designation][] = $item;
+        }
+        $FormData['FormattedEmployees'] = $FormattedEmployees;
+
         return view('home.teams', $FormData);
     }
 
@@ -127,13 +127,20 @@ class homeController extends Controller
         $FormData['isEdit'] = true;
         $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug',$Slug)->value('PageName');
         $FormData['Clients'] = DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->whereNot('C.Testimonial',NULL)->inRandomOrder()->get();
-        $FormData['Employees'] = DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->whereNot('UI.Designation',"Admin")->whereNot('UI.Designation',"CEO")
-        ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' , DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
-        ->inRandomOrder()->get();
         $FormData['ProjectType'] = DB::table('tbl_project_type')->where('DFlag',0)->where('ActiveStatus',1)->get();
         $FormData['Projects'] =  DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)
                                 ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();
         return view('home.'.$Slug, $FormData);
+    }
+    public function PrivacyPolicyView(Request $req){
+        $FormData = $this->FormData;
+        $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->value('PageName');
+        $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->first();
+        if ($FormData['PageContent']) {
+            return view('home.privacy-policy', $FormData);
+        } else {
+            return view('errors.404');
+        }
     }
 
     public function ContactEnquirySave(Request $req){

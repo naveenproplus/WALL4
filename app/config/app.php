@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'WALL 4'),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://rajamsnacks.com/demo'),
+    'url' => env('APP_URL', ''),
 
     'asset_url' => env('ASSET_URL'),
 

@@ -262,7 +262,7 @@
 						</div>
 						<div class="col-md-6 text-center text-md-end"> 
 							<ul class="footer-link d-inline-block">
-								<li><a href="javascript:void(0);">Privacy Policy</a></li>
+								<li><a href="{{ url('/') }}/privacy-policy">Privacy Policy</a></li>
 								<li><a href="javascript:void(0);">Team & Condition</a></li>
 							</ul>	
 						</div>
@@ -534,7 +534,7 @@
 
 						$.ajax({
 							type: "post",
-							url: "{{ url('/') }}/admin/home/content/image-update",
+							url: "{{ url('/') }}/admin/home/content/image-update", 
 							headers: { 'X-CSRF-Token': $('meta[name=_token]').attr('content') },
 							data: formData,
 							processData: false,
@@ -637,7 +637,6 @@
 				
 				var imgSrc = editElement.attr('src');
 				var slug = editElement.attr('id');
-				var imgSrc = editElement.attr('src');
 				var styleAttr = editElement.attr('style');
 				
 				if (!imgSrc && styleAttr && styleAttr.includes('background-image')) {

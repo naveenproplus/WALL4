@@ -96,8 +96,8 @@ class employeesController extends Controller{
 	
 	public function Edit(Request $req,$UserID=null){
 		if($this->general->isCrudAllow($this->CRUD,"edit")==true){
-			$sql="Select UI.UserID,UI.FirstName,UI.LastName,UI.DOB,UI.Designation,UI.Level,UI.GenderID,UI.Address,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,U.RoleID,U.isLogin,UI.ProfileImage,UI.ActiveStatus From tbl_user_info as UI LEFT JOIN users AS U ON U.UserID=UI.UserID";
-			$sql.=" Where UI.DFlag=0 and UI.UserID='".$UserID."'";
+			$sql="Select UI.UserID,UI.FirstName,UI.LastName,UI.DOB,D.Designation,D.Level,UI.GenderID,UI.Address,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,U.RoleID,U.isLogin,UI.ProfileImage,UI.ActiveStatus From tbl_user_info as UI LEFT JOIN users AS U ON U.UserID=UI.UserID LEFT JOIN tbl_designation AS D ON D.DesignationID=UI.DesignationID";
+			$sql.=" Where D.DFlag=0 and D.ActiveStatus=1 and UI.DFlag=0 and UI.UserID='".$UserID."'";
 			$FormData=$this->general->UserInfo;
 			$FormData['ActiveMenuName']=$this->ActiveMenuName;
 			$FormData['PageTitle']=$this->PageTitle;
@@ -119,7 +119,7 @@ class employeesController extends Controller{
         return DB::Table('tbl_user_roles')->where('ActiveStatus',1)->where('DFlag',0)->where('isShow',1)->get();
     }
     public function getDesignation(request $req){
-        return DB::Table('tbl_user_info')->distinct('Designation')->select('Designation')->get();
+        return DB::Table('tbl_designation')->where('ActiveStatus',1)->where('DFlag',0)->get();
     }
 	public function Save(Request $req){
 		if($this->general->isCrudAllow($this->CRUD,"add")==true){
@@ -239,8 +239,7 @@ class employeesController extends Controller{
 						"LastName"=>$req->LastName,
 						"GenderID"=>$req->Gender,
 						"DOB"=>$req->DOB,
-						"Designation"=>$req->Designation,
-						"Level"=>$req->Level,
+						"DesignationID"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
 						"StateID"=>$req->State,
@@ -389,8 +388,7 @@ class employeesController extends Controller{
 						"LastName"=>$req->LastName,
 						"GenderID"=>$req->Gender,
 						"DOB"=>$req->DOB,
-						"Designation"=>$req->Designation,
-						"Level"=>$req->Level,
+						"DesignationID"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
 						"StateID"=>$req->State,
@@ -506,7 +504,7 @@ class employeesController extends Controller{
                 array( 'db' => 'U.Password', 'dt' => '6'),
 				array( 'db' => 'UI.ActiveStatus', 'dt' => '7' ),
 				array( 'db' => 'UI.UserID', 'dt' => '8'),
-				array( 'db' => 'UI.Designation', 'dt' => '9'),
+				array( 'db' => 'D.Designation', 'dt' => '9'),
 			);
 
 			$columns1 = array(
@@ -542,13 +540,13 @@ class employeesController extends Controller{
 			);
 			$data=array();
 			$data['POSTDATA']=$request;
-			$data['TABLE']=' tbl_user_info as UI LEFT JOIN users as U ON U.UserID=UI.UserID LEFT JOIN tbl_countries as C ON C.CountryID=UI.CountryID LEFT JOIN tbl_genders as G ON G.GID=UI.GenderID  LEFT JOIN tbl_states as S ON S.StateID=UI.StateID LEFT JOIN tbl_cities as CI ON CI.CityID=UI.CityID';
+			$data['TABLE']=' tbl_user_info as UI LEFT JOIN users as U ON U.UserID=UI.UserID LEFT JOIN tbl_countries as C ON C.CountryID=UI.CountryID LEFT JOIN tbl_genders as G ON G.GID=UI.GenderID  LEFT JOIN tbl_states as S ON S.StateID=UI.StateID LEFT JOIN tbl_cities as CI ON CI.CityID=UI.CityID LEFT JOIN tbl_designation AS D ON D.DesignationID=UI.DesignationID';
 			$data['PRIMARYKEY']='UI.UserID';
 			$data['COLUMNS']=$columns;
 			$data['COLUMNS1']=$columns1;
 			$data['GROUPBY']=null;
 			$data['WHERERESULT']=null;
-			$data['WHEREALL']=" UI.DFlag=0   and U.isShow=1 ";
+			$data['WHEREALL']=" D.DFlag=0 and D.ActiveStatus=1 and UI.DFlag=0 and U.isShow=1";
 			return $ServerSideProcess->SSP( $data);
 		}else{
 			return response(array('status'=>false,'message'=>"Access Denied"), 403);

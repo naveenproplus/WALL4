@@ -1,6 +1,33 @@
 @extends('home.home-layout')
 @section('home-content')
+<style>
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
 
+    .image-container img {
+        display: block;
+        width: 100%;
+    }
+
+    .center-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f80000;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+    .center-button:hover {
+        background-color: #f80000;
+        color: white;
+
+    }
+</style>
 <!-- Banner  -->
 <div class="slidearea bannerside">
     <div class="side-contact-info">
@@ -128,12 +155,21 @@
                                 <div class="testimonial-1">
                                     <div class="testimonial-info">
                                         <div class="flaticon-quotation quote-icon"></div>
-                                        <div class="testimonial-text">
-                                            <p>{{$item->Testimonial}}</p>
-                                        </div>
+                                        @if($item->Testimonial)
+                                            <div class="testimonial-text">
+                                                <p>{{$item->Testimonial}}</p>
+                                            </div>
+                                        @endif
+                                        @if($item->Thumbnail)
+                                            <div class="image-container">
+                                                <img src="{{ url('/') }}/{{$item->Thumbnail}}" alt="Testimonial Image">
+                                                <a href="{{ $item->VideoURL ?? '#' }}" type="button" target="_blank" class="btn center-button"><i class="fa fa-play"></i></a>
+
+                                            </div>
+                                        @endif
                                         <div class="testimonial-detail">
-                                            <h4 class="testimonial-name">{{$item->Name}}</h4> 
-                                            <span class="testimonial-position text-primary">{{$item->CityName }}</span> 
+                                            <h4 class="testimonial-name">{{$item->Name}}</h4>
+                                            <span class="testimonial-position text-primary">{{$item->CityName }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -176,7 +212,7 @@
     <div class="container-fluid">
         <div class="swiper-container swiper-team">
             <div class="swiper-wrapper">
-                @foreach($Employees as $emp)
+                @foreach($Employees->where('Designation','!=',"CEO") as $emp)
                     <div class="swiper-slide">
                         <div class="card dz-team style-1">
                             <div class="card-media">

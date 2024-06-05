@@ -705,7 +705,6 @@
                 getCategory();
                 getTax();
                 getUOM();
-                initCKEditor();
             }
             const getCategory = async () => {
                 $('#lstCategory').select2('destroy');

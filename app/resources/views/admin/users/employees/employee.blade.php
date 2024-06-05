@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="lstGender">Gender <span class="required">*</span></label>
+                                        <label for="lstGender">Gender {{-- <span class="required">*</span> --}}</label>
                                         <select class="form-control select2" id="lstGender" data-selected="<?php if($isEdit){ echo $EditData[0]->GenderID;} ?>">
                                             <option value="">Select a Gender</option>
                                         </select>
@@ -127,14 +127,13 @@
                                         <span class="errors err-sm" id="lstDesignation-err"></span>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                {{-- <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="lstLevel">Level <span class="required">*</span></label>
                                         <select class="form-control select2" id="lstLevel" data-selected="<?php if($isEdit){ echo $EditData[0]->Level;} ?>">
                                             @if($isEdit && $EditData[0]->Designation == 'CEO') 
                                                 <option value="1" selected >1</option> 
                                             @else
-                                                {{-- <option value="">Select a Level</option> --}}
                                                 <option value="2" @if($isEdit && $EditData[0]->Level == '2') selected @endif>2</option>
                                                 <option value="3" @if($isEdit && $EditData[0]->Level == '3') selected @endif>3</option>
                                                 <option value="4" @if($isEdit && $EditData[0]->Level == '4') selected @endif>4</option>
@@ -144,7 +143,7 @@
                                         </select>
                                         <span class="errors err-sm" id="lstLevel-err"></span>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="txtEmail">Email <span class="fs-10 fw-500" style="color:#ab9898">(User Name) </span> <span class="required">*</span></label>
@@ -413,7 +412,7 @@
                         if(Item.Designation){
                             let selected="";
                             if(Item.Designation==$('#lstDesignation').attr('data-selected')){selected="selected";}
-                            $('#lstDesignation').append('<option '+selected+' value="'+Item.Designation+'">'+Item.Designation+' </option>');
+                            $('#lstDesignation').append('<option '+selected+' value="'+Item.DesignationID+'">'+Item.Designation+' </option>');
                         }
                     }
                     $('#lstDesignation').select2({tags: true});
@@ -575,9 +574,9 @@
 					$('#txtLastName-err').html('The Last Name is not greater than 50 characters.');status=false;
 				}
 			}
-            if(Gender==""){
+            /* if(Gender==""){
                 $('#lstGender-err').html('Gender is required');status=false;
-            }
+            } */
             if(UserRole==""){
                 $('#lstUserRole-err').html('User Role is required');status=false;
             }

@@ -167,6 +167,7 @@ const UploadImages = async () => {
             const uploadComplete=async(e, x, settings, exception)=>{
                 completed++;
                 let percentage=(100*completed)/count;
+                console.log(percentage);
                 $('#divProcessText').html(percentage + '% Completed. Please wait for until upload process complete.');
                 checkUploadCompleted();
             }

@@ -13,15 +13,15 @@
 		<meta name="_token" content="{{ csrf_token() }}"/>
 		
 
-		<link rel="apple-touch-icon" sizes="180x180" href="{{url('/')}}/assets/images/favicon/apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="{{url('/')}}/assets/images/favicon/favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="{{url('/')}}/assets/images/favicon/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="{{url('/')}}/assets/images/favicon/apple-touch-icon.png"> 
+		<link rel="icon" type="image/png" href="{{ url('/') }}/assets/images/logo/icon.png">
+
 		<link rel="manifest" href="{{url('/')}}/assets/images/favicon/site.webmanifest">
 		<meta name="msapplication-TileColor" content="#8e4684">
 		<meta name="theme-color" content="#ffffff">
     <!-- Required meta tags -->
 
-		<title>Login - {{ config('app.name', 'Rajam Snacks') }}</title>
+		<title>Login - {{ config('app.name', 'Wall 4') }}</title>
 		<!-- Google font-->
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i&amp;display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700&amp;display=swap" rel="stylesheet">
