@@ -29,7 +29,7 @@ class homeController extends Controller
             "Services"=>DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
             "FAQ"=> DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
             "Employees"=> DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_designation AS D', 'D.DesignationID', '=', 'UI.DesignationID')
-                            ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)
+                            ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
                             ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'D.Designation', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
                             ->inRandomOrder()->get(),
 
