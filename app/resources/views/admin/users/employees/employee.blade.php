@@ -112,7 +112,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="lstUserRole">Role <span class="required">*</span></label>
-                                        <select class="form-control select2Tag" id="lstUserRole" data-selected="<?php if($isEdit){ echo $EditData[0]->RoleID;} ?>">
+                                        <select class="form-control select2" id="lstUserRole" data-selected="<?php if($isEdit){ echo $EditData[0]->RoleID;} ?>">
                                             <option value="">Select a Role</option>
                                         </select>
                                         <span class="errors err-sm" id="lstUserRole-err"></span>
@@ -121,7 +121,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="lstDesignation">Designation <span class="required">*</span></label>
-                                        <select class="form-control select2Tag" id="lstDesignation" data-selected="<?php if($isEdit){ echo $EditData[0]->Designation;} ?>">
+                                        <select class="form-control select2" id="lstDesignation" data-selected="<?php if($isEdit){ echo $EditData[0]->Designation;} ?>">
                                             <option value="">Select a Designation</option>
                                         </select>
                                         <span class="errors err-sm" id="lstDesignation-err"></span>
@@ -629,10 +629,10 @@
 			formData.append('LoginStatus',$('#lstLoginStatus').val());
 			formData.append('Address',$('#txtAddress').val());
 			formData.append('City',$('#lstCity').val());
-			formData.append('State',$('#lstState').val());
-			formData.append('Country',$('#lstCountry').val());
-			formData.append('PostalCode',$('#lstPostalCode').val());
-			formData.append('PostalCode1',$('#lstPostalCode option:selected').text());
+			formData.append('StateID',$('#lstState').val());
+			formData.append('CountryID',$('#lstCountry').val());
+			formData.append('PostalCodeID',$('#lstPostalCode').val());
+			formData.append('PostalCode',$('#lstPostalCode option:selected').text());
 			formData.append('EMail',$('#txtEmail').val());
 			formData.append('MobileNumber',$('#txtMobileNumber').val());
             @if($isEdit==false)

@@ -15,6 +15,7 @@ use DB;
 use Auth;
 use Hash;
 use cruds;
+use Helper;
 use App\Rules\ValidUnique;
 use App\Rules\ValidDB;
 use App\Http\Controllers\admin\logController;
@@ -272,7 +273,7 @@ class contentController extends Controller{
 					$dir = "uploads/home/content/";
 					if (!file_exists($dir)) {mkdir($dir, 0777, true);}
 					$file = $req->file('croppedImage');
-					$fileName1 =  $slug. "." . $file->getClientOriginalExtension();
+					$fileName1 =  Helper::RandomString(10). "." . $file->getClientOriginalExtension();
 					$file->move($dir, $fileName1);
 					$ImageUrl=$dir.$fileName1;
 				}

@@ -12,6 +12,7 @@ use App\Models\general;
 use App\Models\ServerSideProcess;
 use DB;
 use Auth;
+use Helper;
 use Illuminate\Support\Facades\Hash;
 use App\Rules\ValidUnique;
 use App\Rules\ValidDB;
@@ -80,7 +81,7 @@ class profilecontroller extends Controller{
 
 		$OldData=$NewData=array();
 			if($req->PostalCodeID==$req->PostalCode){ 
-				$req->PostalCodeID=$this->general->Check_and_Create_PostalCode($req->PostalCode,$req->CountryID,$req->StateID,$this->DocNum);
+				$req->merge(['PostalCodeID' => $this->general->Check_and_Create_PostalCode($req->PostalCode,$req->CountryID,$req->StateID,$this->DocNum)]);
 			}
 			$ValidDB=array();
 			$ValidDB['City']['TABLE']="tbl_cities";

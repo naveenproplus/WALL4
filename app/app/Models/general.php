@@ -269,8 +269,10 @@ class general extends Model{
 	public function Check_and_Create_PostalCode($PostalCode,$CountryID,$StateID,$DocNumModel){
 		$PostalCodeID="";
 		
-		$result=DB::Table('tbl_postalcodes')->where('PostalCode',$PostalCode)->get();
-		if(count($result)<=0){
+		$result=DB::Table('tbl_postalcodes')->where('PostalCode',$PostalCode)->first();
+		if($result){
+			$PostalCodeID=$result->PID;
+		}else{
 			$PostalCodeID=$this->DocNum->getDocNum("POSTAL-CODE");
 			$data=array(
 				"PID"=>$PostalCodeID,
@@ -283,14 +285,12 @@ class general extends Model{
 			$result=DB::Table('tbl_postalcodes')->insert($data);
 
 			if($result==true){
-				$DocNumModel = $this->DocNum->updateDocNum("POSTAL-CODE");
-				$result1=DB::Table('tbl_postalcodes')->where('PostalCode',$PostalCode)->get();
-				if(count($result1)>0){
-					$PostalCodeID=$result1[0]->PID;
+				$this->DocNum->updateDocNum("POSTAL-CODE");
+				$result1=DB::Table('tbl_postalcodes')->where('PostalCode',$PostalCode)->first();
+				if($result1){
+					$PostalCodeID=$result1->PID;
 				}
 			}
-		}else{
-			$PostalCodeID=$result[0]->PID;
 		}
 		return $PostalCodeID;
 	}

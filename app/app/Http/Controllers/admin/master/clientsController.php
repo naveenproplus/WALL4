@@ -13,6 +13,7 @@ use App\Rules\ValidUnique;
 use Auth;
 use cruds;
 use DB;
+use Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -138,24 +139,24 @@ class ClientsController extends Controller
             $ValidDB['City']['TABLE'] = "tbl_cities";
             $ValidDB['City']['ErrMsg'] = "City name does  not exist";
             $ValidDB['City']['WHERE'][] = array("COLUMN" => "CityID", "CONDITION" => "=", "VALUE" => $req->City);
-            $ValidDB['City']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->State);
-            $ValidDB['City']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['City']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->StateID);
+            $ValidDB['City']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //States
             $ValidDB['State']['TABLE'] = "tbl_states";
             $ValidDB['State']['ErrMsg'] = "State name does  not exist";
-            $ValidDB['State']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->State);
-            $ValidDB['State']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['State']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->StateID);
+            $ValidDB['State']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //Country
             $ValidDB['Country']['TABLE'] = "tbl_countries";
             $ValidDB['Country']['ErrMsg'] = "Country name  does not exist";
-            $ValidDB['Country']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['Country']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //Postal Code
             $ValidDB['PostalCode']['TABLE'] = "tbl_postalcodes";
             $ValidDB['PostalCode']['ErrMsg'] = "Postal Code  does not exist";
-            $ValidDB['PostalCode']['WHERE'][] = array("COLUMN" => "PID", "CONDITION" => "=", "VALUE" => $req->PostalCode);
+            $ValidDB['PostalCode']['WHERE'][] = array("COLUMN" => "PID", "CONDITION" => "=", "VALUE" => $req->PostalCodeID);
 
             //Gender
             $ValidDB['Gender']['TABLE'] = "tbl_genders";
@@ -166,11 +167,11 @@ class ClientsController extends Controller
                 'Name' => 'required|min:3|max:50',
                 'Address' => 'required|min:10',
                 'MobileNumber' => ['required', new ValidUnique(array("TABLE" => "users", "WHERE" => " EMail='" . $req->MobileNumber . "' "), "This Mobile Number is already taken.")],
-                'Gender' => ['required', new ValidDB($ValidDB['Gender'])],
-                'State' => ['required', new ValidDB($ValidDB['State'])],
+                // 'Gender' => ['required', new ValidDB($ValidDB['Gender'])],
+                'StateID' => ['required', new ValidDB($ValidDB['State'])],
                 'City' => ['required', new ValidDB($ValidDB['City'])],
-                'Country' => ['required', new ValidDB($ValidDB['Country'])],
-                'PostalCode' => ['required', new ValidDB($ValidDB['PostalCode'])],
+                'CountryID' => ['required', new ValidDB($ValidDB['Country'])],
+                'PostalCodeID' => ['required', new ValidDB($ValidDB['PostalCode'])],
 
             );
             $message = array(
@@ -200,9 +201,9 @@ class ClientsController extends Controller
                         "Testimonial" => $req->Testimonial,
                         "VideoURL" => $req->VideoURL,
                         "CityID" => $req->City,
-                        "StateID" => $req->State,
-                        "CountryID" => $req->Country,
-                        "PostalCodeID" => $req->PostalCode,
+                        "StateID" => $req->StateID,
+                        "CountryID" => $req->CountryID,
+                        "PostalCodeID" => $req->PostalCodeID,
                         "Email" => $req->EMail,
                         "MobileNumber" => $req->MobileNumber,
                         "ActiveStatus" => $req->ActiveStatus,
@@ -275,24 +276,24 @@ class ClientsController extends Controller
             $ValidDB['City']['TABLE'] = "tbl_cities";
             $ValidDB['City']['ErrMsg'] = "City name does  not exist";
             $ValidDB['City']['WHERE'][] = array("COLUMN" => "CityID", "CONDITION" => "=", "VALUE" => $req->City);
-            $ValidDB['City']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->State);
-            $ValidDB['City']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['City']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->StateID);
+            $ValidDB['City']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //States
             $ValidDB['State']['TABLE'] = "tbl_states";
             $ValidDB['State']['ErrMsg'] = "State name does  not exist";
-            $ValidDB['State']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->State);
-            $ValidDB['State']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['State']['WHERE'][] = array("COLUMN" => "StateID", "CONDITION" => "=", "VALUE" => $req->StateID);
+            $ValidDB['State']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //Country
             $ValidDB['Country']['TABLE'] = "tbl_countries";
             $ValidDB['Country']['ErrMsg'] = "Country name  does not exist";
-            $ValidDB['Country']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->Country);
+            $ValidDB['Country']['WHERE'][] = array("COLUMN" => "CountryID", "CONDITION" => "=", "VALUE" => $req->CountryID);
 
             //Postal Code
             $ValidDB['PostalCode']['TABLE'] = "tbl_postalcodes";
             $ValidDB['PostalCode']['ErrMsg'] = "Postal Code  does not exist";
-            $ValidDB['PostalCode']['WHERE'][] = array("COLUMN" => "PID", "CONDITION" => "=", "VALUE" => $req->PostalCode);
+            $ValidDB['PostalCode']['WHERE'][] = array("COLUMN" => "PID", "CONDITION" => "=", "VALUE" => $req->PostalCodeID);
 
             //Gender
             $ValidDB['Gender']['TABLE'] = "tbl_genders";
@@ -302,11 +303,11 @@ class ClientsController extends Controller
             // Validation rules
             $rules = [
                 'Name' => 'required|min:3|max:50',
-                'Gender' => 'required|exists:tbl_genders,GID',
-                'State' => 'required|exists:tbl_states,StateID',
+                // 'Gender' => 'required|exists:tbl_genders,GID',
+                'StateID' => 'required|exists:tbl_states,StateID',
                 'City' => 'required|exists:tbl_cities,CityID',
-                'Country' => 'required|exists:tbl_countries,CountryID',
-                'PostalCode' => 'required|exists:tbl_postalcodes,PID',
+                'CountryID' => 'required|exists:tbl_countries,CountryID',
+                'PostalCodeID' => 'required|exists:tbl_postalcodes,PID',
             ];
 
             // Perform validation
@@ -328,9 +329,9 @@ class ClientsController extends Controller
                     "Testimonial" => $req->Testimonial,
                     "VideoURL" => $req->VideoURL,
                     "CityID" => $req->City,
-                    "StateID" => $req->State,
-                    "CountryID" => $req->Country,
-                    "PostalCodeID" => $req->PostalCode,
+                    "StateID" => $req->StateID,
+                    "CountryID" => $req->CountryID,
+                    "PostalCodeID" => $req->PostalCodeID,
                     "Email" => $req->EMail,
                     "MobileNumber" => $req->MobileNumber,
                     "ActiveStatus" => $req->ActiveStatus,

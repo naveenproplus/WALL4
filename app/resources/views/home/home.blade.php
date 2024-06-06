@@ -1,11 +1,23 @@
 @extends('home.home-layout')
 @section('home-content')
+<style>
+	.video-bx.content-media.style-2 {
+		position: relative;
+		width: 100%;
+		margin: 0 auto;
+	}
 
+	.video-bx.content-media.style-2 video {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+</style>
 <!-- Slider -->
 		<div class="slidearea">
 			<div class="side-contact-info">
 				<ul>
-					<li><i class="fas fa-phone-alt"></i> +91 {{$Company['Mobile-Number']}}</li>
+					<li><i class="fas fa-phone-alt"></i>+91 {{$Company['Phone-Number']}}</li>
 					<li><i class="fas fa-envelope"></i> {{$Company['Email']}}</li>
 				</ul>
 			</div>
@@ -112,6 +124,10 @@
 							<div class="video-btn aos-item" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="400">
 								<a href="{{$Company['youtube-url']}}" class="popup-youtube" target="_blank"><i class="fas fa-play"></i></a>
 							</div>
+							{{-- <video controls autoplay muted>
+								<source src="uploads/home/videos/intro-video.mp4" type="video/mp4" id="IntroVideo">
+							</video> --}}
+							
 						</div>
 					</div>
 				</div>

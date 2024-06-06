@@ -32,11 +32,11 @@
 <div class="slidearea bannerside">
     <div class="side-contact-info">
         <ul>
-            <li><i class="fas fa-phone-alt"></i>{{$Company['Phone-Number']}}</li>
+            <li><i class="fas fa-phone-alt"></i>+91 {{$Company['Phone-Number']}}</li>
             <li><i class="fas fa-envelope"></i>{{$Company['Email']}}</li>
         </ul>
     </div>
-    <div class="dz-bnr-inr style-1 overlay-left edit-content" id="img-about-us-bnr" style="background-image: url({{url('/')}}/assets/home/images/banner/bnr3.jpg);">
+    <div class="dz-bnr-inr style-1 overlay-left edit-content" id="img-about-us-bnr" style="background-image: url({{url('/')}}/{{$Contents['img-about-us-bnr']}});">
         <div class="container-fluid">
             <div class="dz-bnr-inr-entry">
                 <h1>{{$PageTitle}}</h1>

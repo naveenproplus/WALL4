@@ -5,7 +5,7 @@
 <div class="slidearea bannerside">
     <div class="side-contact-info">
         <ul>
-            <li><i class="fas fa-phone-alt"></i>{{$Company['Phone-Number']}}</li>
+            <li><i class="fas fa-phone-alt"></i>+91 {{$Company['Phone-Number']}}</li>
             <li><i class="fas fa-envelope"></i>{{$Company['Email']}}</li>
         </ul>
     </div>
@@ -104,7 +104,7 @@
                 <div class="col-md-8">
                     <div class="section-head style-1">
                         <h6 class="sub-title text-primary">{{$key}}</h6>
-                        <h2 class="title">{{$key}}</h2>
+                        {{-- <h2 class="title">{{$key}}</h2> --}}
                     </div>
                 </div>
             </div>
@@ -112,7 +112,7 @@
     @endif
         <div class="container-fluid">
             <div class="swiper-container swiper-team">
-                <div class="swiper-wrapper d-flex justify-content-center">
+                <div class="swiper-wrapper justify-content-center">
                     @foreach($item as $emp)
                         <div class="swiper-slide">
                             <div class="card dz-team style-1">

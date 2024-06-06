@@ -119,7 +119,7 @@ class employeesController extends Controller{
         return DB::Table('tbl_user_roles')->where('ActiveStatus',1)->where('DFlag',0)->where('isShow',1)->get();
     }
     public function getDesignation(request $req){
-        return DB::Table('tbl_designation')->where('ActiveStatus',1)->where('DFlag',0)->get();
+        return DB::Table('tbl_designation')->whereNot('Designation','CEO')->where('ActiveStatus',1)->where('DFlag',0)->get();
     }
 	public function Save(Request $req){
 		if($this->general->isCrudAllow($this->CRUD,"add")==true){
@@ -133,24 +133,24 @@ class employeesController extends Controller{
 			$ValidDB['City']['TABLE']="tbl_cities";
 			$ValidDB['City']['ErrMsg']="City name does  not exist";
 			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CityID","CONDITION"=>"=","VALUE"=>$req->City);
-			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->State);
-			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->StateID);
+			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//States
 			$ValidDB['State']['TABLE']="tbl_states";
 			$ValidDB['State']['ErrMsg']="State name does  not exist";
-			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->State);
-			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->StateID);
+			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//Country
 			$ValidDB['Country']['TABLE']="tbl_countries";
 			$ValidDB['Country']['ErrMsg']="Country name  does not exist";
-			$ValidDB['Country']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['Country']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//Postal Code
 			$ValidDB['PostalCode']['TABLE']="tbl_postalcodes";
 			$ValidDB['PostalCode']['ErrMsg']="Postal Code  does not exist";
-			$ValidDB['PostalCode']['WHERE'][]=array("COLUMN"=>"PID","CONDITION"=>"=","VALUE"=>$req->PostalCode);
+			$ValidDB['PostalCode']['WHERE'][]=array("COLUMN"=>"PID","CONDITION"=>"=","VALUE"=>$req->PostalCodeID);
 			
 			//Gender
 			$ValidDB['Gender']['TABLE']="tbl_genders";
@@ -170,11 +170,11 @@ class employeesController extends Controller{
 				'LastName' =>'max:50',
 				//'Address' => 'required|min:10',
 				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"users","WHERE"=>" EMail='".$req->MobileNumber."' "),"This Mobile Number is already taken.")],
-				'Gender'=>['required',new ValidDB($ValidDB['Gender'])],
-				'State'=>['required',new ValidDB($ValidDB['State'])],
+				// 'Gender'=>['required',new ValidDB($ValidDB['Gender'])],
+				'StateID'=>['required',new ValidDB($ValidDB['State'])],
 				'City'=>['required',new ValidDB($ValidDB['City'])],
-				'Country'=>['required',new ValidDB($ValidDB['Country'])],
-				'PostalCode'=>['required',new ValidDB($ValidDB['PostalCode'])],
+				'CountryID'=>['required',new ValidDB($ValidDB['Country'])],
+				'PostalCodeID'=>['required',new ValidDB($ValidDB['PostalCode'])],
 				'Password' =>'required|min:3|max:20',
 				'ConfirmPassword' =>'required|min:3|max:20|same:Password',
 			);
@@ -242,9 +242,9 @@ class employeesController extends Controller{
 						"DesignationID"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
-						"StateID"=>$req->State,
-						"CountryID"=>$req->Country,
-						"PostalCodeID"=>$req->PostalCode,
+						"StateID"=>$req->StateID,
+						"CountryID"=>$req->CountryID,
+						"PostalCodeID"=>$req->PostalCodeID,
 						"Email"=>$req->EMail,
 						"MobileNumber"=>$req->MobileNumber,
 						"ProfileImage"=>$ProfileImage,
@@ -290,24 +290,24 @@ class employeesController extends Controller{
 			$ValidDB['City']['TABLE']="tbl_cities";
 			$ValidDB['City']['ErrMsg']="City name does  not exist";
 			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CityID","CONDITION"=>"=","VALUE"=>$req->City);
-			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->State);
-			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->StateID);
+			$ValidDB['City']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//States
 			$ValidDB['State']['TABLE']="tbl_states";
 			$ValidDB['State']['ErrMsg']="State name does  not exist";
-			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->State);
-			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"StateID","CONDITION"=>"=","VALUE"=>$req->StateID);
+			$ValidDB['State']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//Country
 			$ValidDB['Country']['TABLE']="tbl_countries";
 			$ValidDB['Country']['ErrMsg']="Country name  does not exist";
-			$ValidDB['Country']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->Country);
+			$ValidDB['Country']['WHERE'][]=array("COLUMN"=>"CountryID","CONDITION"=>"=","VALUE"=>$req->CountryID);
 			
 			//Postal Code
 			$ValidDB['PostalCode']['TABLE']="tbl_postalcodes";
-			$ValidDB['PostalCode']['ErrMsg']="Postal Code  does not exist";
-			$ValidDB['PostalCode']['WHERE'][]=array("COLUMN"=>"PID","CONDITION"=>"=","VALUE"=>$req->PostalCode);
+			$ValidDB['PostalCode']['ErrMsg']="Postal Code does not exist";
+			$ValidDB['PostalCode']['WHERE'][]=array("COLUMN"=>"PID","CONDITION"=>"=","VALUE"=>$req->PostalCodeID);
 			
 			//Gender
 			$ValidDB['Gender']['TABLE']="tbl_genders";
@@ -327,10 +327,10 @@ class employeesController extends Controller{
 				'LastName' =>'max:50',
 				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"users","WHERE"=>" email='".$req->MobileNumber."'  and UserID<>'".$UserID."' "),"This Mobile Number is already taken.")],
 				'Gender'=>['required',new ValidDB($ValidDB['Gender'])],
-				'State'=>['required',new ValidDB($ValidDB['State'])],
+				'StateID'=>['required',new ValidDB($ValidDB['State'])],
 				'City'=>['required',new ValidDB($ValidDB['City'])],
-				'Country'=>['required',new ValidDB($ValidDB['Country'])],
-				'PostalCode'=>['required',new ValidDB($ValidDB['PostalCode'])],
+				'CountryID'=>['required',new ValidDB($ValidDB['Country'])],
+				'PostalCodeID'=>['required',new ValidDB($ValidDB['PostalCode'])],
 			);
 			$message=array(
 			);
@@ -391,9 +391,9 @@ class employeesController extends Controller{
 						"DesignationID"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
-						"StateID"=>$req->State,
-						"CountryID"=>$req->Country,
-						"PostalCodeID"=>$req->PostalCode,
+						"StateID"=>$req->StateID,
+						"CountryID"=>$req->CountryID,
+						"PostalCodeID"=>$req->PostalCodeID,
 						"Email"=>$req->EMail,
 						"MobileNumber"=>$req->MobileNumber,
 						"ActiveStatus"=>$req->ActiveStatus,

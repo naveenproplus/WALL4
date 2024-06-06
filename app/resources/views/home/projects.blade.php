@@ -5,7 +5,7 @@
 <div class="slidearea bannerside">
 	<div class="side-contact-info">
 		<ul>
-            <li><i class="fas fa-phone-alt"></i>{{$Company['Phone-Number']}}</li>
+            <li><i class="fas fa-phone-alt"></i>+91 {{$Company['Phone-Number']}}</li>
             <li><i class="fas fa-envelope"></i>{{$Company['Email']}}</li>
 		</ul>
 	</div>

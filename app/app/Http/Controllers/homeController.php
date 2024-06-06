@@ -132,7 +132,7 @@ class homeController extends Controller
                                 ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();
         return view('home.'.$Slug, $FormData);
     }
-    public function PrivacyPolicyView(Request $req){
+    public function PrivacyPolicyView(Request $req){ return view('errors.404');
         $FormData = $this->FormData;
         $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->value('PageName');
         $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->first();

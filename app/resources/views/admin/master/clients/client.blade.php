@@ -127,7 +127,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="lstGender">Gender <span class="required">*</span></label>
+                                            <label for="lstGender">Gender </label>
                                             <select class="form-control select2" id="lstGender"
                                                 data-selected="<?php if ($isEdit) {
                                                     echo $EditData[0]->GenderID;
@@ -704,10 +704,10 @@
                         status = false;
                     }
                 }
-                if (Gender == "") {
+                /* if (Gender == "") {
                     $('#lstGender-err').html('Gender is required');
                     status = false;
-                }
+                } */
 
                 if (Country == "") {
                     $('#lstCountry-err').html('Country is required');
@@ -750,10 +750,10 @@
                 formData.append('ActiveStatus', $('#lstActiveStatus').val());
                 formData.append('Address', $('#txtAddress').val());
                 formData.append('City', $('#lstCity').val());
-                formData.append('State', $('#lstState').val());
-                formData.append('Country', $('#lstCountry').val());
-                formData.append('PostalCode', $('#lstPostalCode').val());
-                formData.append('PostalCode1', $('#lstPostalCode option:selected').text());
+                formData.append('StateID', $('#lstState').val());
+                formData.append('CountryID', $('#lstCountry').val());
+                formData.append('PostalCodeID', $('#lstPostalCode').val());
+                formData.append('PostalCode', $('#lstPostalCode option:selected').text());
                 formData.append('EMail', $('#txtEmail').val());
                 formData.append('MobileNumber', $('#txtMobileNumber').val());
                 formData.append('Testimonial', $('#txtTestimonial').val());

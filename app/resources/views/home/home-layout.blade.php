@@ -262,7 +262,7 @@
 						</div>
 						<div class="col-md-6 text-center text-md-end"> 
 							<ul class="footer-link d-inline-block">
-								<li><a href="{{ url('/') }}/privacy-policy">Privacy Policy</a></li>
+								<li><a href="{{-- {{ url('/') }}/privacy-policy --}}javascript:void(0);">Privacy Policy</a></li>
 								<li><a href="javascript:void(0);">Team & Condition</a></li>
 							</ul>	
 						</div>
@@ -390,7 +390,9 @@
 				$('.DZ-bt-buy-now').remove();
 				$('.DZ-bt-support-now').remove();
 				@if(!$isEdit && !isset($PageTitle))
-				setTimeout(() => {$('.free-quote').click();}, 2000);
+					/* var video = $('#IntroVideo');
+					video.play(); */
+					setTimeout(() => {$('.free-quote').click();}, 2000);
 				@endif
 				clearInterval(checkExist);
 			}
