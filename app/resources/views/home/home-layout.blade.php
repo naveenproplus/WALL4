@@ -207,7 +207,7 @@
 							<div class="row">
 								<div class="col-md-12 aos-item" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
 									<div class="footer-logo logo-light">
-										<a href="#"><img src="{{$Company['Logo-Light']}}" alt="Footer Logo"></a>
+										<a href="#"><img src="{{ url('/') }}/{{$Company['Logo-Light']}}" alt="Footer Logo"></a>
 									</div>
 								</div>	
 								<div class="col-md-5 col-sm-6 aos-item" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">

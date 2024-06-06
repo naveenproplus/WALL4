@@ -9,7 +9,7 @@
             <li><i class="fas fa-envelope"></i>{{$Company['Email']}}</li>
 		</ul>
 	</div>
-	<div class="dz-bnr-inr style-1 overlay-left" style="background-image: url({{url('/')}}/assets/home/images/banner/bnr8.jpg);">
+	<div class="dz-bnr-inr style-1 overlay-left edit-content" id="img-project-bnr" style="background-image: url({{url('/')}}/{{$Contents['img-project-bnr']}});">
 		<div class="container-fluid">
 			<div class="dz-bnr-inr-entry">
 				<h1>{{$PageTitle}}</h1>

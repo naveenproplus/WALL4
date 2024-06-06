@@ -266,14 +266,13 @@ class contentController extends Controller{
 			DB::beginTransaction();
 			$status=false;
 			try{
-				$slug = $req->Slug;
 				$ImageUrl= "";
 
 				if ($req->hasFile('croppedImage')) {
 					$dir = "uploads/home/content/";
 					if (!file_exists($dir)) {mkdir($dir, 0777, true);}
 					$file = $req->file('croppedImage');
-					$fileName1 =  Helper::RandomString(10). "." . $file->getClientOriginalExtension();
+					$fileName1 =  $req->Slug . "-" . Helper::RandomString(10) . "." . $file->getClientOriginalExtension();
 					$file->move($dir, $fileName1);
 					$ImageUrl=$dir.$fileName1;
 				}
@@ -283,7 +282,7 @@ class contentController extends Controller{
 						$TranNo=$this->DocNum->getDocNum("Home-Content");
 						$data=[
 							"TranNo"=>$TranNo,
-							"Slug"=>$slug,
+							"Slug"=>$req->Slug,
 							"Content"=>$ImageUrl,
 							"CreatedBy"=>$this->UserID
 						];
