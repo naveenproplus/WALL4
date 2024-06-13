@@ -132,12 +132,22 @@ class homeController extends Controller
                                 ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();
         return view('home.'.$Slug, $FormData);
     }
-    public function PrivacyPolicyView(Request $req){ return view('errors.404');
+    public function PrivacyPolicyView(Request $req){
         $FormData = $this->FormData;
         $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->value('PageName');
         $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->first();
         if ($FormData['PageContent']) {
             return view('home.privacy-policy', $FormData);
+        } else {
+            return view('errors.404');
+        }
+    }
+    public function TermsAndConditionsView(Request $req){
+        $FormData = $this->FormData;
+        $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->value('PageName');
+        $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->first();
+        if ($FormData['PageContent']) {
+            return view('home.terms-and-conditions', $FormData);
         } else {
             return view('errors.404');
         }

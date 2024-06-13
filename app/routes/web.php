@@ -30,7 +30,7 @@ Route::controller(homeController::class)->group(function () {
     Route::get('/projects/{Slug}', 'ProjectDetailsView');
     Route::get('/get/faq', 'getFaq');
     Route::get('/services/{Slug}', 'ServicesDetailsView');
-    Route::get('/terms-and-conditions', 'termsAndConditions');
+    Route::get('/terms-and-conditions', 'TermsAndConditionsView');
     Route::get('/privacy-policy', 'PrivacyPolicyView');
     Route::get('/help', 'help');
     Route::get('/teams', 'TeamsView');

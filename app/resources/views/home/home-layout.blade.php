@@ -90,6 +90,15 @@
 						<div class="extra-nav">
 							<div class="extra-cell">
 								<div class="extra-icon-box w-auto">
+									<li><a href="{{$Company['youtube']}}" target="_blank"><i style="background-color: #ec1414" class="fab fa-youtube"></i></a></li>
+								</div>
+								<div class="extra-icon-box w-auto">
+									<li><a href="{{$Company['facebook']}}" target="_blank" ><i style="background-color: #1877F2" class="fab fa-facebook-f"></i></a></li>
+								</div>
+								<div class="extra-icon-box w-auto">
+									<li><a href="{{$Company['instagram']}}" target="_blank"><i style="background-color: #dd30c6" class="fab fa-instagram"></i></a></li>
+								</div>
+								<div class="extra-icon-box w-auto">
 									<i class="fas fa-map-marker-alt"></i>
 									<h6 class="title">{{$Company['CityName']}} - {{$Company['PostalCode']}}</h6>
 								</div>
@@ -262,8 +271,8 @@
 						</div>
 						<div class="col-md-6 text-center text-md-end"> 
 							<ul class="footer-link d-inline-block">
-								<li><a href="{{-- {{ url('/') }}/privacy-policy --}}javascript:void(0);">Privacy Policy</a></li>
-								<li><a href="javascript:void(0);">Team & Condition</a></li>
+								<li><a href="{{ url('/') }}/privacy-policy">Privacy Policy</a></li>
+								<li><a href="{{ url('/') }}/terms-and-conditions">Terms & Conditions</a></li>
 							</ul>	
 						</div>
 					</div>
