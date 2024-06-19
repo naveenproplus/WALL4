@@ -121,7 +121,7 @@
                                 </div>
                                 <div class="card-body">
                                     <h5 class="dz-name m-b5"><a href="javascript:void(0);">{{$emp->FirstName}} {{$emp->LastName ?? $emp->LastName}}</a></h5>
-                                    <span class="dz-position">{{$emp->Designation}}</span>
+                                    <span class="dz-position">{{$emp->Designation ?? $emp->Dept}}</span>
                                 <ul class="dz-social">
                                         <li><a href="javascript:void(0);"><i class="fab fa-skype"></i></a></li>
                                         <li><a href="javascript:void(0);"><i class="fab fa-facebook"></i></a></li>

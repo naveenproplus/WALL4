@@ -28,9 +28,9 @@ class homeController extends Controller
             "TopClients"=>DB::table('tbl_client')->where('ClientType','Company')->get(),
             "Services"=>DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
             "FAQ"=> DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
-            "Employees"=> DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_designation AS D', 'D.DesignationID', '=', 'UI.DesignationID')
+            "Employees"=> DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_dept AS D', 'D.DeptID', '=', 'UI.DeptID')
                             ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
-                            ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'D.Designation', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
+                            ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
                             ->inRandomOrder()->get(),
 
         ];
@@ -54,10 +54,10 @@ class homeController extends Controller
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Teams";   
         
-        $FormData['CEO'] = $FormData['Employees']->where('Designation','CEO')->first();
+        $FormData['CEO'] = $FormData['Employees']->where('Dept','CEO')->first();
         $FormattedEmployees = [];
         foreach ($FormData['Employees']->sortBy('Level') as $item) {
-            $FormattedEmployees[$item->Designation][] = $item;
+            $FormattedEmployees[$item->Dept][] = $item;
         }
         $FormData['FormattedEmployees'] = $FormattedEmployees;
 

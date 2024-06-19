@@ -120,9 +120,22 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label for="lstDept">Deparment <span class="required">*</span></label>
+                                        <select class="form-control select2" id="lstDept" data-selected="<?php if($isEdit){ echo $EditData[0]->DeptID;} ?>" @if($isEdit && $EditData[0]->Dept == 'CEO') disabled @endif>
+                                            @if($isEdit && $EditData[0]->Dept == 'CEO')
+                                                <option value="{{$EditData[0]->DeptID}}">CEO</option>
+                                            @endif
+                                        </select>
+                                        <span class="errors err-sm" id="lstDept-err"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <label for="lstDesignation">Designation <span class="required">*</span></label>
-                                        <select class="form-control select2" id="lstDesignation" data-selected="<?php if($isEdit){ echo $EditData[0]->Designation;} ?>">
-                                            <option value="">Select a Designation</option>
+                                        <select class="form-control select2" id="lstDesignation" data-selected="<?php if($isEdit){ echo $EditData[0]->Designation;} ?>" @if($isEdit && $EditData[0]->Dept == 'CEO') disabled @endif>
+                                            @if($isEdit && $EditData[0]->Dept == 'CEO')
+                                                <option value="CEO">CEO</option>
+                                            @endif
                                         </select>
                                         <span class="errors err-sm" id="lstDesignation-err"></span>
                                     </div>
@@ -147,7 +160,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="txtEmail">Email <span class="fs-10 fw-500" style="color:#ab9898">(User Name) </span> <span class="required">*</span></label>
-                                        <input type="email" @if($isEdit) disabled @endif id="txtEmail" class="form-control" placeholder="E-Mail" value="<?php if($isEdit==true){ echo $EditData[0]->EMail;} ?>">
+                                        <input type="email" id="txtEmail" class="form-control" placeholder="E-Mail" value="<?php if($isEdit==true){ echo $EditData[0]->EMail;} ?>">
                                         <span class="errors err-sm" id="txtEmail-err"></span>
                                     </div>
                                 </div>
@@ -368,7 +381,10 @@
 			getCountry();
 			getGender();
 			getUserRoles();
-			getDesignation();
+            @if(!($isEdit && $EditData[0]->Dept == 'CEO'))
+                getDept();
+                getDesignation();
+            @endif
             $('#txtProfileImage').dropify({
                 showRemove: false
             });
@@ -395,6 +411,30 @@
                 }
             });
         }
+        const getDept=async()=>{
+            $.ajax({
+                type:"post",
+                url:"{{url('/')}}/admin/users-and-permissions/employees/get/dept",
+                headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') },
+                dataType:"json",
+                async:true,
+                error:function(e, x, settings, exception){ajaxErrors(e, x, settings, exception);},
+                complete: function(e, x, settings, exception){},
+                success:function(response){
+                    $('#lstDept').select2('destroy');
+                    $('#lstDept option').remove();
+                    $('#lstDept').append('<option value="" selected>Select a Department</option>');
+                    for(let Item of response){
+                        if(Item.Dept && Item.Dept !='CEO'){
+                            let selected="";
+                            if(Item.DeptID==$('#lstDept').attr('data-selected')){selected="selected";}
+                            $('#lstDept').append('<option '+selected+' value="'+Item.DeptID+'">'+Item.Dept+' </option>');
+                        }
+                    }
+                    $('#lstDept').select2();
+                }
+            });
+        }
         const getDesignation=async()=>{
             $.ajax({
                 type:"post",
@@ -409,10 +449,10 @@
                     $('#lstDesignation option').remove();
                     $('#lstDesignation').append('<option value="" selected>Select a Designation</option>');
                     for(let Item of response){
-                        if(Item.Designation){
+                        if(Item.Designation && Item.Designation !='CEO'){
                             let selected="";
                             if(Item.Designation==$('#lstDesignation').attr('data-selected')){selected="selected";}
-                            $('#lstDesignation').append('<option '+selected+' value="'+Item.DesignationID+'">'+Item.Designation+' </option>');
+                            $('#lstDesignation').append('<option '+selected+' value="'+Item.Designation+'">'+Item.Designation+' </option>');
                         }
                     }
                     $('#lstDesignation').select2({tags: true});
@@ -546,6 +586,7 @@
             let Password=$('#txtPassword').val();
             let ConfirmPassword=$('#txtConfirmPassword').val();
             let UserRole=$('#lstUserRole').val();
+            let Dept=$('#lstDept').val();
             let Designation=$('#lstDesignation').val();
 			let EMail=$('#txtEmail').val();
 
@@ -589,6 +630,12 @@
             if(City==""){
                 $('#lstCity-err').html('City is required');status=false;
             }
+            if(!Dept){
+                $('#lstDept-err').html('Deparment is required');status=false;
+            }
+            if(!Designation){
+                $('#lstDesignation-err').html('Designation is required');status=false;
+            }
             if(PostalCode==""){
                 $('#lstPostalCode-err').html('Postal Code is required');status=false;
             }
@@ -624,6 +671,7 @@
 			formData.append('UserRole',$('#lstUserRole').val());
 			formData.append('ActiveStatus',$('#lstActiveStatus').val());
             formData.append('DOB',$('#dtpDOB').val());
+            formData.append('DeptID',$('#lstDept').val());
             formData.append('Designation',$('#lstDesignation').val());
             formData.append('Level',$('#lstLevel').val());
 			formData.append('LoginStatus',$('#lstLoginStatus').val());

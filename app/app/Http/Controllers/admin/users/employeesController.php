@@ -96,7 +96,7 @@ class employeesController extends Controller{
 	
 	public function Edit(Request $req,$UserID=null){
 		if($this->general->isCrudAllow($this->CRUD,"edit")==true){
-			$sql="Select UI.UserID,UI.FirstName,UI.LastName,UI.DOB,D.Designation,D.Level,UI.GenderID,UI.Address,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,U.RoleID,U.isLogin,UI.ProfileImage,UI.ActiveStatus From tbl_user_info as UI LEFT JOIN users AS U ON U.UserID=UI.UserID LEFT JOIN tbl_designation AS D ON D.DesignationID=UI.DesignationID";
+			$sql="Select UI.UserID,UI.FirstName,UI.LastName,UI.DOB,UI.Designation,UI.DeptID,D.Dept,D.Level,UI.GenderID,UI.Address,UI.CityID,UI.StateID,UI.CountryID,UI.PostalCodeID,UI.EMail,UI.MobileNumber,U.RoleID,U.isLogin,UI.ProfileImage,UI.ActiveStatus From tbl_user_info as UI LEFT JOIN users AS U ON U.UserID=UI.UserID LEFT JOIN tbl_dept AS D ON D.DeptID=UI.DeptID";
 			$sql.=" Where D.DFlag=0 and D.ActiveStatus=1 and UI.DFlag=0 and UI.UserID='".$UserID."'";
 			$FormData=$this->general->UserInfo;
 			$FormData['ActiveMenuName']=$this->ActiveMenuName;
@@ -118,8 +118,11 @@ class employeesController extends Controller{
     public function getUserRoles(request $req){
         return DB::Table('tbl_user_roles')->where('ActiveStatus',1)->where('DFlag',0)->where('isShow',1)->get();
     }
+    public function getDept(request $req){
+        return DB::Table('tbl_dept')->where('ActiveStatus',1)->where('DFlag',0)->get();
+    }
     public function getDesignation(request $req){
-        return DB::Table('tbl_designation')->whereNot('Designation','CEO')->where('ActiveStatus',1)->where('DFlag',0)->get();
+        return DB::Table('tbl_user_info')->distinct('Designation')->select('Designation')->get();
     }
 	public function Save(Request $req){
 		if($this->general->isCrudAllow($this->CRUD,"add")==true){
@@ -169,7 +172,8 @@ class employeesController extends Controller{
 				'FirstName' =>'required|min:3|max:50',
 				'LastName' =>'max:50',
 				//'Address' => 'required|min:10',
-				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"users","WHERE"=>" EMail='".$req->MobileNumber."' "),"This Mobile Number is already taken.")],
+				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"tbl_user_info","WHERE"=>" MobileNumber='".$req->MobileNumber."' "),"This Mobile Number is already taken.")],
+				'EMail' => ['required','email',new ValidUnique(array("TABLE"=>"users","WHERE"=>" email='".$req->EMail."' "),"This E-Mail is already taken.")],
 				// 'Gender'=>['required',new ValidDB($ValidDB['Gender'])],
 				'StateID'=>['required',new ValidDB($ValidDB['State'])],
 				'City'=>['required',new ValidDB($ValidDB['City'])],
@@ -181,7 +185,6 @@ class employeesController extends Controller{
 			$message=array(
 			);
 			if($req->ProfileImage!=""){$rules['PImage']='mimes:jpeg,jpg,png,gif,bmp';}
-			if($req->EMail!=""){$rules['EMail']=['required','email',new ValidUnique(array("TABLE"=>"tbl_user_info","WHERE"=>" email='".$req->EMail."' "),"This E-Mail is already taken.")];}
 
 			$validator = Validator::make($req->all(), $rules,$message);
 			
@@ -239,7 +242,8 @@ class employeesController extends Controller{
 						"LastName"=>$req->LastName,
 						"GenderID"=>$req->Gender,
 						"DOB"=>$req->DOB,
-						"DesignationID"=>$req->Designation,
+						"DeptID"=>$req->DeptID,
+						"Designation"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
 						"StateID"=>$req->StateID,
@@ -325,7 +329,8 @@ class employeesController extends Controller{
 			$rules=array(
 				'FirstName' =>'required|min:3|max:50',
 				'LastName' =>'max:50',
-				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"users","WHERE"=>" email='".$req->MobileNumber."'  and UserID<>'".$UserID."' "),"This Mobile Number is already taken.")],
+				'EMail' =>['required',new ValidUnique(array("TABLE"=>"users","WHERE"=>" email='".$req->EMail."'  and UserID<>'".$UserID."' "),"This Email is already taken.")],
+				'MobileNumber' =>['required',new ValidUnique(array("TABLE"=>"tbl_user_info","WHERE"=>" MobileNumber='".$req->MobileNumber."'  and UserID<>'".$UserID."' "),"This Mobile Number is already taken.")],
 				'Gender'=>['required',new ValidDB($ValidDB['Gender'])],
 				'StateID'=>['required',new ValidDB($ValidDB['State'])],
 				'City'=>['required',new ValidDB($ValidDB['City'])],
@@ -335,13 +340,11 @@ class employeesController extends Controller{
 			$message=array(
 			);
 			if($req->ProfileImage!=""){$rules['PImage']='mimes:jpeg,jpg,png,gif,bmp';}
-			if($req->EMail!=""){$rules['EMail']=['required','email',new ValidUnique(array("TABLE"=>"tbl_user_info","WHERE"=>" email='".$req->EMail."' and UserID<>'".$UserID."'"),"This E-Mail is already taken.")];}
-
 
 			$validator = Validator::make($req->all(), $rules,$message);
 			
 			if ($validator->fails()) {
-				return array('status'=>false,'message'=>"User Update Failed",'errors'=>$validator->errors());			
+				return array('status'=>false,'message'=>"User Update Failed",'errors'=>$validator->errors());
 			}
 			DB::beginTransaction();
 			$status=false;
@@ -350,7 +353,7 @@ class employeesController extends Controller{
 				$CPImage="";
 				$dir="uploads/admin/employees/";
 				if (!file_exists( $dir)) {mkdir( $dir, 0777, true);}
-				if($req->hasFile('ProfileImage')){ return 1;
+				if($req->hasFile('ProfileImage')){
 					$file = $req->file('ProfileImage');
 					$fileName=md5($file->getClientOriginalName() . time());
 					$fileName1 =  $fileName. "." . $file->getClientOriginalExtension();
@@ -374,6 +377,7 @@ class employeesController extends Controller{
 
 				$data=array(
 					"Name"=>$Name,
+					"email"=>$req->EMail,
 					"RoleID"=>$req->UserRole,
 					"isLogin"=>$req->LoginStatus,
 					"ActiveStatus"=>$req->ActiveStatus,
@@ -388,7 +392,8 @@ class employeesController extends Controller{
 						"LastName"=>$req->LastName,
 						"GenderID"=>$req->Gender,
 						"DOB"=>$req->DOB,
-						"DesignationID"=>$req->Designation,
+						"DeptID"=>$req->DeptID,
+						"Designation"=>$req->Designation,
 						"Address"=>$req->Address,
 						"CityID"=>$req->City,
 						"StateID"=>$req->StateID,
@@ -504,7 +509,8 @@ class employeesController extends Controller{
                 array( 'db' => 'U.Password', 'dt' => '6'),
 				array( 'db' => 'UI.ActiveStatus', 'dt' => '7' ),
 				array( 'db' => 'UI.UserID', 'dt' => '8'),
-				array( 'db' => 'D.Designation', 'dt' => '9'),
+				array( 'db' => 'UI.Designation', 'dt' => '9'),
+				array( 'db' => 'D.Dept', 'dt' => '10'),
 			);
 
 			$columns1 = array(
@@ -540,7 +546,7 @@ class employeesController extends Controller{
 			);
 			$data=array();
 			$data['POSTDATA']=$request;
-			$data['TABLE']=' tbl_user_info as UI LEFT JOIN users as U ON U.UserID=UI.UserID LEFT JOIN tbl_countries as C ON C.CountryID=UI.CountryID LEFT JOIN tbl_genders as G ON G.GID=UI.GenderID  LEFT JOIN tbl_states as S ON S.StateID=UI.StateID LEFT JOIN tbl_cities as CI ON CI.CityID=UI.CityID LEFT JOIN tbl_designation AS D ON D.DesignationID=UI.DesignationID';
+			$data['TABLE']=' tbl_user_info as UI LEFT JOIN users as U ON U.UserID=UI.UserID LEFT JOIN tbl_countries as C ON C.CountryID=UI.CountryID LEFT JOIN tbl_genders as G ON G.GID=UI.GenderID  LEFT JOIN tbl_states as S ON S.StateID=UI.StateID LEFT JOIN tbl_cities as CI ON CI.CityID=UI.CityID LEFT JOIN tbl_dept AS D ON D.DeptID=UI.DeptID';
 			$data['PRIMARYKEY']='UI.UserID';
 			$data['COLUMNS']=$columns;
 			$data['COLUMNS1']=$columns1;
@@ -617,7 +623,7 @@ class employeesController extends Controller{
 			$data['COLUMNS1']=$columns1;
 			$data['GROUPBY']=null;
 			$data['WHERERESULT']=null;
-			$data['WHEREALL']=" UI.DFlag=1    and U.isShow=1";
+			$data['WHEREALL']=" UI.DFlag=1 and U.isShow=1";
 			return $ServerSideProcess->SSP( $data);
 		}else{
 			return response(array('status'=>false,'message'=>"Access Denied"), 403);

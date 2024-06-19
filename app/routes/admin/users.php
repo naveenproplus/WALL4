@@ -35,6 +35,7 @@ Route::group(['prefix'=>'employees'],function (){
         Route::post('/restore/{UserID}', 'Restore');
 
         Route::post('/get/user-roles', 'getUserRoles');
+        Route::post('/get/dept', 'getDept');
         Route::post('/get/designation', 'getDesignation');
         Route::post('/get/password', 'getPassword');
     });
