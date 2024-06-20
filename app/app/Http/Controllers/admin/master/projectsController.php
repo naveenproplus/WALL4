@@ -324,16 +324,11 @@ class projectsController extends Controller
                 $OldData = $this->getProjects(array("ProjectID" => $ProjectID));
                 $dir = "uploads/admin/master/projects/" . $ProjectID . "/";
                 if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                // Handle cover image
                 $newProjectImgPath = '';
 
-                // Check if a new cover image is uploaded
                 if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    // Generate new filename for the cover image
                     $newProjectImgPath = $dir . $img['coverImg']['fileName'];
-                    // Move the image file
                     rename($img['coverImg']['uploadPath'], $newProjectImgPath);
-                    // Unlink the existing cover image file
                     if (is_array($OldData) && array_key_exists('ProjectImage', $OldData) && file_exists($OldData['ProjectImage'])) {
                         unlink($OldData['ProjectImage']);
                     }

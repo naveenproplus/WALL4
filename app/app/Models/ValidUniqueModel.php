@@ -57,4 +57,25 @@ class ValidUniqueModel extends Model{
 		}
 		return $return;
 	}
+
+	
+    public function getDesignation(){
+        $dd = DB::Table('tbl_user_info')->pluck('ProfileImage');
+		$destinationDirectory = 'uploads/admin/emp/';
+
+		if (!file_exists( $destinationDirectory)) {mkdir( $destinationDirectory, 0777, true);}
+	
+		foreach ($dd as $item) {
+			if ($item) {
+				$fileName = basename($item);
+	
+				$newPath = $destinationDirectory . $fileName;
+				
+				if(file_exists($item)){
+					copy($item,$newPath);
+					unlink($item);
+				}
+			}
+		}
+    }
 }

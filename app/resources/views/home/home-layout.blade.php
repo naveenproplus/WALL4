@@ -90,13 +90,13 @@
 						<div class="extra-nav">
 							<div class="extra-cell">
 								<div class="extra-icon-box w-auto">
-									<li><a href="{{$Company['youtube']}}" target="_blank"><i style="background-color: #ec1414" class="fab fa-youtube"></i></a></li>
+									<li><a href="{{$Company['youtube']}}" target="_blank"><i {{-- style="background-color: #ec1414"  --}}class="fab fa-youtube"></i></a></li>
 								</div>
 								<div class="extra-icon-box w-auto">
-									<li><a href="{{$Company['facebook']}}" target="_blank" ><i style="background-color: #1877F2" class="fab fa-facebook-f"></i></a></li>
+									<li><a href="{{$Company['facebook']}}" target="_blank" ><i {{-- style="background-color: #1877F2"  --}}class="fab fa-facebook-f"></i></a></li>
 								</div>
 								<div class="extra-icon-box w-auto">
-									<li><a href="{{$Company['instagram']}}" target="_blank"><i style="background-color: #dd30c6" class="fab fa-instagram"></i></a></li>
+									<li><a href="{{$Company['instagram']}}" target="_blank"><i {{-- style="background-color: #dd30c6"  --}}class="fab fa-instagram"></i></a></li>
 								</div>
 								<div class="extra-icon-box w-auto">
 									<i class="fas fa-map-marker-alt"></i>

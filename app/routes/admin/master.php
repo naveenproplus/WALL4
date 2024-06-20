@@ -6,8 +6,8 @@ use App\Http\Controllers\admin\master\clientsController;
 use App\Http\Controllers\admin\master\galleryController;
 use App\Http\Controllers\admin\master\serviceController;
 use App\Http\Controllers\admin\master\categoryController;
+use App\Http\Controllers\admin\master\ProjectAreaController;
 use App\Http\Controllers\admin\master\projectsController;
-use App\Http\Controllers\admin\master\projectTypeController;
 use App\Http\Controllers\admin\master\youtubeVideoController;
 
 Route::group(['prefix' => 'category'], function () {
@@ -60,8 +60,8 @@ Route::group(['prefix' => 'youtube-video'], function () {
 });
 
 
-Route::group(['prefix' => 'project-type'], function () {
-    Route::controller(projectTypeController::class)->group(function () {
+Route::group(['prefix' => 'project-area'], function () {
+    Route::controller(ProjectAreaController::class)->group(function () {
          Route::get('/', 'index');
         Route::get('/create', 'Create');
         Route::get('/edit/{PID}', 'Edit');

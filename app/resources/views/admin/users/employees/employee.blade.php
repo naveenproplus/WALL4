@@ -193,7 +193,7 @@
                                 @endif
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="">Login Status</label>
+                                        <label for="lstLoginStatus">Login Status</label>
                                         <select class="form-control select2" id="lstLoginStatus" data-minimum-results-for-search="Infinity">
                                             <option value="1" @if($isEdit==true) @if($EditData[0]->isLogin=="1") selected @endif @endif >Enabled</option>
                                             <option value="0" @if($isEdit==true) @if($EditData[0]->isLogin=="0") selected @endif @endif>Disabled</option>
@@ -202,7 +202,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="">User Status</label>
+                                        <label for="lstActiveStatus">User Status</label>
                                         <select class="form-control" id="lstActiveStatus">
                                             <option value="1" @if($isEdit==true) @if($EditData[0]->ActiveStatus=="1") selected @endif @endif >Active</option>
                                             <option value="0" @if($isEdit==true) @if($EditData[0]->ActiveStatus=="0") selected @endif @endif>Inactive</option>
@@ -447,7 +447,7 @@
                 success:function(response){
                     $('#lstDesignation').select2('destroy');
                     $('#lstDesignation option').remove();
-                    $('#lstDesignation').append('<option value="" selected>Select a Designation</option>');
+                    $('#lstDesignation').append('<option value="" selected>Select or Enter a Designation</option>');
                     for(let Item of response){
                         if(Item.Designation && Item.Designation !='CEO'){
                             let selected="";
