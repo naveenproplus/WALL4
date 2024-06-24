@@ -32,7 +32,7 @@
     <div class="container">
         <div class="row">
             {{-- <div class="col-sm-12">
-                <img src="{{url('/')}}/{{$Service->ServiceImage}}" class="m-b30 w-100" alt="">
+                <img loading="lazy" src="{{url('/')}}/{{$Service->ServiceImage}}" class="m-b30 w-100" alt="">
             </div> --}}
             <div class="col-lg-8 col-md-7 aos-item" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
                 <div class="service-detail">
@@ -41,10 +41,10 @@
                         <p>{{$Service->Description1}}</p>
                         <div class="row lightgallery">
                             <div class="col-lg-6">
-                                <img src="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" class="m-b30 w-100" alt="">
+                                <img loading="lazy" src="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" class="m-b30 w-100" alt="">
                                 {{-- <div class="dz-box overlay style-1">
                                     <div class="dz-media">
-                                        <img src="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" alt="{{$Service->ServiceName}}">
+                                        <img loading="lazy" src="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" alt="{{$Service->ServiceName}}">
                                     </div>
                                     <div class="dz-info">
                                         <span data-exthumbimage="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" data-src="{{url('/')}}/{{$Service->ServiceGallery[0] ?? ''}}" class="view-btn lightimg"></span>
@@ -53,7 +53,7 @@
                                 <p class="m-b0">{{$Service->Description2}}</p>
                             </div>
                             <div class="col-lg-6">
-                                <img src="{{url('/')}}/{{$Service->ServiceGallery[1] ?? ''}}" class="m-b30 w-100" alt="">
+                                <img loading="lazy" src="{{url('/')}}/{{$Service->ServiceGallery[1] ?? ''}}" class="m-b30 w-100" alt="">
                                 <p class="m-b0">{{$Service->Description3}}</p>
                             </div>
                         </div>	
@@ -123,7 +123,7 @@
                 @foreach ($TopClients as $item)
                     <div class="swiper-slide">
                         <div class="clients-logo aos-item" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="100">
-                            <img class="logo-main" src="{{url('/')}}/{{$item->ProfileImage}}" alt="{{$item->Name}}" height="100px" width="100px">
+                            <img loading="lazy" class="logo-main" src="{{url('/')}}/{{$item->ProfileImage}}" alt="{{$item->Name}}" height="100px" width="100px">
                         </div>
                     </div>
                 @endforeach

@@ -126,7 +126,7 @@ class projectsController extends Controller
 
     private function getProjects($data = array())
     {
-        $sql = "SELECT P.ProjectID, P.ProjectName, P.Slug, P.SDesc, P.LDesc ,P.ProjectAddress ,P.ProjectImage , P.ActiveStatus, P.ProjectAddress,P.ClientID ,P.ServiceID ,P.ProjectType FROM tbl_projects as P Where P.DFlag=0 ";
+        $sql = "SELECT P.ProjectID, P.ProjectName, P.Slug, P.SDesc, P.LDesc ,P.ProjectAddress ,P.ProjectImage , P.ActiveStatus, P.ProjectAddress,P.ClientID ,P.ServiceID ,P.ProjectAreaID, PA.ProjectType FROM tbl_projects as P left join tbl_project_area as PA on PA.ProjectAreaID = P.ProjectAreaID Where P.DFlag = 0 ";
         if (is_array($data)) {
             if (array_key_exists("ProjectID", $data)) {$sql .= " and P.ProjectID='" . $data['ProjectID'] . "'";}
 
@@ -152,7 +152,7 @@ class projectsController extends Controller
                 'Slug' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_projects", "WHERE" => " Slug='" . $req->Slug . "'"), "Slug is already exists.")],
 
                 'ClientID' => ['required'],
-                'ProjectType' => ['required'],
+                'ProjectAreaID' => ['required'],
             );
 
             $message = [
@@ -206,7 +206,7 @@ class projectsController extends Controller
                     "ProjectID" => $ProjectID,
                     "ProjectName" => $req->ProjectName,
                     "Slug" => $req->Slug,
-                    "ProjectType" => $req->ProjectType,
+                    "ProjectAreaID" => $req->ProjectAreaID,
                     "ProjectAddress" => $req->Address,
                     "SDesc" => $req->SDesc,
                     "LDesc" => $req->LDesc,
@@ -352,13 +352,12 @@ class projectsController extends Controller
                     "ProjectAddress" => $req->Address,
                     "ClientID" => $req->ClientID,
                     "ServiceID" => $req->ServiceID,
-                    "ProjectType" => $req->ProjectType,
+                    "ProjectAreaID" => $req->ProjectAreaID,
                     "SDesc" => $req->SDesc,
                     "LDesc" => $req->LDesc,
                     "CreatedOn" => date("Y-m-d H:i:s"),
                     "CreatedBy" => $this->UserID,
                 );
-                logger($data);
 
                 // Check if only ProjectImage path is not empty
                 if ($newProjectImgPath != "") {
@@ -666,14 +665,14 @@ class projectsController extends Controller
         }
     }
 
-    public static function getProjectType()
+    public static function getProjectArea(Request $req)
     {
         try {
-            $clients = DB::select('SELECT PID, ProjectTypeName FROM tbl_project_type where DFlag = 0 and ActiveStatus = 1');
+            $clients = DB::select('SELECT ProjectAreaID, ProjectAreaName FROM tbl_project_area where DFlag = 0 and ActiveStatus = 1 and ProjectType = "'.$req->ProjectType.'"');
             return response()->json($clients);
         } catch (\Exception $e) {
-            Log::error('Error fetching project type: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while fetching project type. Please check the logs for more information.'], 500);
+            Log::error('Error fetching project area: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching project area. Please check the logs for more information.'], 500);
         }
     }
 

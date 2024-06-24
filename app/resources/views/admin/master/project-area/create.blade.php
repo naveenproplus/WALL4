@@ -493,40 +493,6 @@
                                 cache: false,
                                 processData: false,
                                 contentType: false,
-                                xhr: function() {
-                                    var xhr = new window.XMLHttpRequest();
-                                    xhr.upload.addEventListener("progress", function(evt) {
-                                        if (evt.lengthComputable) {
-                                            var percentComplete = (evt.loaded / evt
-                                                .total) * 100;
-                                            percentComplete = parseFloat(
-                                                percentComplete).toFixed(2);
-                                            $('#divProcessText').html(
-                                                percentComplete +
-                                                '% Completed.<br> Please wait for until upload process complete.'
-                                                );
-                                            //Do something with upload progress here
-                                        }
-                                    }, false);
-                                    return xhr;
-                                },
-                                beforeSend: function() {
-                                    ajaxIndicatorStart(
-                                        "Please wait Upload Process on going.");
-                                    var percentVal = '0%';
-                                    setTimeout(() => {
-                                        $('#divProcessText').html(percentVal +
-                                            ' Completed.<br> Please wait for until upload process complete.'
-                                            );
-                                    }, 100);
-                                },
-                                error: function(e, x, settings, exception) {
-                                    ajaxErrors(e, x, settings, exception);
-                                },
-                                complete: function(e, x, settings, exception) {
-                                    btnReset($('#nextBtn'));
-                                    ajaxIndicatorStop();
-                                },
                                 success: function(response) {
                                     document.documentElement.scrollTop =
                                     0; // For Chrome, Firefox, IE and Opera
@@ -542,8 +508,7 @@
                                         }, function() {
                                             @if ($isEdit == true)
                                                 window.location.replace(
-                                                    "{{ url('/') }}/admin/master/project-area/"
-                                                    );
+                                                    "{{ url('/') }}/admin/master/project-area/");
                                             @else
                                                 window.location.reload();
                                             @endif

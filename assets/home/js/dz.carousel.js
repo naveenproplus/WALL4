@@ -122,39 +122,8 @@ jQuery(document).ready(function() {
 	}
 	
 	// Swiper Portfolio
-	if(jQuery('.swiper-team-2').length > 0){
-		var swiper2 = new Swiper('.swiper-team-2', {
-			slidesPerView: 3,
-			spaceBetween: 30,
-			speed: 1500,
-			loop:true,
-			navigation: {
-				nextEl: '.swiper-button-next2',
-				prevEl: '.swiper-button-prev2',
-			},
-			breakpoints: {
-				1480: {
-					slidesPerView: 3,
-				},
-				1280: {
-					slidesPerView: 3,
-				},
-				991: {
-					slidesPerView: 2,
-				},
-				591: {
-					slidesPerView: 2,
-				},
-				320: {
-					slidesPerView: 1,
-				},
-			}
-		});
-	}
-	
-	// Swiper Portfolio
 	if(jQuery('.swiper-team').length > 0){
-		var swiper3 = new Swiper('.swiper-team', {
+		var teamsSwiper = new Swiper('.swiper-team', {
 			slidesPerView: 4,
 			spaceBetween: 30,
 			speed: 1500,
@@ -181,11 +150,16 @@ jQuery(document).ready(function() {
 				},
 			}
 		});
+		setInterval(function() {
+			if(jQuery('.swiper-team').length > 0){
+				teamsSwiper.slideNext();
+			}
+		}, 1500);
 	}
 	
 	// Swiper Portfolio
 	if(jQuery('.swiper-client').length > 0){
-		var swiper4 = new Swiper('.swiper-client', {
+		var testimonialSwiper = new Swiper('.swiper-client', {
 			slidesPerView: 1,
 			spaceBetween: 30,
 			speed: 1500,
@@ -196,7 +170,7 @@ jQuery(document).ready(function() {
 			},
 		});
 		
-		swiper4.on('slideChange', function () {
+		testimonialSwiper.on('slideChange', function () {
 			setTimeout(function(){
 				var dataRel = $('.swiper-client .swiper-slide-active').data('rel');	
 				jQuery('.client-area li').removeClass('active');
@@ -207,7 +181,7 @@ jQuery(document).ready(function() {
 		jQuery('.client-area li a').on('click',function(e){
 			e.preventDefault();
 			var memberRel = jQuery(this).parent().data('member');
-			swiper4.slideTo(memberRel);
+			testimonialSwiper.slideTo(memberRel);
 		});
 	}
 	
@@ -235,40 +209,6 @@ jQuery(document).ready(function() {
 		});
 	}
 	
-	// Blog Swiper
-	if(jQuery('.blog-swiper-2').length > 0){
-		var swiper5 = new Swiper('.blog-swiper-2', {
-			slidesPerView: 2,
-			spaceBetween: 30,
-			speed: 1500,
-			loop:true,
-			navigation: {
-	          	nextEl: ".testimonial3-next",
-	         	prevEl: ".testimonial3-prev",
-	        },
-			pagination: {
-				el: '.testimonial3-pagination',
-				clickable: true,
-				renderBullet: function (index, className) {
-				 return '<span class="' + className + '">' +"0"+ (index + 1) + "</span>";
-				},
-			},
-			breakpoints: {
-				991: {
-					slidesPerView: 3,
-				},
-				767: {
-					slidesPerView: 2,
-				},
-				591: {
-					slidesPerView: 1.5,
-				},
-				320: {
-					slidesPerView: 1,
-				},
-			}
-		});
-	}
 	
 	// Blog Swiper
 	if(jQuery('.post-swiper').length > 0){
@@ -310,121 +250,11 @@ jQuery(document).ready(function() {
 		});
 	}
 	
-	// Testimonial Swiper
-	if(jQuery('.testimonial-swiper-2').length > 0){
-		var swiper3 = new Swiper('.testimonial-swiper-2', {
-			speed: 1500,
-			slidesPerView: 1,
-			spaceBetween: 30,
-			autoplay: {
-			   delay: 3000,
-			},
-		});
-	}
-	
-	// Testimonial Swiper
-	if(jQuery('.testimonial-swiper-3').length > 0){
-		var swiper3 = new Swiper('.testimonial-swiper-3', {
-			speed: 1500,
-			parallax: true,
-			slidesPerView: 3,
-			spaceBetween: 30,
-			loop:true,
-			autoplay: {
-			   delay: 3000,
-			},
-			navigation: {
-	          	nextEl: ".testimonial3-next",
-	         	prevEl: ".testimonial3-prev",
-	        },
-			pagination: {
-				el: '.testimonial3-pagination',
-				clickable: true,
-				renderBullet: function (index, className) {
-				 return '<span class="' + className + '">' +"0"+ (index + 1) + "</span>";
-				},
-			},
-			breakpoints: {
-				1191: {
-					slidesPerView: 3,
-				},
-				1024: {
-					slidesPerView: 2,
-				},
-				991: {
-					slidesPerView: 2,
-				},
-				767: {
-					slidesPerView: 1,
-				},
-				320: {
-					slidesPerView: 1,
-				},
-			}
-		});
-	}
-	
-	// Team Swiper
-	if(jQuery('.team-swiper').length > 0){
-		var swiper8 = new Swiper('.team-swiper', {
-			speed: 1500,
-			parallax: true,
-			slidesPerView: 4,
-			spaceBetween: 30,
-			loop:true,
-			navigation: {
-				nextEl: '.swiper-button-next4',
-				prevEl: '.swiper-button-prev4',
-			},
-			breakpoints: {
-				1191: {
-					slidesPerView: 4,
-				},
-				991: {
-					slidesPerView: 3,
-				},
-				591: {
-					slidesPerView: 2,
-				},
-				320: {
-					slidesPerView: 1,
-				},
-			}
-		});
-	}
-	
-	// Team Swiper
-	if(jQuery('.team-swiper-2').length > 0){
-		var swiper4 = new Swiper('.team-swiper-2', {
-			speed: 1500,
-			parallax: true,
-			slidesPerView: 4,
-			spaceBetween: 30,
-			loop:true,
-			navigation: {
-				nextEl: '.swiper-button-next4',
-				prevEl: '.swiper-button-prev4',
-			},
-			breakpoints: {
-				1191: {
-					slidesPerView: 4,
-				},
-				991: {
-					slidesPerView: 3,
-				},
-				591: {
-					slidesPerView: 2,
-				},
-				320: {
-					slidesPerView: 1,
-				},
-			}
-		});
-	}
+
 	
 	// Clients Swiper
 	if(jQuery('.clients-swiper').length > 0){
-		var swiper9 = new Swiper('.clients-swiper', {
+		var clientsSwiper = new Swiper('.clients-swiper', {
 			speed: 1500,
 			parallax: true,
 			slidesPerView: 4,
@@ -452,7 +282,13 @@ jQuery(document).ready(function() {
 				},
 			}
 		});
+		setInterval(function() {
+			if(jQuery('.clients-swiper').length > 0){
+				clientsSwiper.slideNext();
+			}
+		}, 1000);
 	}
+
 	
 });
 /* Document .ready END */

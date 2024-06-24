@@ -348,7 +348,9 @@ var Visva = function(){
 				selector : '.lightimg',
 				loop:true,
 				thumbnail:true,
-				exThumbImage: 'data-exthumbimage'
+				exThumbImage: 'data-exthumbimage',
+				download: false,
+				share: false
 			});
 		}
 	}	

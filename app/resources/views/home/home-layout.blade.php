@@ -19,6 +19,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
 	<meta http-equiv="Permissions-Policy" content="accelerometer=(self)">
+	
 	<!-- Title -->
 	<title>{{ $Company['Name'] }}</title>
 	
@@ -32,7 +33,6 @@
 	<link href="{{ url('/') }}/assets/home/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 	<link href="{{ url('/') }}/assets/home/vendor/aos/aos.css" rel="stylesheet">
 	<link href="{{ url('/') }}/assets/home/vendor/rangeslider/rangeslider.css" rel="stylesheet">
-	{{-- <link href="{{ url('/') }}/assets/home/vendor/switcher/switcher.css" rel="stylesheet"> --}}
 	<link rel="stylesheet" type="text/css" href="{{ url('/') }}/assets/css/sweetalert2.css?r={{ date('dmyHis') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/assets/css/toastr.css?r={{ date('dmyHis') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url('/') }}/assets/plugins/image-cropper/image-cropper.css?r={{ date('dmyHis') }}">
@@ -52,7 +52,7 @@
 <div id="loading-area" class="loading-page-1">
 	<div class="loading-area">
 		{{-- <p>Loading</p> --}}
-		<img src="{{$Company['Logo']}}" alt="">
+		<img loading="lazy" src="{{$Company['Logo']}}" alt="">
 		<span></span>
 	</div>
 </div>
@@ -123,7 +123,7 @@
 						</div>
 						<div class="header-nav navbar-collapse collapse justify-content-end" id="navbarNavDropdown">
 							<div class="logo-header logo-dark">
-								<a href="{{ url('/') }}"><img src="{{$Company['Logo']}}" alt=""></a>
+								<a href="{{ url('/') }}"><img loading="lazy" src="{{$Company['Logo']}}" alt=""></a>
 							</div>
 							<ul class="nav navbar-nav navbar navbar-left">	
 								<li class="sub-menu-down">
@@ -165,7 +165,7 @@
 		<div class="contact-sidebar">
 			<div class="contact-box">
 				<div class="logo-contact logo-dark">
-					<a href="{{ url('/') }}"><img src="{{$Company['Logo']}}" alt=""></a>
+					<a href="{{ url('/') }}"><img loading="lazy" src="{{$Company['Logo']}}" alt=""></a>
 				</div>
 				<div class="m-b50 contact-text">
 					<div class="dz-title">
@@ -186,7 +186,7 @@
 						@foreach ($Gallery as $item)
 							<li>
 								<div class="dlab-post-thum dlab-img-effect">
-									<span data-exthumbimage="{{ url('/') }}/{{$item->GalleryImage}}" data-src="{{ url('/') }}/{{$item->GalleryImage}}" class="lightimg" title="{{$item->GalleryName}}">		<img src="{{ url('/') }}/{{$item->GalleryImage}}" alt="{{$item->GalleryName}}"> 
+									<span data-exthumbimage="{{ url('/') }}/{{$item->GalleryImage}}" data-src="{{ url('/') }}/{{$item->GalleryImage}}" class="lightimg" title="{{$item->GalleryName}}">	<img loading="lazy" src="{{ url('/') }}/{{$item->GalleryImage}}" alt="{{$item->GalleryName}}"> 
 									</span>
 								</div>
 							</li>
@@ -216,7 +216,7 @@
 							<div class="row">
 								<div class="col-md-12 aos-item" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
 									<div class="footer-logo logo-light">
-										<a href="#"><img src="{{ url('/') }}/{{$Company['Logo-Light']}}" alt="Footer Logo"></a>
+										<a href="#"><img loading="lazy" src="{{ url('/') }}/{{$Company['Logo-Light']}}" alt="Footer Logo"></a>
 									</div>
 								</div>	
 								<div class="col-md-5 col-sm-6 aos-item" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
@@ -376,7 +376,6 @@
 <script src="{{ url('/') }}/assets/home/js/dz.ajax.js"></script><!-- AJAX -->
 <script src="{{ url('/') }}/assets/home/js/custom.js"></script><!-- CUSTOM JS -->
 <script src="{{ url('/') }}/assets/home/vendor/rangeslider/rangeslider.js"></script><!-- RANGESLIDER -->
-{{-- <script src="{{ url('/') }}/assets/home/vendor/switcher/switcher.js"></script><!-- SWITCHER --> --}}
 <script src="{{ url('/') }}/assets/js/sweet-alert/sweetalert.min.js?r={{ date('dmyHis') }}"></script>
 <script src="{{ url('/') }}/assets/js/toastr.min.js?r={{ date('dmyHis') }}"></script>
 <script src="{{ url('/') }}/assets/plugins/image-cropper/cropper.js"></script>
@@ -715,7 +714,7 @@
 			}, 4000)
 
 
-			// Free Consultation Part
+			// Free Consultation Part 
 
 			var modal = $('#free-quote-modal');
 

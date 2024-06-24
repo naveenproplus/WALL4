@@ -22,13 +22,15 @@ class homeController extends Controller
             "Settings" => $this->getSettings(),
             "Company" => $this->getCompanySettings(),
             "Gallery" => $this->getGallery(),
-            "isEdit"=>false,
-            "Contents"=>$this->getHomeContents(),
-            "LatestProjects"=>$this->getLatestProjects(""),
-            "TopClients"=>DB::table('tbl_client')->where('ClientType','Company')->get(),
-            "Services"=>DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
-            "FAQ"=> DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
-            "Employees"=> DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_dept AS D', 'D.DeptID', '=', 'UI.DeptID')
+            "isEdit" => false,
+            "Contents" =>$this->getHomeContents(),
+            "Projects" => DB::table('tbl_projects as P')->leftJoin('tbl_project_area as PA','PA.ProjectAreaID','P.ProjectAreaID')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)->select('P.*','S.ServiceName','PA.ProjectAreaName','PA.ProjectType')->orderBy('P.CreatedOn')->get(),
+            "ProjectArea" => DB::table('tbl_project_area')->where('DFlag',0)->where('ActiveStatus',1)->get(),
+            "TopClients" => DB::table('tbl_client')->where('DFlag', 0)->where('ActiveStatus',1)->where('ClientType','Company')->get(),
+            "TestimonialClients" => DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->where('C.Testimonial','!=',NULL)->inRandomOrder()->take(5)->get(),
+            "Services" => DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
+            "FAQ" => DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
+            "Employees" => DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_dept AS D', 'D.DeptID', '=', 'UI.DeptID')
                             ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
                             ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
                             ->inRandomOrder()->get(),
@@ -44,16 +46,12 @@ class homeController extends Controller
     public function AboutUsView(Request $req){
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "About Us";
-        $FormData['Clients'] = DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->whereNot('C.Testimonial',NULL)->inRandomOrder()->get();
-        $FormData['Projects'] =  DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)
-                                ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();      
         return view('home.about-us', $FormData);
     }
     
     public function TeamsView(Request $req){
         $FormData = $this->FormData;
-        $FormData['PageTitle'] = "Teams";   
-        
+        $FormData['PageTitle'] = "Teams";
         $FormData['CEO'] = $FormData['Employees']->where('Dept','CEO')->first();
         $FormattedEmployees = [];
         foreach ($FormData['Employees']->sortBy('Level') as $item) {
@@ -68,13 +66,12 @@ class homeController extends Controller
 
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Our Services";
-        $FormData['Services'] = DB::table('tbl_services')->where('DFlag',0)->get();
         return view('home.services', $FormData);
     }
     public function ServicesDetailsView(Request $req,$Slug){
-        $ServiceData = DB::table('tbl_services')->where('Slug',$Slug)->where('DFlag',0)->where('ActiveStatus',1)->first();
+        $FormData = $this->FormData;
+        $ServiceData = $FormData['Services']->where('Slug',$Slug)->first();
         if($ServiceData){
-            $FormData = $this->FormData;
             $FormData['PageTitle'] = "Services Details";
             $ServiceData->ServiceGallery = DB::table('tbl_services_gallery')->where('ServiceID',$ServiceData->ServiceID)->inRandomOrder()->pluck('ImageUrl');
             $FormData['Service'] = $ServiceData;
@@ -87,19 +84,17 @@ class homeController extends Controller
     public function ProjectsView(Request $req){
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Projects";
-        $FormData['ProjectType'] = DB::table('tbl_project_type')->where('DFlag',0)->where('ActiveStatus',1)->get();
-        $FormData['Projects'] = DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)
-        ->select('P.*','S.ServiceName','PT.ProjectTypeName')
-        ->get();
+        foreach($FormData['Projects'] as $project){
+            $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$project->ProjectID)->pluck('ImageUrl');
+        }
+        // return $FormData['Projects'];
         return view('home.projects', $FormData);
     }
 
     public function ProjectDetailsView(Request $req,$Slug){
-        $ProjectData = DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)->where('P.Slug',$Slug)
-        ->select('P.*','S.ServiceName','PT.ProjectTypeName')->first();
+        $FormData = $this->FormData;
+        $ProjectData = $FormData['Projects']->where('Slug',$Slug)->first();
         if($ProjectData){
-            $FormData = $this->FormData;
-            $FormData['LatestProjects'] = $this->getLatestProjects($Slug);
             $FormData['PageTitle'] = "Projects Details";
             $ProjectData->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$ProjectData->ProjectID)->pluck('ImageUrl');
             $FormData['Project'] = $ProjectData;
@@ -126,17 +121,13 @@ class homeController extends Controller
         $FormData = $this->FormData;
         $FormData['isEdit'] = true;
         $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug',$Slug)->value('PageName');
-        $FormData['Clients'] = DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->whereNot('C.Testimonial',NULL)->inRandomOrder()->get();
-        $FormData['ProjectType'] = DB::table('tbl_project_type')->where('DFlag',0)->where('ActiveStatus',1)->get();
-        $FormData['Projects'] =  DB::table('tbl_projects as P')->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)
-                                ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))->inRandomOrder()->get();
         return view('home.'.$Slug, $FormData);
     }
     public function PrivacyPolicyView(Request $req){
         $FormData = $this->FormData;
-        $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->value('PageName');
-        $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->first();
-        if ($FormData['PageContent']) {
+        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->select('PageName','PageContent')->first();
+        if ($FormData['Page']) {
+            $FormData['PageTitle'] = $FormData['Page']->PageName;
             return view('home.privacy-policy', $FormData);
         } else {
             return view('errors.404');
@@ -144,9 +135,9 @@ class homeController extends Controller
     }
     public function TermsAndConditionsView(Request $req){
         $FormData = $this->FormData;
-        $FormData['PageTitle'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->value('PageName');
-        $FormData['PageContent'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->first();
-        if ($FormData['PageContent']) {
+        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->select('PageName','PageContent')->first();
+        if ($FormData['Page']) {
+            $FormData['PageTitle'] = $FormData['Page']->PageName;
             return view('home.terms-and-conditions', $FormData);
         } else {
             return view('errors.404');
@@ -249,21 +240,6 @@ class homeController extends Controller
                 $settings[$result[$i]->KeyName] = $result[$i]->KeyValue;
             }
         }
-        //Check Privacy Policy enable or not
-        $t = DB::Table('tbl_page_content')->where('ActiveStatus', 1)->where('DFlag', 0)->where('Slug', 'privacy-policy')->get();
-        if (count($t) > 0) {
-            $settings['isEnabledPrivacyPolicy'] = true;
-        }
-        //Check Privacy Policy enable or not
-        $t = DB::Table('tbl_page_content')->where('ActiveStatus', 1)->where('DFlag', 0)->where('Slug', 'terms-condition')->get();
-        if (count($t) > 0) {
-            $settings['isEnabledTermsConditions'] = true;
-        }
-        //Check help enable or not
-        $t = DB::Table('tbl_page_content')->where('ActiveStatus', 1)->where('DFlag', 0)->where('Slug', 'help')->get();
-        if (count($t) > 0) {
-            $settings['isEnabledHelp'] = true;
-        }
         return $settings;
     }
 
@@ -343,16 +319,5 @@ class homeController extends Controller
             $content[$row->Slug]=$row->Content;
         }
         return $content;
-    }
-
-    private function getLatestProjects($Slug){
-        $query = DB::table('tbl_projects as P')
-        ->leftJoin('tbl_project_type as PT','PT.PID','P.ProjectType')
-        ->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')
-        ->where('P.DFlag',0)->where('P.ActiveStatus',1)->where('S.DFlag',0)->where('S.ActiveStatus',1)
-        ->select('P.ProjectID','P.ProjectName','P.ProjectAddress','S.ServiceName','P.Slug','PT.ProjectTypeName','P.ProjectType',DB::raw('CONCAT("'.url('/').'/",COALESCE(NULLIF(ProjectImage, ""),"assets/images/no-image.png")) as ProjectImage'))
-        ->orderBy('P.CreatedOn')->get();
-
-        return $Slug ? $query->where('Slug','!=',$Slug) : $query;
     }
 }

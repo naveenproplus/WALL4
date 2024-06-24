@@ -61,7 +61,7 @@
 				</div>
 				<div class="col-lg-6 aos-item" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
 					<div class="content-media right edit-content">
-						<img src="{{url('/')}}/assets/home/images/video/pic2-1.jpg" alt="">
+						<img loading="lazy" src="{{url('/')}}/assets/home/images/video/pic2-1.jpg" alt="">
 					</div>
 				</div>
 			</div>
@@ -81,7 +81,7 @@
 				@foreach ($TopClients as $item)
 					<div class="swiper-slide">
 						<div class="clients-logo aos-item" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="100">
-							<img class="logo-main" src="{{url('/')}}/{{$item->ProfileImage}}" alt="{{$item->Name}}" height="100px" width="100px">
+							<img loading="lazy" class="logo-main" src="{{url('/')}}/{{$item->ProfileImage}}" alt="{{$item->Name}}" height="100px" width="100px">
 						</div>
 					</div>
 				@endforeach

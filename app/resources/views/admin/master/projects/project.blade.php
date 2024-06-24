@@ -73,15 +73,28 @@
 
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label class="lstProjectType">Project Type <span
-                                                                    class="required">*</span></label>
-                                                            <select class="form-control select2" id="lstProjectType"
-                                                                data-selected="<?php if ($isEdit) {
-                                                                    echo $EditData[0]->ProjectType;
-                                                                } ?>">
-                                                                <option value="">Select a Project Type</option>
+                                                            <label for="lstProjectType">Project Type <span class="required">*</span></label>
+                                                            <select class="form-control select2" id="lstProjectType">
+                                                                <option value="Commercial"
+                                                                    @if ($isEdit == true) @if ($EditData[0]->ProjectType == 'Commercial') selected @endif
+                                                                    @endif >Commercial</option>
+                                                                <option value="Residential"
+                                                                    @if ($isEdit == true) @if ($EditData[0]->ProjectType == 'Residential') selected @endif
+                                                                    @endif>Residential</option>
                                                             </select>
-                                                            <div class="errors err-sm ProjectInfo" id="lstProjectType-err">
+                                                            <div class="errors err-sm ProjectInfo" id="lstActiveStatus-err">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label class="lstProjectArea">Project Area <span
+                                                                    class="required">*</span></label>
+                                                            <select class="form-control select2" id="lstProjectArea" data-selected="<?php if ($isEdit) {echo $EditData[0]->ProjectAreaID;} ?>">
+                                                                <option value="">Select a Project Area</option>
+                                                            </select>
+                                                            <div class="errors err-sm ProjectInfo" id="lstProjectArea-err">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -116,19 +129,13 @@
                                                         </div>
                                                     </div>
 
-
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="">Active Status</label>
+                                                            <label for="lstActiveStatus">Active Status</label>
                                                             <select class="form-control" id="lstActiveStatus">
-                                                                <option value="1"
-                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active
-                                                                </option>
-                                                                <option value="0"
-                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif>
-                                                                    Inactive</option>
+                                                                <option value="1" @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active</option>
+                                                                <option value="0" @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif>Inactive</option>
                                                             </select>
-
                                                             <div class="errors err-sm ProjectInfo" id="lstActiveStatus-err">
                                                             </div>
                                                         </div>
@@ -151,7 +158,7 @@
                                                 <div class="row">
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="">Short Description <span class="required"> *</span></label>
+                                                            <label for="txtTitle">Short Description <span class="required"> *</span></label>
                                                             <textarea id="txtTitle" class="form-control" rows="2"><?php if ($isEdit) { echo $EditData[0]->SDesc; } ?></textarea>
                                                             <div class="errors err-sm Project Descriptions" id="txtTitle-err"></div>
                                                         </div>
@@ -362,39 +369,40 @@
 
             getClients();
 
-            const getProjectType = async () => {
-                $('#lstProjectType').select2('destroy');
-                $('#lstProjectType option').remove();
-                $('#lstProjectType').append('<option value="" selected>Select a Project</option>');
-
-                $.ajax({
-                    type: "post",
-                    url: "{{ url('/') }}/admin/master/projects/get-project-type",
-                    headers: {
-                        'X-CSRF-Token': $('meta[name=_token]').attr('content')
-                    },
-                    dataType: "json",
-                    async: true,
-                    error: function(e, x, settings, exception) {
-                        ajaxErrors(e, x, settings, exception);
-                    },
-                    complete: function(e, x, settings, exception) {},
-                    success: function(response) {
-                        for (let client of response) {
-                            let selected = "";
-                            if (client.PID == $('#lstProjectType').attr('data-selected')) {
-                                selected = "selected";
+            const getProjectArea = async () => {
+                // $('#lstProjectArea').select2('destroy');
+                $('#lstProjectArea option').remove();
+                $('#lstProjectArea').append('<option value="" selected>Select a Project Area</option>');
+                let ProjectType = $('#lstProjectType').val();
+                if(ProjectType){
+                    $.ajax({
+                        type: "post",
+                        url: "{{ url('/') }}/admin/master/projects/get-project-area",
+                        headers: {
+                            'X-CSRF-Token': $('meta[name=_token]').attr('content')
+                        },
+                        dataType: "json",
+                        data: {ProjectType: ProjectType},
+                        async: true,
+                        error: function(e, x, settings, exception) {
+                            ajaxErrors(e, x, settings, exception);
+                        },
+                        complete: function(e, x, settings, exception) {},
+                        success: function(response) {
+                            for (let client of response) {
+                                let selected = "";
+                                if (client.ProjectAreaID == $('#lstProjectArea').attr('data-selected')) {
+                                    selected = "selected";
+                                }
+                                $('#lstProjectArea').append('<option ' + selected + ' value="' +client.ProjectAreaID + '">' + client.ProjectAreaName + '</option>');
                             }
-                            $('#lstProjectType').append('<option ' + selected + ' value="' +
-                                client
-                                .PID + '">' + client.ProjectTypeName + '</option>');
+                            // $('#lstProjectArea').select2();
                         }
-                        $('#lstProjectType').select2();
-                    }
-                });
+                    });
+                }
             }
 
-            getProjectType();
+            getProjectArea();
 
 
 
@@ -453,7 +461,7 @@
                     let ProjectName = $('#txtProjectName').val();
                     let ClientID = $('#lstClient').val();
                     let ServiceID = $('#lstService').val();
-                    let ProjectType = $('#lstProjectType').val();
+                    let ProjectArea = $('#lstProjectArea').val();
                     let Slug = $('#txtSlug').val();
 
 
@@ -481,8 +489,8 @@
                         status = false;
                     }
 
-                    if (ProjectType == "") {
-                        $('#lstProjectType-err').html('ProjectType is required');
+                    if (ProjectArea == "") {
+                        $('#lstProjectArea-err').html('Project Area is required');
                         status = false;
                     }
                 }else if (page == "Project Descriptions"){
@@ -527,7 +535,6 @@
             });
             const appInit = async () => {
 
-                initCKEditor();
             }
 
 
@@ -552,7 +559,7 @@
                     }
                 });
 
-                formData.append('ProjectType', $('#lstProjectType').val());
+                formData.append('ProjectAreaID', $('#lstProjectArea').val());
                 formData.append('Slug', $('#txtSlug').val());
                 formData.append('ClientID', $('#lstClient').val());
                 formData.append('ServiceID', $('#lstService').val());
@@ -654,8 +661,8 @@
                                             $('#lstServiceID-err').html(
                                                 KeyValue);
                                         }
-                                        if (key == "ProjectType") {
-                                            $('#lstProjectType-err').html(
+                                        if (key == "ProjectAreaID") {
+                                            $('#lstProjectArea-err').html(
                                                 KeyValue);
                                         }
                                         if (key == "Slug") {
@@ -826,6 +833,9 @@
                     status = false;
                 }
             });
+            $(document).on('change', '#lstProjectType', async function() {
+                getProjectArea();
+            });
 
             appInit();
         });
@@ -882,22 +892,15 @@
                 //alert("count is :"+galleryCount);
             });
 
-
-            // Event handler for removing input box
-            // Attach the event handler to a static parent element of the dynamically generated gallery items
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
-                // Get the input element associated with the clicked dropify clear button
                 const inputElement = $(this).closest('.dropify-wrapper').find('input[type="file"]')[0];
 
-                // Get the value of the data-slno attribute
                 const dataSlno = inputElement.getAttribute('data-slno');
 
-                // Log the data-slno value to the console
                 console.log("data-slno:", dataSlno);
 
-                // Assuming DeletedGalleryImg is defined elsewhere in your code
                 DeletedGalleryImg.push(dataSlno);
-                console.log("DeletedGalleryImg:", DeletedGalleryImg); // Ensure it's getting populated
+                console.log("DeletedGalleryImg:", DeletedGalleryImg);
             });
 
             $(document).on('click', '.btnRemoveGallery', function() {
@@ -994,7 +997,7 @@
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 700/1167,
+                // aspectRatio: 700/1167,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
@@ -1134,5 +1137,6 @@
             // Remove the entire input section
             parentDiv.remove();
         });
+
     </script>
 @endsection

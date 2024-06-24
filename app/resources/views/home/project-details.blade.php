@@ -42,7 +42,7 @@
                             </div>
                             <div class="icon-content">
                                 <h4 class="title m-b5">Project Type</h4>
-                                <p>{{$Project->ProjectTypeName}}</p>
+                                <p>{{$Project->ProjectAreaName}}</p>
                             </div>
                         </div>
                         <div class="icon-bx-wraper style-7 left m-b30">
@@ -147,11 +147,11 @@
     <div class="container-fluid">
         <div class="swiper-container swiper-portfolio lightgallery aos-item" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="400">
             <div class="swiper-wrapper">
-                @foreach ($LatestProjects->where('Slug','!=',$Project->Slug)->shuffle() as $key=>$item)
+                @foreach ($Projects->where('Slug','!=',$Project->Slug)->shuffle() as $key=>$item)
                     <div class="swiper-slide">
                         <div class="dz-box overlay style-1 @if($key % 2 != 0)mt-5 @endif">
                             <div class="dz-media">
-                                <img src="{{$item->ProjectImage}}" alt="{{$item->ProjectImage}}">
+                                <img src="{{url('/')}}/{{$item->ProjectImage}}" alt="{{basename($item->ProjectImage)}}">
                             </div>
                             <div class="dz-info">
                                 <span data-exthumbimage="{{$item->ProjectImage}}" data-src="{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>

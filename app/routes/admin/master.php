@@ -179,7 +179,7 @@ Route::group(['prefix' => 'projects'], function () {
         Route::post('/get/tax', 'getTax');
         Route::post('/get/uom', 'getUOM');
         Route::post('/getclients', 'getClients');
-        Route::post('/get-project-type', 'getProjectType');
+        Route::post('/get-project-area', 'getProjectArea');
         
         Route::post('/check/project-name', 'checkProjectName');
         Route::post('/check/slug', 'checkSlug');

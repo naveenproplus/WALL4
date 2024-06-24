@@ -31,37 +31,60 @@
 	<div class="container">
 		<div class="site-filters style-1 clearfix center">
 			<ul class="filters" data-toggle="buttons">
-				<li class="btn active">
+				<li data-filter=".Residential" class="btn">
 					<input type="radio">
-					<a href="javascript:void(0);">All</a> 
+					<a href="javascript:void(0);">Residential</a>
 				</li>
-				@foreach ($ProjectType as $item)
-					<li data-filter=".{{$item->PID}}" class="btn">
-						<input type="radio">
-						<a href="javascript:void(0);">{{$item->ProjectTypeName}}</a>
-					</li>
-				@endforeach
+				<li data-filter=".Commercial" class="btn">
+					<input type="radio">
+					<a href="javascript:void(0);">Commercial</a>
+				</li>
 			</ul>
 		</div>
 	</div>
-	<div class="container">
-		<ul id="masonry" class="row lightgallery">
-			@foreach ($Projects as $item)
-				<li class="card-container col-xl-4 col-md-6 col-sm-6 {{$item->ProjectType}} m-b30">
+	<div class="container" id="divProjectArea">
+		<ul id="masonry" class="row">
+			@foreach ($ProjectArea as $key=>$item)
+				<li class="card-container col-xl-4 col-md-6 col-sm-6 {{$item->ProjectType}} m-b30 project-area" id="liProjectArea{{$key}}">
 					<div class="dz-box overlay style-1">
 						<div class="dz-media">
-							<img src="{{$item->ProjectImage}}" alt="{{$item->ProjectName}}">
+							<img loading="lazy" src="{{url('/')}}/{{$item->ProjectAreaImage}}" alt="{{$item->ProjectAreaName}}">
 						</div>
 						<div class="dz-info">
-							<span data-exthumbimage="{{$item->ProjectImage}}" data-src="{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
-							<h6 class="sub-title">{{$item->ServiceName}}</h6>
-							<h4 class="title m-b15"><a href="{{url('/')}}/projects/{{$item->Slug}}">{{$item->ProjectName}} <span>{{$item->ProjectAddress}}</span></a></h4>
+							<span 
+								data-exthumbimage{{$key}}="{{url('/')}}/{{$item->ProjectAreaImage}}"
+								data-src="{{url('/')}}/{{$item->ProjectAreaImage}}" 
+								class="view-btn lightimg{{$key}}" 
+								title="{{$item->ProjectAreaName}}" 
+								style="cursor: pointer"
+							></span>
+							@foreach ($Projects->where('ProjectAreaID',$item->ProjectAreaID) as $row)
+								<span 
+									data-exthumbimage{{$key}}="{{url('/')}}/{{$row->ProjectImage}}" 
+									data-src="{{url('/')}}/{{$row->ProjectImage}}" 
+									class="lightimg{{$key}}" 
+									title="{{$item->ProjectAreaName}}"
+								></span>
+								@foreach ($row->ProjectGallery as $gallery)
+									<span 
+										data-exthumbimage{{$key}}="{{url('/')}}/{{$gallery}}" 
+										data-src="{{url('/')}}/{{$gallery}}" 
+										class="lightimg{{$key}}" 
+										title="{{$item->ProjectAreaName}}"
+									></span>
+								@endforeach
+							@endforeach
+							<h6 class="sub-title">{{$item->ProjectAreaName}}</h6>
+							<h4 class="title m-b15"><a href="javascript:void(0);">{{$item->ProjectAreaName}}</a></h4>
 						</div>
 					</div>
 				</li>
 			@endforeach
 		</ul>
 	</div>
+	
+	
+	
 </section>
 <!-- Our Strategy -->
 <section class="section-full dz-content-bx style-2 text-white" >
@@ -73,7 +96,7 @@
 				</div>
 				<div class="col-lg-6 aos-item" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
 					<div class="content-media right">
-						<img src="{{url('/')}}/assets/home/images/video/pic2-1.jpg" alt="">
+						<img loading="lazy" src="{{url('/')}}/assets/home/images/video/pic2-1.jpg" alt="">
 					</div>
 				</div>
 			</div>
@@ -122,5 +145,28 @@
 
 @endsection
 @section('scripts')
+	<script>
+		$(document).ready(function () {
 
+			var PojectTypeTrigger = setInterval(function() {
+				if ($('#accordionFaq').length) {
+					$('li[data-filter=".Residential"] input[type="radio"]').trigger('click');
+					clearInterval(PojectTypeTrigger);
+				}
+			}, 100);
+
+
+			$('#divProjectArea .project-area').each(function(i){
+				$('#liProjectArea'+ i).lightGallery({
+					selector: '.lightimg' + i,
+					loop: true,
+					thumbnail: true,
+					exThumbImage: 'data-exthumbimage'+ i,
+					download: false,
+					share: false
+				});
+			});
+
+		});
+	</script>
 @endsection
