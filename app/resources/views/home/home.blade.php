@@ -150,7 +150,7 @@
 								</div>
 								<div class="icon-content">
 								<h4 class="title m-b10"><a href="{{url('/')}}/services">{{$item->ServiceName}}</a></h4>
-									<p class="m-b30 service-content">{{$item->Title}}</p>
+									<p class="m-b30 service-content">{{$item->Description1 ?? $item->Description2}}</p>
 									<a href="{{url('/')}}/services" class="btn btn-primary btn-rounded btn-sm hover-icon">
 										<span>Read More</span>
 										<i class="fas fa-arrow-right"></i>
@@ -185,12 +185,12 @@
 							<div class="swiper-slide">
 								<div class="dz-box overlay style-1 @if($key % 2 != 0)mt-5 @endif">
 									<div class="dz-media">
-										<img loading="lazy" src="{{$item->ProjectImage}}" alt="{{$item->ProjectImage}}">
+										<img loading="lazy" src="{{url('/')}}/{{$item->ProjectImage}}" alt="{{$item->Slug}}">
 									</div>
 									<div class="dz-info">
-										<span data-exthumbimage="{{$item->ProjectImage}}" data-src="{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
+										<span data-exthumbimage="{{url('/')}}/{{$item->ProjectImage}}" data-src="{{url('/')}}/{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
 										<h6 class="sub-title">{{$item->ServiceName}}</h6>
-										<h4 class="title m-b15"><a href="{{url('/')}}/projects/{{$item->Slug}}">{{$item->ProjectName}} <span>{{$item->ProjectAddress}}</span></a></h4>
+										<h4 class="title m-b15"><a href="{{-- {{url('/')}}/projects/{{$item->Slug}} --}} javascript:void(0);">{{$item->ProjectName}} <span>{{$item->ProjectAddress}}</span></a></h4>
 									</div>
 								</div>
 							</div>
@@ -260,88 +260,6 @@
 				</div>
 			</div>
 		</section>
-		<!-- Blog -->
-		{{-- <section class="content-inner bg-gray line-img" style="background-image:url({{url('/')}}/assets/home/images/background/bg2.png); background-position:right bottom; background-size:100%; background-repeat:no-repeat;">
-			<div class="container">
-				<div class="section-head style-1 text-center">
-					<h6 class="sub-title text-primary">OUR BLOG</h6>
-					<h2 class="title">Latest News Feed</h2>
-				</div> 
-				<div class="blog-area">
-					<div class="row">
-						<div class="col-lg-4 col-md-12 m-b30">
-							<div class="dz-card blog-grid style-1 aos-item h-100 overlay-post" data-aos="fade-up" data-aos-duration="2000" data-aos-delay="200">
-								<div class="dz-media">
-									<a href="blog-details.html"><img src="{{url('/')}}/assets/home/images/blog/pic1.jpg" alt=""></a>
-								</div>
-								<div class="dz-info">
-									<div class="dz-meta">
-										<ul>
-											<li class="post-date"><strong>20</strong><span>March</span></li>
-											<li class="post-category"><a href="javascript:void(0);">Architectural</a></li>
-											<li class="post-user">By <a href="javascript:void(0);">John Doe</a></li>
-										</ul>
-									</div>
-									<h5 class="dz-title"><a href="blog-details.html">Sed lacinia pulvinar odio, nec tempus augue.</a></h5>
-									<div class="read-more">
-										<a href="blog-details.html" class="btn btn-primary btn-rounded btn-sm hover-icon">
-											<span>Read More</span>
-											<i class="fas fa-arrow-right"></i>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6 m-b30">
-							<div class="dz-card blog-grid style-1 aos-item h-100" data-aos="fade-up" data-aos-duration="2000" data-aos-delay="500">
-								<div class="dz-media">
-									<a href="blog-details.html"><img src="{{url('/')}}/assets/home/images/blog/blog-grid/pic2.jpg" alt=""></a>
-								</div>
-								<div class="dz-info">
-									<div class="dz-meta">
-										<ul>
-											<li class="post-date"><strong>15</strong><span>March</span></li>
-											<li class="post-category"><a href="javascript:void(0);">Architectural</a></li>
-											<li class="post-user">By <a href="javascript:void(0);">John Doe</a></li>
-										</ul>
-									</div>
-									<h5 class="dz-title"><a href="blog-details.html">Integer vestibulum rutrum aliquet cras.</a></h5>
-									<div class="read-more">
-										<a href="blog-details.html" class="btn btn-primary btn-rounded btn-sm hover-icon">
-											<span>Read More</span>
-											<i class="fas fa-arrow-right"></i>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6 m-b30">
-							<div class="dz-card blog-grid style-1 aos-item h-100" data-aos="fade-up" data-aos-duration="2000" data-aos-delay="800">
-								<div class="dz-media">
-									<a href="blog-details.html"><img src="{{url('/')}}/assets/home/images/blog/blog-grid/pic3.jpg" alt=""></a>
-								</div>
-								<div class="dz-info">
-									<div class="dz-meta">
-										<ul>
-											<li class="post-date"><strong>05</strong><span>March</span></li>
-											<li class="post-category"><a href="javascript:void(0);">Architectural</a></li>
-											<li class="post-user">By <a href="javascript:void(0);">John Doe</a></li>
-										</ul>
-									</div>
-									<h5 class="dz-title"><a href="blog-details.html">Aenean sit amet ex nec nisl consectetur iaculis.</a></h5>
-									<div class="read-more">
-										<a href="blog-details.html" class="btn btn-primary btn-rounded btn-sm hover-icon">
-											<span>Read More</span>
-											<i class="fas fa-arrow-right"></i>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section> --}}
 
 		<!-- Top Clients -->
 		<section class="content-inner-1">

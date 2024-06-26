@@ -105,7 +105,7 @@
 </section>
 
 <!-- Map & FAQs -->
-<section class="section-full content-inner overflow-hidden" style="background-image:url(assets/home/images/background/bg1.png); background-position:left top; background-size:100%; background-repeat:no-repeat;">
+<section class="section-full content-inner overflow-hidden" style="background-image:url({{url('/')}}/assets/home/images/background/bg1.png); background-position:left top; background-size:100%; background-repeat:no-repeat;">
 	<div class="container">
 		<div class="row align-items-center">
 			<div class="col-lg-6 m-b30 aos-item aos-init aos-animate" data-aos="fade-right" data-aos-duration="800" data-aos-delay="300">
@@ -148,10 +148,10 @@
 	<script>
 		$(document).ready(function () {
 
-			var PojectTypeTrigger = setInterval(function() {
-				if ($('#accordionFaq').length) {
+			var ProjectTypeTrigger = setInterval(function() {
+				if ($('.project-area.Commercial').css('display') != 'none') {
 					$('li[data-filter=".Residential"] input[type="radio"]').trigger('click');
-					clearInterval(PojectTypeTrigger);
+					clearInterval(ProjectTypeTrigger);
 				}
 			}, 100);
 

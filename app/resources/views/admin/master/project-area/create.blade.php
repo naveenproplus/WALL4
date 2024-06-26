@@ -329,15 +329,15 @@
     </script>
     <script>
         $(document).ready(function() {
+
             
             $('#txtProjectAreaImage').dropify({
                 showRemove: false
             });
             
-            const UploadImages = async () => {
+            const SUploadImages = async () => {
                 let uploadImages = await new Promise((resolve, reject) => {
-                    ajaxIndicatorStart(
-                        "% Completed. Please wait until the upload process is complete.");
+                    ajaxIndicatorStart("% Completed. Please wait until the upload gets complete.");
                     setTimeout(() => {
                         let count = $("input.imageScrop").length;
                         let completed = 0;
@@ -353,9 +353,7 @@
                         const uploadComplete = async (e, x, settings, exception) => {
                             completed++;
                             let percentage = (100 * completed) / count;
-                            $('#divProcessText').html(percentage +
-                                '% Completed. Please wait until the upload process is complete.'
-                            );
+                            $('#divProcessText').html(percentage +'% Completed. Please wait until the upload gets complete.');
                             checkUploadCompleted();
                         };
 
@@ -370,34 +368,22 @@
                             $.ajax({
                                 type: "post",
                                 url: "{{ url('/') }}/admin/tmp/upload-image",
-                                headers: {
-                                    'X-CSRF-Token': $('meta[name=_token]')
-                                        .attr('content')
-                                },
+                                headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')},
                                 data: formData,
                                 dataType: "json",
-                                error: function(e, x, settings, exception) {
-                                    ajaxErrors(e, x, settings,
-                                        exception);
-                                },
+                                error: function(e, x, settings, exception) {ajaxErrors(e, x, settings,exception);},
                                 complete: uploadComplete,
                                 success: function(response) {
-                                    if (response.referData
-                                        .isCoverImage == 1) {
+                                    if (response.referData.isCoverImage == 1) {
                                         images.coverImg = {
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName
+                                            uploadPath: response.uploadPath,
+                                            fileName: response.fileName
                                         };
                                     } else {
                                         images.gallery.push({
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName,
-                                            slno: response
-                                                .referData.slno
+                                            uploadPath: response.uploadPath,
+                                            fileName: response.fileName,
+                                            slno: response.referData.slno
                                         });
                                     }
                                     console.log(images);
@@ -416,16 +402,12 @@
                                     index: rowIndex,
                                     id: id,
                                     slno: $('#' + id).attr('data-slno'),
-                                    isCoverImage: $('#' + id).attr(
-                                        'data-is-cover-image')
-                                };
+                                    isCoverImage: $('#' + id).attr('data-is-cover-image')};
                                 upload(formData);
                             } else {
                                 completed++;
                                 let percentage = (100 * completed) / count;
-                                $('#divProcessText').html(percentage +
-                                    '% Completed. Please wait until the upload process is complete.'
-                                );
+                                $('#divProcessText').html(percentage +'% Completed. Please wait until the upload gets complete.');
                                 checkUploadCompleted();
                             }
                         });
@@ -450,7 +432,7 @@
                 return status;
             }
             const getData = async() => {
-                let tmp = await UploadImages();
+                let tmp = await SUploadImages();
                 let formData = new FormData();
                 formData.append('ProjectAreaName', $('#txtProjectAreaName').val());
                 formData.append('ProjectType', $('#lstProjectType').val());

@@ -121,10 +121,10 @@
                     <div class="swiper-slide">
                         <div class="dz-box overlay style-1 @if($key % 2 != 0)mt-5 @endif">
                             <div class="dz-media">
-                                <img loading="lazy" src="{{$item->ProjectImage}}" alt="{{$item->ProjectImage}}">
+                                <img loading="lazy" src="{{url('/')}}/{{$item->ProjectImage}}" alt="{{$item->Slug}}">
                             </div>
                             <div class="dz-info">
-                                <span data-exthumbimage="{{$item->ProjectImage}}" data-src="{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
+                                <span data-exthumbimage="{{url('/')}}/{{$item->ProjectImage}}" data-src="{{url('/')}}/{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
                                 <h6 class="sub-title">{{$item->ServiceName}}</h6>
                                 <h4 class="title m-b15"><a href="{{-- {{url('/')}}/projects/{{$item->Slug}} --}}javascript:void(0);">{{$item->ProjectName}} <span>{{$item->ProjectAddress}}</span></a></h4>
                             </div>

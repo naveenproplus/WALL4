@@ -98,7 +98,7 @@ const ajaxErrors=async(e, x, settings, exception)=> {
         } else if (x == 'abort') {
             //message = "Request was aborted by the server";
         }
-        console.log(isToastr)
+        console.log(isToastr);
         if ((message != "")&&(message!=undefined)) {
             if(isToastr==true){
                 toastr.error(message, "Failed", {
@@ -158,7 +158,7 @@ const ajaxErrors=async(e, x, settings, exception)=> {
 const UploadImages = async () => {
     let RootUrl=$('#txtRootUrl').val();
     let uploadImages=await new Promise((resolve,reject)=>{
-        ajaxIndicatorStart("% Completed. Please wait for until upload process complete.");
+        ajaxIndicatorStart("% Completed. Please wait for until upload gets complete.");
         setTimeout(() => {
             let count = $("input.imageScrop").length;
             let completed = 0;
@@ -168,12 +168,12 @@ const UploadImages = async () => {
                 completed++;
                 let percentage=(100*completed)/count;
                 console.log(percentage);
-                $('#divProcessText').html(percentage + '% Completed. Please wait for until upload process complete.');
+                $('#divProcessText').append(percentage + '% Completed. Please wait for until upload gets complete.');
                 checkUploadCompleted();
             }
             const checkUploadCompleted=async()=>{
                 if(count<=completed){
-                    ajaxIndicatorStop();
+                    // ajaxIndicatorStop();
                     resolve(images);
                 }
             }
@@ -213,7 +213,7 @@ const UploadImages = async () => {
                 }else{
                     completed++;
                     let percentage=(100*completed)/count;
-                    $('#divProcessText').html(percentage + '% Completed. Please wait for until upload process complete.');
+                    $('#divProcessText').html(percentage + '% Completed. Please wait for until upload gets complete.');
                     checkUploadCompleted();
                 }
             });

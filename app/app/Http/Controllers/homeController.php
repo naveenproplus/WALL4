@@ -121,7 +121,16 @@ class homeController extends Controller
         $FormData = $this->FormData;
         $FormData['isEdit'] = true;
         $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug',$Slug)->value('PageName');
-        return view('home.'.$Slug, $FormData);
+        if ($FormData['PageTitle']) {
+            if ($FormData['PageTitle'] == 'Projects'){
+                foreach($FormData['Projects'] as $project){
+                    $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$project->ProjectID)->pluck('ImageUrl');
+                }
+            }
+            return view('home.'.$Slug, $FormData);
+        } else {
+            return view('errors.404');
+        }
     }
     public function PrivacyPolicyView(Request $req){
         $FormData = $this->FormData;
