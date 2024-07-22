@@ -46,7 +46,7 @@
 								<div class="overlay-slide" data-swiper-parallax="100%"></div>
 							</div>
 						</div>
-						<div class="swiper-slide">
+						{{-- <div class="swiper-slide">
 							<div class="silder-img overlay-black-light">
 								<img loading="lazy" src="{{url('/')}}/{{$Contents['img-home-slider3']}}" class="edit-content" id="img-home-slider3" data-swiper-parallax="30%" alt="">
 							</div>
@@ -56,7 +56,7 @@
 								</div>
 								<div class="overlay-slide" data-swiper-parallax="100%"></div>
 							</div>
-						</div>
+						</div> --}}
 					</div>
 					<div class="slider-one-pagination">
 						<!-- Add Navigation -->

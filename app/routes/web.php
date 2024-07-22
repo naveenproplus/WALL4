@@ -21,6 +21,7 @@ Route::get('/clear', function () {
     Artisan::call('view:clear');
     return "Cleared!";
 });
+
 Route::controller(homeController::class)->group(function () {
     Route::get('/', 'HomeView');
     Route::get('/home', 'HomeView');
@@ -44,7 +45,6 @@ Route::controller(homeController::class)->group(function () {
     Route::post('/get/projects', 'getProjectsList');
     Route::post('/save/service-enquiry', 'ServiceEnquirySave');
     Route::post('/save/contact-enquiry', 'ContactEnquirySave');
-
 });
 Route::controller(supportController::class)->group(function () {
     Route::post('/get/country', 'GetCountry');

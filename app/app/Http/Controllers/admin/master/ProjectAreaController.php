@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin\master;
 
+use App\helper\helper;
 use App\Http\Controllers\admin\logController;
 use App\Http\Controllers\Controller;
 use App\Models\DocNum;
@@ -122,7 +123,6 @@ class ProjectAreaController extends Controller
             $img = json_decode($req->Images, true);
 
             $OldData = $NewData = array();
-            $ProjectAreaID = "";
             $rules = array(
                 'ProjectAreaName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_project_area", "WHERE" => " ProjectAreaName='" . $req->ProjectAreaName . "'"), "This Project Area Name is already exists.")],
             );
@@ -140,19 +140,26 @@ class ProjectAreaController extends Controller
             }
             DB::beginTransaction();
             $status = false;
-            $ProjectAreaImage = "";
             try {
-
+                $ProjectAreaImage = "";
                 $ProjectAreaID = $this->DocNum->getDocNum("Project-Area");
-
                 $dir = "uploads/admin/master/project-area/";
                 if (!file_exists($dir)) {mkdir($dir, 0777, true);}
                 
-                if ($img && array_key_exists("coverImg", $img)) {
-                    if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                        $ProjectAreaImage = $dir . $img['coverImg']['fileName'];
-                        rename($img['coverImg']['uploadPath'], $ProjectAreaImage);
+                if ($img && array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
+                    $UploadedImage = $img['coverImg']['uploadPath'];
+                    $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                    $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                    $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                
+                    copy($UploadedImage, $defaultImage);
+                    $webImage = helper::compressImageToWebp($defaultImage);
+                    if($webImage['status']){
+                        $ProjectAreaImage = $webImage['path'];
+                    }else{
+                        return $webImage;
                     }
+                    unlink($UploadedImage);
                 }
 
                 $data = array(
@@ -222,15 +229,25 @@ class ProjectAreaController extends Controller
                 $ProjectAreaImage = "";
                 $dir = "uploads/admin/master/project-area/";
                 if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                
-                if ($img && array_key_exists("coverImg", $img)) {
-                    if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                        $ProjectAreaImage = $dir . $img['coverImg']['fileName'];
-                        rename($img['coverImg']['uploadPath'], $ProjectAreaImage);
-                        $OldImage = $OldData[0]->ProjectAreaImage;
-                    }
-                }
 
+
+                if ($img && array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
+                    $UploadedImage = $img['coverImg']['uploadPath'];
+                    $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                    $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                    $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                
+                    copy($UploadedImage, $defaultImage);
+                    $webImage = helper::compressImageToWebp($defaultImage);
+                    if($webImage['status']){
+                        $ProjectAreaImage = $webImage['path'];
+                    }else{
+                        return $webImage;
+                    }
+                    $OldImage = $OldData[0]->ProjectAreaImage;
+                    unlink($UploadedImage);
+                }
+                
                 $data = array(
                     "ProjectAreaName" => $req->ProjectAreaName,
                     "ProjectType" => $req->ProjectType,
@@ -427,4 +444,8 @@ class ProjectAreaController extends Controller
             return response(array('status' => false, 'message' => "Access Denied"), 403);
         }
     }
+
+    
+    
+    
 }

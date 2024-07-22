@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin\master;
 
+use App\helper\helper;
 use App\Http\Controllers\admin\logController;
 use App\Http\Controllers\Controller;
 use App\Models\DocNum;
@@ -146,7 +147,13 @@ class categoryController extends Controller
                     $fileName = md5($file->getClientOriginalName() . time());
                     $fileName1 = $fileName . "." . $file->getClientOriginalExtension();
                     $file->move($dir, $fileName1);
-                    $CategoryImage = $dir . $fileName1;
+                    $originalFilePath = $dir . $fileName1;
+                    $webImage = helper::compressImageToWebp($originalFilePath);
+                    if($webImage['status']){
+                        $CategoryImage = $webImage['path'];
+                    }else{
+                        return $webImage;
+                    }
                 }
 
                 $data = array(
@@ -210,12 +217,14 @@ class categoryController extends Controller
                     $fileName = md5($file->getClientOriginalName() . time());
                     $fileName1 = $fileName . "." . $file->getClientOriginalExtension();
                     $file->move($dir, $fileName1);
-                    $CategoryImage = $dir . $fileName1;
-
-                    $result = DB::Table('tbl_category')->where('CID', $CID)->get();
-                    if (count($result) > 0) {
-                        $CImage = $result[0]->CImage;
+                    $originalFilePath = $dir . $fileName1;
+                    $webImage = Helper::compressImageToWebp($originalFilePath);
+                    if($webImage['status']){
+                        $CategoryImage = $webImage['path'];
+                    }else{
+                        return $webImage;
                     }
+                    $CImage = $OldData[0]->CImage;
                 }
 
                 $data = array(
@@ -233,7 +242,6 @@ class categoryController extends Controller
             }
             if ($status == true) {
                 DB::commit();
-
                 if ($CImage != "") {
                     if (file_exists($CImage)) {
                         unlink($CImage);

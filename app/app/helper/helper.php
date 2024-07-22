@@ -87,4 +87,62 @@ class helper{
         }
         return false;
 	}
+	public static function compressImageToWebp($filePath) {
+		$quality = 90;
+		$maxFileSizes = [100 * 1024, 200 * 1024, 300 * 1024, 400 * 1024, 500 * 1024]; // 100KB to 500KB
+	
+		$pathInfo = pathinfo($filePath);
+		$extension = strtolower($pathInfo['extension']);
+		
+		if (!in_array($extension, ['jpeg', 'jpg', 'png'])) {
+			return ['status' => false, 'message' => 'Unsupported image type'];
+		}
+	
+		$webpFilePath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '-web.webp';
+	
+		switch ($extension) {
+			case 'jpeg':
+			case 'jpg':
+				$image = imagecreatefromjpeg($filePath);
+				break;
+			case 'png':
+				$image = imagecreatefrompng($filePath);
+				break;
+		}
+	
+		if ($image === false) {
+			return ['status' => false, 'message' => 'Failed to create image resource'];
+		}
+	
+		foreach ($maxFileSizes as $maxFileSize) {
+			$compressionSuccess = false;
+			$currentQuality = $quality;
+	
+			while (!$compressionSuccess && $currentQuality > 10) {
+				imagewebp($image, $webpFilePath, $currentQuality);
+				clearstatcache(true, $webpFilePath); // Clear cache to get the correct file size
+				$fileSize = filesize($webpFilePath);
+	
+				if ($fileSize <= $maxFileSize) {
+					$compressionSuccess = true;
+				} else {
+					$currentQuality -= 10;
+				}
+			}
+	
+			if ($compressionSuccess) {
+				imagedestroy($image);
+				unlink($filePath);
+				return ['status' => true, 'message' => 'Image successfully compressed', 'path' => $webpFilePath];
+			}
+		}
+	
+		imagedestroy($image);
+	
+		// Remove the partially compressed file if it exists
+		if (file_exists($webpFilePath)) {
+			unlink($webpFilePath);
+		}
+		return ['status' => false, 'message' => 'Compression failed'];
+	}
 }

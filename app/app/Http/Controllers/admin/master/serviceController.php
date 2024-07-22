@@ -180,8 +180,7 @@ class serviceController extends Controller
         return $result;
     }
 
-    public function Save(Request $req)
-    {
+    public function Save(Request $req){
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -215,10 +214,8 @@ class serviceController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if (array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        unlink($img['coverImg']['uploadPath']);
-                    }
+                if (array_key_exists("coverImg", $img) && file_exists($img['coverImg']['uploadPath'])) {
+                    unlink($img['coverImg']['uploadPath']);
                 }
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $gallery) {
@@ -232,34 +229,47 @@ class serviceController extends Controller
             DB::beginTransaction();
             $status = false;
             $ServiceImage = "";
-            $ServiceIcon = ""; // New variable for service icon
             $galleryUrls = [];
-            $newserviceIconPath = "";
             try {
                 $ServiceID = $this->DocNum->getDocNum("Services");
                 $dir = "uploads/admin/master/services/" . $ServiceID . "/";
                 if (!file_exists($dir)) {
                     mkdir($dir, 0777, true);
                 }
-                // Handle service icon upload
-                if (array_key_exists("serviceIcon", $img)) {
-                    if (file_exists($img['serviceIcon']['uploadPath'])) {
-                        $ServiceIcon = $this->addWaterMark->addWaterMark($img['serviceIcon']['uploadPath'], $dir, $img['serviceIcon']['fileName'], true);
-                        unlink($img['serviceIcon']['uploadPath']);
-                    }
-                }
                 if (array_key_exists("coverImg", $img)) {
                     if (file_exists($img['coverImg']['uploadPath'])) {
-                        $ServiceImage = $this->addWaterMark->addWaterMark($img['coverImg']['uploadPath'], $dir, $img['coverImg']['fileName'], true);
-                        unlink($img['coverImg']['uploadPath']);
+                        $UploadedImage = $img['coverImg']['uploadPath'];
+                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                        $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                    
+                        copy($UploadedImage, $defaultImage);
+                        $webImage = Helper::compressImageToWebp($defaultImage);
+                        if($webImage['status']){
+                            $ServiceImage = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
+                        unlink($UploadedImage);
                     }
                 }
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
-                            $tmp = $this->addWaterMark->addWaterMark($pg['uploadPath'], $dir, $pg['fileName'], true);
+                            $UploadedImage = $pg['uploadPath'];
+                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                            $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                        
+                            copy($UploadedImage, $defaultImage);
+                            $webImage = Helper::compressImageToWebp($defaultImage);
+                            if($webImage['status']){
+                                $tmp = $webImage['path'];
+                            }else{
+                                return $webImage;
+                            }
+                            unlink($UploadedImage);
                             $galleryUrls[] = $tmp;
-                            unlink($pg['uploadPath']);
                         }
                     }
                 }
@@ -284,15 +294,15 @@ class serviceController extends Controller
                     "CreatedBy" => $this->UserID,
                 );
                 $status = DB::Table('tbl_services')->insert($data);
-                // Store gallery images URLs in the database
+
                 if ($status && !empty($galleryUrls)) {
                     foreach ($galleryUrls as $url) {
                         $SLNO = $this->DocNum->getDocNum("Service-Gallery");
                         $inserted = DB::table('tbl_services_gallery')->insert([
+                            'SLNO' => $SLNO,
                             'ServiceID' => $ServiceID,
                             'ImageUrl' => $url,
-                            'SLNO' => $SLNO,
-                            'CreatedOn' => date("Y-m-d H:i:s"),
+                            'CreatedOn' => date("Y-m-d H:i:s")
                         ]);
                         if ($inserted) {
                             $this->DocNum->updateDocNum("Service-Gallery");
@@ -307,27 +317,13 @@ class serviceController extends Controller
                 DB::commit();
                 $this->DocNum->updateDocNum("Services");
                 $NewData = $this->getServices(array("ServiceID" => $ServiceID));
-                $logData = array(
-                    "Description" => "New Service Created ",
-                    "ModuleName" => $this->ActiveMenuName,
-                    "Action" => cruds::ADD,
-                    "ReferID" => $ServiceID,
-                    "OldData" => $OldData,
-                    "NewData" => $NewData,
-                    "UserID" => $this->UserID,
-                    "IP" => $req->ip(),
-                );
+                $logData = array( "Description" => "New Service Created ","ModuleName" => $this->ActiveMenuName,"Action" => cruds::ADD,"ReferID" => $ServiceID,"OldData" => $OldData,"NewData" => $NewData,"UserID" => $this->UserID,"IP" => $req->ip(),);
                 $this->logs->Store($logData);
 
-                return [
-                    'status' => true,
-                    'message' => "Service Create Successfully",
-                ];
+                return ['status' => true,'message' => "Service Create Successfully"];
             } else {
-                if ($ServiceImage != "") {
-                    if (file_exists($ServiceImage)) {
-                        unlink($ServiceImage);
-                    }
+                if ($ServiceImage && file_exists($ServiceImage)) {
+                    unlink($ServiceImage);
                 }
                 foreach ($galleryUrls as $url) {
                     if (file_exists($url)) {
@@ -335,19 +331,14 @@ class serviceController extends Controller
                     }
                 }
                 DB::rollback();
-
-                return [
-                    'status' => false,
-                    'message' => "Service Create Failed",
-                ];
+                return [ 'status' => false, 'message' => "Service Create Failed"];
             }
         } else {
             return response()->json(['status' => false, 'message' => "Access Denied"], 403);
         }
     }
 
-    public function Update(Request $req, $ServiceID)
-    {
+    public function Update(Request $req, $ServiceID){
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -390,10 +381,8 @@ class serviceController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if (array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        unlink($img['coverImg']['uploadPath']);
-                    }
+                if (array_key_exists("coverImg", $img) && file_exists($img['coverImg']['uploadPath'])) {
+                    unlink($img['coverImg']['uploadPath']);
                 }
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $gallery) {
@@ -404,49 +393,52 @@ class serviceController extends Controller
                 }
                 return array('status' => false, 'message' => "Service Update Failed", 'errors' => $validator->errors());
             }
+
             DB::beginTransaction();
             $status = false;
             $ServiceImage = "";
-            $ServiceIcon = ""; // New variable for service icon
-            $gallery = [];
-            $newServiceIconPath = "";
+            $SImage = "";
+            $galleryUrls = [];
             try {
                 $OldData = $this->getServices(array("ServiceID" => $ServiceID));
                 $dir = "uploads/admin/master/services/" . $ServiceID . "/";
                 if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                // Handle cover image
-                $newServiceImgPath = '';
-
-                // Check if a new cover image is uploaded
-                if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    // Generate new filename for the cover image
-                    $newServiceImgPath = $dir . $img['coverImg']['fileName'];
-                    // Move the image file
-                    rename($img['coverImg']['uploadPath'], $newServiceImgPath);
-                    // Unlink the existing cover image file
-                    if (is_array($OldData) && array_key_exists('ServiceImage', $OldData) && file_exists($OldData['ServiceImage'])) {
-                        unlink($OldData['ServiceImage']);
+                
+                if (array_key_exists("coverImg", $img)) {
+                    if (file_exists($img['coverImg']['uploadPath'])) {
+                        $UploadedImage = $img['coverImg']['uploadPath'];
+                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                        $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                    
+                        copy($UploadedImage, $defaultImage);
+                        $webImage = Helper::compressImageToWebp($defaultImage);
+                        if($webImage['status']){
+                            $ServiceImage = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
+                        unlink($UploadedImage);
+                        $SImage = $OldData[0]->ServiceImage;
                     }
                 }
-
-                // Handle service icon upload
-                if (array_key_exists('serviceIcon', $img) && file_exists($img['serviceIcon']['uploadPath'])) {
-                    // Generate new filename for the cover image
-                    $newServiceIconPath = $dir . $img['serviceIcon']['fileName'];
-                    // Move the image file
-                    rename($img['serviceIcon']['uploadPath'], $newServiceIconPath);
-                    // Unlink the existing cover image file
-                    if (is_array($OldData) && array_key_exists('serviceIcon', $OldData) && file_exists($OldData['serviceIcon'])) {
-                        unlink($OldData['serviceIcon']);
-                    }
-                }
-
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
-                            $tmp = $this->addWaterMark->addWaterMark($pg['uploadPath'], $dir, $pg['fileName'], true);
-                            $gallery[] = array("slno" => $pg['slno'], "ServiceID" => $ServiceID, "ImageUrl" => $tmp);
-                            unlink($pg['uploadPath']);
+                            $UploadedImage = $pg['uploadPath'];
+                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                            $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                        
+                            copy($UploadedImage, $defaultImage);
+                            $webImage = Helper::compressImageToWebp($defaultImage);
+                            if($webImage['status']){
+                                $tmp = $webImage['path'];
+                            }else{
+                                return $webImage;
+                            }
+                            unlink($UploadedImage);
+                            $galleryUrls[] = array("slno" => $pg['slno'], "ServiceID" => $ServiceID, "ImageUrl" => $tmp);
                         }
                     }
                 }
@@ -472,18 +464,13 @@ class serviceController extends Controller
                 );
 
                 // Check if both ServiceImage and ServiceIcon paths are not empty
-                if ($newServiceImgPath != "" && $newServiceIconPath != "") {
-                    $data["ServiceImage"] = $newServiceImgPath;
+                if ($ServiceImage != "") {
+                    $data["ServiceImage"] = $ServiceImage;
                 }
-                // Check if only ServiceImage path is not empty
-                elseif ($newServiceImgPath != "") {
-                    $data["ServiceImage"] = $newServiceImgPath;
-                }
-                // Check if only ServiceIcon path is not empty
 
                 $status = DB::table('tbl_services')->where('ServiceID', $ServiceID)->update($data);
                 if ($status) {
-                    foreach ($gallery as $pg) {
+                    foreach ($galleryUrls as $pg) {
                         if ($status) {
                             $tmp = DB::Table('tbl_services_gallery')->where('slno', $pg['slno'])->where('ServiceID', $ServiceID)->get();
                             if ($pg['slno'] != "" && count($tmp) > 0) {
@@ -520,9 +507,9 @@ class serviceController extends Controller
 
             if ($status == true) {
                 DB::commit();
-                if ($ServiceImage != "") {
-                    if (file_exists($ServiceImage)) {
-                        unlink($ServiceImage);
+                if ($SImage != "") {
+                    if (file_exists($SImage)) {
+                        unlink($SImage);
                     }
                 }
                 $NewData = $this->getServices(array("ServiceID" => $ServiceID));
@@ -541,7 +528,7 @@ class serviceController extends Controller
                     }
                 }
                 DB::rollback();
-                return array('status' => false, 'message' => "Service update Failed");
+                return array('status' => false, 'message' => "Service Update Failed");
             }
         } else {
             return response(array('status' => false, 'message' => "Access Denied"), 403);

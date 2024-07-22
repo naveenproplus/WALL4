@@ -45,7 +45,7 @@
                                                     echo url('/') . '/' . $EditData[0]->ProjectAreaImage;
                                                 }
                                             } ?>"
-                                            data-allowed-file-extensions="jpeg jpg png gif"
+                                            data-allowed-file-extensions="jpeg jpg png"
                                             data-is-cover-image="1" />
                                         <span class="errors" id="txtProjectAreaImage-err"></span>
                                     </div>

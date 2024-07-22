@@ -44,7 +44,7 @@
             <div class="swiper-container swiper-team">
                 <div class="swiper-wrapper justify-content-center">
                     @foreach($item as $emp)
-                        <div class="swiper-slide">
+                        <div class="swiper-slide w-auto">
                             <div class="card dz-team style-1">
                                 <div class="card-media">
                                     <img src="{{$emp->ProfileImage}}" alt="{{$emp->FirstName}}">

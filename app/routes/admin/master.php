@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\master\categoryController;
 use App\Http\Controllers\admin\master\ProjectAreaController;
 use App\Http\Controllers\admin\master\projectsController;
 use App\Http\Controllers\admin\master\youtubeVideoController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'category'], function () {
     Route::controller(categoryController::class)->group(function () {

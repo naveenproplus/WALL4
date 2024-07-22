@@ -165,7 +165,7 @@ class ClientsController extends Controller
 
             $rules = array(
                 'Name' => 'required|min:3|max:50',
-                'Address' => 'required|min:10',
+                // 'Address' => 'required|min:10',
                 'MobileNumber' => ['required', new ValidUnique(array("TABLE" => "users", "WHERE" => " EMail='" . $req->MobileNumber . "' "), "This Mobile Number is already taken.")],
                 // 'Gender' => ['required', new ValidDB($ValidDB['Gender'])],
                 'StateID' => ['required', new ValidDB($ValidDB['State'])],
@@ -176,7 +176,7 @@ class ClientsController extends Controller
             );
             $message = array(
             );
-            if ($req->ProfileImage != "") {$rules['PImage'] = 'mimes:jpeg,jpg,png,gif,bmp';}
+            if ($req->ProfileImage != "") {$rules['PImage'] = 'mimes:jpeg,jpg,png';}
             if ($req->EMail != "") {$rules['EMail'] = ['required', 'email', new ValidUnique(array("TABLE" => "tbl_client", "WHERE" => " email='" . $req->EMail . "' "), "This E-Mail is already taken.")];}
 
             $validator = Validator::make($req->all(), $rules, $message);
@@ -212,18 +212,19 @@ class ClientsController extends Controller
                     );
                     $dir = "uploads/admin/master/clients/";
                     if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                    if($req->hasFile('ProfileImage')){
-                        $file = $req->file('ProfileImage');
-                        $fileName=md5($file->getClientOriginalName() . time());
-                        $fileName1 =  $fileName. "." . $file->getClientOriginalExtension();
-                        $file->move($dir, $fileName1);
-                        $data["ProfileImage"]=$dir.$fileName1;
-                    }elseif($req->ProfileImage){
+                    if($req->ProfileImage){
                         $Img=json_decode($req->ProfileImage);
                         if(file_exists($Img->uploadPath)){
                             $fileName1=$Img->fileName!=""?$Img->fileName:Helper::RandomString(10)."png";
                             copy($Img->uploadPath,$dir.$fileName1);
-                            $data["ProfileImage"]=$dir.$fileName1;
+                            
+                            $originalFilePath = $dir . $fileName1;
+                            $webImage = Helper::compressImageToWebp($originalFilePath);
+                            if($webImage['status']){
+                                $data["ProfileImage"] = $webImage['path'];
+                            }else{
+                                return $webImage;
+                            }
                             unlink($Img->uploadPath);
                         }
                     }
@@ -232,7 +233,13 @@ class ClientsController extends Controller
                         if (!file_exists($Tdir)) {mkdir($Tdir, 0777, true);}
                         $fileName = md5($req->file('Thumbnail')->getClientOriginalName() . time()) . "." . $req->file('Thumbnail')->getClientOriginalExtension();
                         $req->file('Thumbnail')->move($Tdir, $fileName);
-                        $data["Thumbnail"] = $Tdir . $fileName;
+                        $originalFilePath = $Tdir . $fileName;
+                        $webImage = Helper::compressImageToWebp($originalFilePath);
+                        if($webImage['status']){
+                            $data["Thumbnail"] = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
                     }
 
                     Log::info('Received data:', $data);
@@ -248,11 +255,6 @@ class ClientsController extends Controller
                 $NewData = DB::Table('tbl_client')->where('ClientID', $ClientID)->get();
                 return array('status' => true, 'message' => "Client Create Successfully");
             } else {
-                if ($ProfileImage != "") {
-                    if (file_exists($ProfileImage)) {
-                        unlink($ProfileImage);
-                    }
-                }
                 DB::rollback();
                 return array('status' => false, 'message' => "Client Create Failed");
             }
@@ -341,27 +343,34 @@ class ClientsController extends Controller
                 
                 $dir = "uploads/admin/master/clients/";
                 if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                if($req->hasFile('ProfileImage')){
-					$file = $req->file('ProfileImage');
-					$fileName=md5($file->getClientOriginalName() . time());
-					$fileName1 =  $fileName. "." . $file->getClientOriginalExtension();
-					$file->move($dir, $fileName1);
-                    $data["ProfileImage"]=$dir.$fileName1;
-				}elseif($req->ProfileImage){
-					$Img=json_decode($req->ProfileImage);
-					if(file_exists($Img->uploadPath)){
-						$fileName1=$Img->fileName!=""?$Img->fileName:Helper::RandomString(10)."png";
-						copy($Img->uploadPath,$dir.$fileName1);
-                        $data["ProfileImage"]=$dir.$fileName1;
-						unlink($Img->uploadPath);
-					}
-				}
+                if($req->ProfileImage){
+                    $Img=json_decode($req->ProfileImage);
+                    if(file_exists($Img->uploadPath)){
+                        $fileName1=$Img->fileName!=""?$Img->fileName:Helper::RandomString(10)."png";
+                        copy($Img->uploadPath,$dir.$fileName1);
+                        
+                        $originalFilePath = $dir . $fileName1;
+                        $webImage = Helper::compressImageToWebp($originalFilePath);
+                        if($webImage['status']){
+                            $data["ProfileImage"] = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
+                        unlink($Img->uploadPath);
+                    }
+                }
                 if ($req->hasFile('Thumbnail')) {
                     $Tdir = "uploads/admin/master/clients/thumbnail/";
                     if (!file_exists($Tdir)) {mkdir($Tdir, 0777, true);}
                     $fileName = md5($req->file('Thumbnail')->getClientOriginalName() . time()) . "." . $req->file('Thumbnail')->getClientOriginalExtension();
                     $req->file('Thumbnail')->move($Tdir, $fileName);
-                    $data["Thumbnail"] = $Tdir . $fileName;
+                    $originalFilePath = $Tdir . $fileName;
+                    $webImage = Helper::compressImageToWebp($originalFilePath);
+                    if($webImage['status']){
+                        $data["Thumbnail"] = $webImage['path'];
+                    }else{
+                        return $webImage;
+                    }
                 }elseif($req->isThumbnailRemoved){
                     $data['Thumbnail'] = "";
                 }
@@ -419,7 +428,6 @@ class ClientsController extends Controller
             DB::beginTransaction();
             $status = false;
             try {
-
                 $status = DB::table('tbl_client')->where('ClientID', $ClientID)->update(array("DFlag" => 0, "DeletedBy" => $this->UserID, "DeletedOn" => date("Y-m-d H:i:s")));
             } catch (Exception $e) {
                 Log::error($e->getMessage());

@@ -250,6 +250,34 @@ jQuery(document).ready(function() {
 		});
 	}
 	
+	// Team Swiper
+	if(jQuery('.team-swiper').length > 0){
+		var swiper8 = new Swiper('.team-swiper', {
+			speed: 1500,
+			parallax: true,
+			slidesPerView: 4,
+			spaceBetween: 30,
+			loop:true,
+			navigation: {
+				nextEl: '.swiper-button-next4',
+				prevEl: '.swiper-button-prev4',
+			},
+			breakpoints: {
+				1191: {
+					slidesPerView: 4,
+				},
+				991: {
+					slidesPerView: 3,
+				},
+				591: {
+					slidesPerView: 2,
+				},
+				320: {
+					slidesPerView: 1,
+				},
+			}
+		});
+	}
 
 	
 	// Clients Swiper

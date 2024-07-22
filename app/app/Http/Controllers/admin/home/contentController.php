@@ -222,24 +222,26 @@ class contentController extends Controller{
 			$status=false;
 			try{
 				foreach($req->HomeContents as $row){
-					$isSlugExists = DB::table('tbl_home_contents')->where('Slug',$row['Slug'])->exists();
-					if(!$isSlugExists){
-						$TranNo=$this->DocNum->getDocNum("Home-Content");
-						$data=[
-							"TranNo"=>$TranNo,
-							"Slug"=>$row['Slug'],
-							"Content"=>$row['Content'],
-							"CreatedBy"=>$this->UserID
-						];
-						$status=DB::Table('tbl_home_contents')->insert($data);
-						$this->DocNum->updateDocNum("Home-Content");
-					}else{
-						$data=[
-							"Content"=>$row['Content'],
-							"UpdatedOn"=>date("Y-m-d H:i:s"),
-							"UpdatedBy"=>$this->UserID
-						];
-						$status=DB::Table('tbl_home_contents')->where('Slug',$row['Slug'])->update($data);	
+					if(array_key_exists('Slug',$row) && $row['Slug']){
+						$isSlugExists = DB::table('tbl_home_contents')->where('Slug',$row['Slug'])->exists();
+						if(!$isSlugExists){
+							$TranNo=$this->DocNum->getDocNum("Home-Content");
+							$data=[
+								"TranNo"=>$TranNo,
+								"Slug"=>$row['Slug'],
+								"Content"=>$row['Content'],
+								"CreatedBy"=>$this->UserID
+							];
+							$status=DB::Table('tbl_home_contents')->insert($data);
+							$this->DocNum->updateDocNum("Home-Content");
+						}else{
+							$data=[
+								"Content"=>$row['Content'],
+								"UpdatedOn"=>date("Y-m-d H:i:s"),
+								"UpdatedBy"=>$this->UserID
+							];
+							$status=DB::Table('tbl_home_contents')->where('Slug',$row['Slug'])->update($data);
+						}
 					}
 				}
 			}catch(Exception $e) {
@@ -267,15 +269,25 @@ class contentController extends Controller{
 			$status=false;
 			try{
 				$ImageUrl= "";
+				$dir = "uploads/home/content/";
+				if (!file_exists($dir)) {mkdir($dir, 0777, true);}
 
 				if ($req->hasFile('croppedImage')) {
-					$dir = "uploads/home/content/";
-					if (!file_exists($dir)) {mkdir($dir, 0777, true);}
 					$file = $req->file('croppedImage');
-					$fileName1 =  $req->Slug . "-" . Helper::RandomString(10) . "." . $file->getClientOriginalExtension();
-					$file->move($dir, $fileName1);
-					$ImageUrl=$dir.$fileName1;
+					$originalFileName = $req->Slug . "-" . Helper::RandomString(10);
+					$originalExtension = $file->getClientOriginalExtension();
+					$originalFilePath = $dir . $originalFileName . '.' . $originalExtension;
+				
+					$file->move($dir, $originalFileName . '.' . $originalExtension);
+				
+					$webImage = Helper::compressImageToWebp($originalFilePath);
+                    if($webImage['status']){
+                        $ImageUrl = $webImage['path'];
+                    }else{
+                        return $webImage;
+                    }
 				}
+				
 				if($ImageUrl){
 					$isSlugExists = DB::table('tbl_home_contents')->where('Slug',$req->Slug)->exists();
 					if(!$isSlugExists){
@@ -296,6 +308,8 @@ class contentController extends Controller{
 						];
 						$status=DB::Table('tbl_home_contents')->where('Slug',$req->Slug)->update($data);
 					}
+				}else{
+					return ['status'=>false,'message'=>"Image not found!"];
 				}
 
 			}catch(Exception $e) {

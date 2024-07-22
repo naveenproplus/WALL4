@@ -12,6 +12,7 @@ use App\Models\support;
 use App\Rules\ValidUnique;
 use Auth;
 use cruds;
+use Helper;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -31,6 +32,7 @@ class projectsController extends Controller
     private $Settings;
     private $Menus;
     private $addWaterMark;
+    
     public function __construct()
     {
         $this->ActiveMenuName = "Projects";
@@ -138,8 +140,7 @@ class projectsController extends Controller
         return $result;
     }
 
-    public function Save(Request $req)
-    {
+    public function Save(Request $req){
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -156,7 +157,7 @@ class projectsController extends Controller
             );
 
             $message = [
-                'ClientID.required' => 'Client field is required.', // Customize the error message for ClientID
+                'ClientID.required' => 'Client field is required.',
             ];
 
             $validator = Validator::make($req->all(), $rules, $message);
@@ -183,22 +184,42 @@ class projectsController extends Controller
             try {
                 $ProjectID = $this->DocNum->getDocNum("Projects");
                 $dir = "uploads/admin/master/projects/" . $ProjectID . "/";
-                if (!file_exists($dir)) {
-                    mkdir($dir, 0777, true);
-                }
+                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
 
                 if (array_key_exists("coverImg", $img)) {
                     if (file_exists($img['coverImg']['uploadPath'])) {
-                        $ProjectImage = $this->addWaterMark->addWaterMark($img['coverImg']['uploadPath'], $dir, $img['coverImg']['fileName'], true);
-                        unlink($img['coverImg']['uploadPath']);
+                        $UploadedImage = $img['coverImg']['uploadPath'];
+                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                        $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                    
+                        copy($UploadedImage, $defaultImage);
+                        $webImage = Helper::compressImageToWebp($defaultImage);
+                        if($webImage['status']){
+                            $ProjectImage = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
+                        unlink($UploadedImage);
                     }
                 }
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
-                            $tmp = $this->addWaterMark->addWaterMark($pg['uploadPath'], $dir, $pg['fileName'], true);
+                            $UploadedImage = $pg['uploadPath'];
+                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                            $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                        
+                            copy($UploadedImage, $defaultImage);
+                            $webImage = Helper::compressImageToWebp($defaultImage);
+                            if($webImage['status']){
+                                $tmp = $webImage['path'];
+                            }else{
+                                return $webImage;
+                            }
+                            unlink($UploadedImage);
                             $galleryUrls[] = $tmp;
-                            unlink($pg['uploadPath']);
                         }
                     }
                 }
@@ -216,7 +237,7 @@ class projectsController extends Controller
                     "CreatedBy" => $this->UserID,
                 );
 
-                if ($ProjectImage !== null) {
+                if ($ProjectImage) {
                     $data["ProjectImage"] = $ProjectImage;
                 }
 
@@ -237,8 +258,7 @@ class projectsController extends Controller
                     }
                 }
             } catch (Exception $e) {
-                Log::error('Error inserting project: ' . $e->getMessage()); // Log the exception message
-
+                Log::error('Error inserting project: ' . $e->getMessage());
                 $status = false;
             }
 
@@ -260,7 +280,7 @@ class projectsController extends Controller
 
                 return [
                     'status' => true,
-                    'message' => "Project Create Successfully",
+                    'message' => "Project Created Successfully",
                 ];
             } else {
                 if ($ProjectImage != "") {
@@ -275,10 +295,7 @@ class projectsController extends Controller
                 }
                 DB::rollback();
 
-                return [
-                    'status' => false,
-                    'message' => "Project Create Failed",
-                ];
+                return [ 'status' => false, 'message' => "Project Create Failed"];
             }
         } else {
             return response()->json(['status' => false, 'message' => "Access Denied"], 403);
@@ -286,7 +303,7 @@ class projectsController extends Controller
     }
 
     public function Update(Request $req, $ProjectID)
-    {
+    { return 1;
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -327,20 +344,44 @@ class projectsController extends Controller
                 $newProjectImgPath = '';
 
                 if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    $newProjectImgPath = $dir . $img['coverImg']['fileName'];
-                    rename($img['coverImg']['uploadPath'], $newProjectImgPath);
-                    if (is_array($OldData) && array_key_exists('ProjectImage', $OldData) && file_exists($OldData['ProjectImage'])) {
-                        unlink($OldData['ProjectImage']);
+
+                    if (file_exists($img['coverImg']['uploadPath'])) {
+                        $UploadedImage = $img['coverImg']['uploadPath'];
+                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                        $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                    
+                        copy($UploadedImage, $defaultImage);
+                        $webImage = Helper::compressImageToWebp($defaultImage);
+                        if($webImage['status']){
+                            $newProjectImgPath = $webImage['path'];
+                        }else{
+                            return $webImage;
+                        }
+                        unlink($UploadedImage);
+                        $ProjectImage = $OldData[0]->ServiceImage;
                     }
                 }
 
                 // Store gallery images URLs in the database
                 if (array_key_exists("gallery", $img)) {
+                    
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
-                            $tmp = $this->addWaterMark->addWaterMark($pg['uploadPath'], $dir, $pg['fileName'], true);
-                            $gallery[] = array("slno" => $pg['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
-                            unlink($pg['uploadPath']);
+                            $UploadedImage = $pg['uploadPath'];
+                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                            $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
+                        
+                            copy($UploadedImage, $defaultImage);
+                            $webImage = Helper::compressImageToWebp($defaultImage);
+                            if($webImage['status']){
+                                $tmp = $webImage['path'];
+                            }else{
+                                return $webImage;
+                            }
+                            unlink($UploadedImage);
+                            $galleryUrls[] = array("slno" => $pg['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
                         }
                     }
                 }
@@ -405,7 +446,7 @@ class projectsController extends Controller
 
             if ($status == true) {
                 DB::commit();
-                if ($ProjectImage != "") {
+                if ($ProjectImage) {
                     if (file_exists($ProjectImage)) {
                         unlink($ProjectImage);
                     }
@@ -415,7 +456,7 @@ class projectsController extends Controller
                 $this->logs->Store($logData);
                 return array('status' => true, 'message' => "Project updated Successfully");
             } else {
-                if ($ProjectImage != "") {
+                if ($ProjectImage) {
                     if (file_exists($ProjectImage)) {
                         unlink($ProjectImage);
                     }

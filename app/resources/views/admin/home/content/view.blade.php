@@ -24,10 +24,10 @@
 								<div class="col-md-4 my-2"><h5>{{$PageTitle}}</h5></div>
 								<div class="col-md-4 my-2 text-right text-md-right">
 									@if($crud['restore']==1)
-										<a href="{{url('/')}}/admin/home/content/restore" class="btn  btn-outline-dark btn-sm  full-right mr-10" type="button" >Restore</a>
+										{{-- <a href="{{url('/')}}/admin/home/content/restore" class="btn  btn-outline-dark btn-sm  full-right mr-10" type="button" >Restore</a> --}}
 									@endif
 									@if($crud['add']==1)
-										<a href="{{url('/')}}/admin/home/content/create" class="btn  btn-outline-success btn-sm btn-air-success  full-right" type="button" >Create</a>
+										{{-- <a href="{{url('/')}}/admin/home/content/create" class="btn  btn-outline-success btn-sm btn-air-success  full-right" type="button" >Create</a> --}}
 									@endif
 								</div>
 							</div>

@@ -820,14 +820,14 @@
                 formData.append('Description3', $('#txtDescription3').val());
 
                 // Append dynamically added images
-                $('.gallery-item input[type="file"]').each(function(index, element) {
+                /* $('.gallery-item input[type="file"]').each(function(index, element) {
                     var files = $(element)[0].files;
                     if (files.length > 0) {
                         $.each(files, function(i, file) {
                             formData.append('gallery_images[]', file);
                         });
                     }
-                });
+                }); */
 
                 formData.append('Images', JSON.stringify(tmp));
                 formData.append('DeletedGalleryImg', JSON.stringify(DeletedGalleryImg));
