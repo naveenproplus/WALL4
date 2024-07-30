@@ -281,11 +281,18 @@ class contentController extends Controller{
 					$file->move($dir, $originalFileName . '.' . $originalExtension);
 				
 					$webImage = Helper::compressImageToWebp($originalFilePath);
-                    if($webImage['status']){
-                        $ImageUrl = $webImage['path'];
-                    }else{
-                        return $webImage;
-                    }
+					if ($webImage['status']) {
+						$ImageUrl = $webImage['path'];
+						
+						$files = glob($dir . '*');
+						foreach ($files as $file) {
+							if (is_file($file) && strpos(basename($file), $req->Slug) !== false && realpath($file) != realpath($ImageUrl)) {
+								unlink($file);
+							}
+						}
+					} else {
+						return $webImage;
+					}
 				}
 				
 				if($ImageUrl){

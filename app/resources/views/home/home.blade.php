@@ -26,7 +26,7 @@
 					<div class="swiper-wrapper">
 						<div class="swiper-slide">
 							<div class="silder-img overlay-black-light">
-								<img loading="lazy" src="{{url('/')}}/{{$Contents['img-home-slider1']}}" class="edit-content" id="img-home-slider1" data-swiper-parallax="30%" alt="">
+								<img loading="lazy" src="{{url('/')}}/{{$Contents['img-home-slider1']}}" {{-- class="edit-content" --}} id="img-home-slider1" data-swiper-parallax="30%" alt="">
 							</div>
 							<div class="silder-content" data-swiper-parallax="-40%">
 								<div class="inner-content edit-content" id="home-slider-content1">
@@ -37,7 +37,7 @@
 						</div>
 						<div class="swiper-slide">
 							<div class="silder-img overlay-black-light">
-								<img loading="lazy" src="{{url('/')}}/{{$Contents['img-home-slider2']}}" class="edit-content" id="img-home-slider2" data-swiper-parallax="30%" alt="">
+								<img loading="lazy" src="{{url('/')}}/{{$Contents['img-home-slider2']}}" {{-- class="edit-content" --}} id="img-home-slider2" data-swiper-parallax="30%" alt="">
 							</div>
 							<div class="silder-content" data-swiper-parallax="-40%">
 								<div class="inner-content edit-content" id="home-slider-content2">
@@ -252,7 +252,7 @@
 							{!!$Contents['our-strategy']!!}
 						</div>
 						<div class="col-lg-6 aos-item" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-							<div class="content-media right edit-content">
+							<div class="content-media right">
 								<img loading="lazy" src="{{url('/')}}/assets/home/images/video/pic2-1.jpg" alt="">
 							</div>
 						</div>

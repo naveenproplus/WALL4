@@ -382,8 +382,7 @@ class ClientsController extends Controller
             }
             if($status){
                 DB::commit();
-                return ['status' => true, 'message' => "Client Update Successfully"];
-                
+                return ['status' => true, 'message' => "Client Updated Successfully"];
             }else{
                 DB::rollback();
                 Log::error('Client Update Failed: ' . $e->getMessage());

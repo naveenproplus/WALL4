@@ -177,10 +177,10 @@
 					</p>
 					<a href="{{ url('/') }}/about-us" class="btn btn-primary btn-sm btn-rounded">READ MORE</a>
 				</div>
-				<div class="dz-title">
+				{{-- <div class="dz-title">
 					<h4>Gallery</h4>
 					<div class="dz-separator style-1 text-primary mb-0"></div>
-				</div>
+				</div> --}}
 				<div class="widget bg-white widget_gallery">
 					<ul id="lightgallery" class="lightgallery m-b0">
 						@foreach ($Gallery as $item)
@@ -527,7 +527,7 @@
 					$('#inputImage').trigger('click');
 				});
 
-				$("#btnCropApply").on('click', function() {
+				$(document).on('click','#btnCropApply',function(){
 					btnLoading($('#btnCropApply'));
 					var canvas = $image.cropper('getCroppedCanvas');
 					if (!canvas) {

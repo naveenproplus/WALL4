@@ -303,7 +303,7 @@ class projectsController extends Controller
     }
 
     public function Update(Request $req, $ProjectID)
-    { return 1;
+    {
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -359,13 +359,12 @@ class projectsController extends Controller
                             return $webImage;
                         }
                         unlink($UploadedImage);
-                        $ProjectImage = $OldData[0]->ServiceImage;
+                        $ProjectImage = $OldData[0]->ProjectImage;
                     }
                 }
 
                 // Store gallery images URLs in the database
                 if (array_key_exists("gallery", $img)) {
-                    
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
                             $UploadedImage = $pg['uploadPath'];
@@ -381,7 +380,7 @@ class projectsController extends Controller
                                 return $webImage;
                             }
                             unlink($UploadedImage);
-                            $galleryUrls[] = array("slno" => $pg['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
+                            $gallery[] = array("slno" => $pg['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
                         }
                     }
                 }
