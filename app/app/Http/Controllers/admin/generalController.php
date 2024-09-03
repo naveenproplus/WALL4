@@ -114,4 +114,21 @@ class generalController extends Controller
         }
         return array();
     }
+    public function tempUpload(Request $req){
+		if($req->hasFile('image')){
+			$tempPath = 'uploads/temp/'.date("Ymd")."/";
+			if (!file_exists($tempPath)) {
+				mkdir($tempPath, 0755, true);
+			}
+			$file = $req->file('image');
+			$fileName1=$file->getClientOriginalName();
+			if($file->move($tempPath, $fileName1)){
+				return ['status' => true, 'message' => 'File uploaded successfully',"referData"=>$req->referData,"uploadDir"=>$tempPath,"fileName"=>$fileName1,"uploadURL"=>$tempPath.$fileName1];
+			}else{
+				return ['status' => false, 'message' => 'File upload failed'];
+			}
+		}else{
+			return ['status' => false, 'message' => 'File upload failed'];
+		}
+	}
 }

@@ -124,7 +124,7 @@ class ProjectAreaController extends Controller
 
             $OldData = $NewData = array();
             $rules = array(
-                'ProjectAreaName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_project_area", "WHERE" => " ProjectAreaName='" . $req->ProjectAreaName . "'"), "This Project Area Name is already exists.")],
+                'ProjectAreaName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_project_area", "WHERE" => "ProjectAreaName='" . $req->ProjectAreaName . "' and ProjectType ='" . $req->ProjectType . "'"), "This Project Area Name is already exists.")],
             );
             $message = array();
 
@@ -206,7 +206,7 @@ class ProjectAreaController extends Controller
             $OldData = DB::table('tbl_project_area')->where('ProjectAreaID', $ProjectAreaID)->get();
 
             $rules = array(
-                'ProjectAreaName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_project_area", "WHERE" => " ProjectAreaName='" . $req->ProjectAreaName . "' and ProjectAreaID<>'" . $ProjectAreaID . "'"), "This Project Area Name already exists.")],
+                'ProjectAreaName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_project_area", "WHERE" => " ProjectAreaName='" . $req->ProjectAreaName . "' and ProjectType ='" . $req->ProjectType . "' and  ProjectAreaID <>'" . $ProjectAreaID . "'"), "This Project Area Name already exists.")],
             );
 
             $message = array();

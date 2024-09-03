@@ -681,8 +681,8 @@ class projectsController extends Controller
     public function checkProjectName(Request $req)
     {
         $sql = "Select * from tbl_projects Where ProjectName='" . $req->ProjectName . "'";
-        if ($req->serviceID != "") {
-            $sql .= " and ProjectID<>'" . $req->projectID . "'";
+        if ($req->ProjectID != "") {
+            $sql .= " and ProjectID <>'" . $req->ProjectID . "'";
         }
         $result = DB::SELECT($sql);
         if (count($result) > 0) {

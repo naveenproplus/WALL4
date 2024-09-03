@@ -321,6 +321,7 @@
     <script src="{{ url('/') }}/assets/js/theme-customizer/customizer.js?r={{ date('dmyHis') }}"></script>
     <!-- login js-->
     <script src="{{ url('/') }}/assets/js/custom.js?r={{ date('dmyHis') }}"></script>
+    <script src="{{ url('/') }}/assets/js/customFileUpload.js?r={{ date('dmyHis') }}"></script>
     <script src="{{ url('/') }}/assets/js/support.js?r={{ date('dmyHis') }}"></script>
     <!-- Plugin used-->
     @yield('script')

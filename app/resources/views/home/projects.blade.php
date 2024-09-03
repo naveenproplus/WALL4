@@ -31,6 +31,10 @@
 	<div class="container">
 		<div class="site-filters style-1 clearfix center">
 			<ul class="filters" data-toggle="buttons">
+				{{-- <li data-filter="" class="btn">
+					<input type="radio">
+					<a href="javascript:void(0);">All</a>
+				</li> --}}
 				<li data-filter=".Residential" class="btn">
 					<input type="radio">
 					<a href="javascript:void(0);">Residential</a>
@@ -44,7 +48,7 @@
 	</div>
 	<div class="container" id="divProjectArea">
 		<ul id="masonry" class="row">
-			@foreach ($ProjectArea as $key=>$item)
+			@foreach ($ProjectArea/* ->filter(function ($item) {return strpos($item->ProjectAreaName, 'Other') !== 0;}) */ as $key => $item)
 				<li class="card-container col-xl-4 col-md-6 col-sm-6 {{$item->ProjectType}} m-b30 project-area" id="liProjectArea{{$key}}">
 					<div class="dz-box overlay style-1">
 						<div class="dz-media">
@@ -87,7 +91,7 @@
 	
 </section>
 <!-- Our Strategy -->
-<section class="section-full dz-content-bx style-2 text-white" >
+{{-- <section class="section-full dz-content-bx style-2 text-white" >
 	<div class="dz-content-inner bg-dark" style="background-image: url({{url('/')}}/assets/home/images/background/bg2-1.png); background-position: center;">
 		<div class="container">
 			<div class="row">
@@ -102,7 +106,7 @@
 			</div>
 		</div>
 	</div>
-</section>
+</section> --}}
 
 <!-- Map & FAQs -->
 <section class="section-full content-inner overflow-hidden" style="background-image:url({{url('/')}}/assets/home/images/background/bg1.png); background-position:left top; background-size:100%; background-repeat:no-repeat;">
@@ -149,9 +153,12 @@
 		$(document).ready(function () {
 
 			var ProjectTypeTrigger = setInterval(function() {
-				if ($('.project-area.Commercial').css('display') != 'none') {
+				if( $('#divProjectArea .project-area').length > 0){
+					console.log(1);
 					$('li[data-filter=".Residential"] input[type="radio"]').trigger('click');
-					clearInterval(ProjectTypeTrigger);
+					if ($('#divProjectArea .project-area').length > 0 && $('.project-area.Commercial').css('display') == 'none') {
+						clearInterval(ProjectTypeTrigger);
+					}
 				}
 			}, 100);
 

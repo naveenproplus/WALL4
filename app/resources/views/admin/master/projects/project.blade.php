@@ -997,7 +997,7 @@
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 700/1167,
+                aspectRatio: 0,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
