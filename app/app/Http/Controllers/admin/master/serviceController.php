@@ -391,7 +391,8 @@ class serviceController extends Controller
 
             if ($validator->fails()) {
                 if (!empty($req->profileImage) && $req->profileImage !== "undefined") {
-                    unlink($req->profileImage);
+                    $profileImage = json_decode($req->profileImage, true);
+                    unlink($profileImage);
                 }
                 if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
                     foreach ($req->gallery_images as $imageData) {
