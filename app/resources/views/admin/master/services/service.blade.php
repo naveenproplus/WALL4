@@ -15,7 +15,8 @@
             <div class="row">
                 <div class="col-sm-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}/admin"><i class="f-16 fa fa-home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}/admin"><i class="f-16 fa fa-home"></i></a>
+                        </li>
                         <li class="breadcrumb-item">Master</li>
                         <li class="breadcrumb-item"><a
                                 href="{{ url('/') }}/admin/master/services">{{ $PageTitle }}</a></li>
@@ -163,10 +164,15 @@
                                                         <div class="form-group">
                                                             <label for="">Active Status</label>
                                                             <select class="form-control" id="lstActiveStatus">
-                                                                <option value="1" @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active</option>
-                                                                <option value="0" @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif> Inactive</option>
+                                                                <option value="1"
+                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active
+                                                                </option>
+                                                                <option value="0"
+                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif>
+                                                                    Inactive</option>
                                                             </select>
-                                                            <div class="errors err-sm ServiceInfo" id="lstActiveStatus-err">
+                                                            <div class="errors err-sm ServiceInfo"
+                                                                id="lstActiveStatus-err">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -176,30 +182,46 @@
                                                 <div class="row">
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="">Title <span class="required"> *</span></label>
-                                                            <textarea id="txtTitle" class="form-control" rows="2"><?php if ($isEdit) { echo $EditData[0]->Title; } ?></textarea>
-                                                            <div class="errors err-sm ServiceInfo" id="txtTitle-err"></div>
+                                                            <label for="">Title <span class="required">
+                                                                    *</span></label>
+                                                            <textarea id="txtTitle" class="form-control" rows="2"><?php if ($isEdit) {
+                                                                echo $EditData[0]->Title;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm ServiceInfo" id="txtTitle-err">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="">Description 1<span class="required"> *</span></label>
-                                                            <textarea id="txtDescription1" class="form-control" rows="4"><?php if ($isEdit) { echo $EditData[0]->Description1; } ?></textarea>
-                                                            <div class="errors err-sm ServiceInfo" id="txtDescription1-err"></div>
+                                                            <label for="">Description 1<span class="required">
+                                                                    *</span></label>
+                                                            <textarea id="txtDescription1" class="form-control" rows="4"><?php if ($isEdit) {
+                                                                echo $EditData[0]->Description1;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm ServiceInfo"
+                                                                id="txtDescription1-err"></div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="">Description 2<span class="required"> *</span></label>
-                                                            <textarea id="txtDescription2" class="form-control" rows="4"><?php if ($isEdit) { echo $EditData[0]->Description2; } ?></textarea>
-                                                            <div class="errors err-sm ServiceInfo" id="txtDescription2-err"></div>
+                                                            <label for="">Description 2<span class="required">
+                                                                    *</span></label>
+                                                            <textarea id="txtDescription2" class="form-control" rows="4"><?php if ($isEdit) {
+                                                                echo $EditData[0]->Description2;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm ServiceInfo"
+                                                                id="txtDescription2-err"></div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="">Description 3<span class="required"> *</span></label>
-                                                            <textarea id="txtDescription3" class="form-control" rows="4"><?php if ($isEdit) { echo $EditData[0]->Description3; } ?></textarea>
-                                                            <div class="errors err-sm ServiceInfo" id="txtDescription3-err"></div>
+                                                            <label for="">Description 3<span class="required">
+                                                                    *</span></label>
+                                                            <textarea id="txtDescription3" class="form-control" rows="4"><?php if ($isEdit) {
+                                                                echo $EditData[0]->Description3;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm ServiceInfo"
+                                                                id="txtDescription3-err"></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -210,9 +232,11 @@
                                                         <label>Service Icon</label>
                                                         <div id="iconContainer">
                                                             @foreach ($ServiceIcons as $item)
-                                                                @if($item)
-                                                                    <div class="card icon-card @if ($isEdit && $EditData[0]->ServiceIcon == $item) selected @endif">
-                                                                        <i class="flaticon-{{$item}}" data-title="{{$item}}"></i>
+                                                                @if ($item)
+                                                                    <div
+                                                                        class="card icon-card @if ($isEdit && $EditData[0]->ServiceIcon == $item) selected @endif">
+                                                                        <i class="flaticon-{{ $item }}"
+                                                                            data-title="{{ $item }}"></i>
                                                                     </div>
                                                                 @endif
                                                             @endforeach
@@ -380,14 +404,15 @@
         </div>
     </div>
     <script>
-         $(document).ready(function() {
+        $(document).ready(function() {
             var uploadedImageURL;
+            let uploadData = {};
             var URL = window.URL || window.webkitURL;
             var $dataRotate = $('#dataRotate');
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 5 / 3,
+                aspectRatio: 9 / 6,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
@@ -396,13 +421,31 @@
                 keyboard: false
             });
             $('#ImgCrop').modal('hide');
+
+            const callback = async (response, id, uuid, fileName) => {
+                if (response.uploadURL != undefined) {
+                    $('#' + id).attr('data-upload-url', response.uploadURL);
+                    $('#' + id).attr('src', response.uploadURL);
+                }
+                delete uploadData[uuid];
+                let objKeys = Object.keys(uploadData);
+                let detailID = $('#' + id).attr('data-detail-id');
+                let rowIndex = $('#' + id).attr('data-row-index');
+                if (objKeys.length > 0) {
+                    $('.btnUpdateProductImage[data-detail-id="' + detailID + '"]').attr('data-continue', 0);
+                } else {
+                    $('.btnUpdateProductImage[data-detail-id="' + detailID + '"]').attr('data-continue', 1);
+                }
+                $('.btnRemoveGallery[data-detail-id="' + detailID + '"][data-row-index="' + rowIndex + '"]')
+                    .show();
+            }
             $(document).on('change', '.imageScrop', function() {
+
                 let id = $(this).attr('id');
                 $image.attr('data-id', id);
+                $('#ImgCrop').modal('show');
                 var files = this.files;
                 if (files && files.length) {
-
-                    $('#ImgCrop').modal('show');
                     file = files[0];
                     if (/^image\/\w+$/.test(file.type)) {
                         uploadedImageName = file.name;
@@ -412,6 +455,8 @@
                         }
                         uploadedImageURL = URL.createObjectURL(file);
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+                        $('#' + id).attr('data-file-name', uploadedImageName);
+                        $('#' + id).attr('data-file-ext', uploadedImageType);
                     } else {
                         window.alert('Please choose an image file.');
                     }
@@ -478,6 +523,7 @@
             $('#inputImage').change(function() {
                 var files = this.files;
                 var file;
+                let id = $image.attr('data-id');
                 if (!$image.data('cropper')) {
                     return;
                 }
@@ -491,6 +537,8 @@
                         }
                         uploadedImageURL = URL.createObjectURL(file);
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+                        $('#' + id).attr('data-file-name', uploadedImageName);
+                        $('#' + id).attr('data-file-ext', uploadedImageType);
                         $('#inputImage').val('');
                     } else {
                         window.alert('Please choose an image file.');
@@ -503,28 +551,50 @@
             $("#btnCropApply").on('click', function() {
                 btnLoading($('#btnCropApply'));
                 setTimeout(() => {
-                    var base64 = $image.cropper('getCroppedCanvas').toDataURL();
                     var id = $image.attr('data-id');
+                    let uploadedImageName = $('#' + id).attr('data-file-name');
+                    let ext = $('#' + id).attr('data-file-ext');
+                    var base64 = $image.cropper('getCroppedCanvas').toDataURL(ext, 1.0);
                     $('#' + id).attr('src', base64);
+                    $('#' + id).attr('data-is-new', 1);
+                    $('#' + id).attr('data-remove', 0);
                     $('#' + id).parent().find('img').attr('src', base64)
-
+                    let uuid = generateUUID();
+                    uploadData[uuid] = new customFileUpload(base64, uuid, id, uploadedImageName, {
+                        callback,
+                        uploadURL: "{{ route('temp.upload') }}",
+                        csrfToken: "{{ csrf_token() }}"
+                    });
                     $('#ImgCrop').modal('hide');
                     setTimeout(() => {
                         btnReset($('#btnCropApply'));
                     }, 100);
                 }, 100);
             });
-            $('#btnCropCancel').on('click', function() {
+
+            $(document).on('click', '#ImgCrop button[data-dismiss="modal"]', function() {
                 var id = $image.attr('data-id');
                 $('#' + id).val("");
-                $('#' + id).parent().find('button.dropify-clear').trigger('click');
+                $('#' + id).attr('data-is-new', 0);
+                $('#' + id).attr('data-remove', 1);
+                $('#' + id).attr('data-upload-url', '');
+                $('#' + id).attr('src', "");
+                $('#' + id).parent().find('img').attr('src', "");
+                $('#' + id).parent().find('.dropify-clear').trigger('click');
                 $('#ImgCrop').modal('hide');
+            });
+
+            $(document).on('click', '.dropify-clear', function() {
+                $(this).parent().find('input[type="file"]').attr('data-remove', 1);
+                $(this).parent().find('input[type="file"]').attr('data-is-new', 0);
+                $(this).parent().find('input[type="file"]').attr('data-upload-url', '');
             });
         });
     </script>
     <script>
-        
         var DeletedGalleryImg = [];
+        var DeletedProfileImg = [];
+
         $(document).ready(function() {
             let GalleryCount = parseInt("{{ $GalleryCount }}");
             var currentTab = 0;
@@ -553,8 +623,8 @@
                 }
                 fixStepIndicator(n);
                 let page = x[currentTab].getAttribute('data-page');
-                if(currentTab == 2){
-                    page +="( "+$('#txtServiceName').val()+" )";
+                if (currentTab == 2) {
+                    page += "( " + $('#txtServiceName').val() + " )";
                 }
                 $('#pageTitle').html(page);
             }
@@ -576,7 +646,9 @@
                 let x = document.getElementsByClassName("tab");
                 let page = x[currentTab].getAttribute('data-page');
                 if (page == "Service Info") {
-                    $("html, body").animate({scrollTop: 0}, "slow");
+                    $("html, body").animate({
+                        scrollTop: 0
+                    }, "slow");
                     $('.errors.ServiceInfo').html('');
                     let ServiceName = $('#txtServiceName').val();
                     let HSNSAC = $('#txtHSNSAC').val();
@@ -651,31 +723,46 @@
                         $('#lstActiveStatus-err').html('Active status is required');
                         status = false;
                     }
-                }else if (page == "Service Descriptions") {
-                    
+                } else if (page == "Service Descriptions") {
+
                     let Title = $('#txtTitle').val();
                     let Description1 = $('#txtDescription1').val();
                     let Description2 = $('#txtDescription2').val();
                     let Description3 = $('#txtDescription3').val();
 
-                    if (Title == "") {$('#txtTitle-err').html('Title is required');status = false;
+                    if (Title == "") {
+                        $('#txtTitle-err').html('Title is required');
+                        status = false;
                     } else if (Title.length < 20) {
-                        $('#txtTitle-err').html('The Title must be greater than 20 characters');status = false;
+                        $('#txtTitle-err').html('The Title must be greater than 20 characters');
+                        status = false;
                     }
-                    if (Description1 == "") {$('#txtDescription1-err').html('Description 1 is required');status = false;
+                    if (Description1 == "") {
+                        $('#txtDescription1-err').html('Description 1 is required');
+                        status = false;
                     } else if (Description1.length < 20) {
-                        $('#txtDescription1-err').html('The Description 1 must be greater than 20 characters');status = false;
+                        $('#txtDescription1-err').html('The Description 1 must be greater than 20 characters');
+                        status = false;
                     }
-                    if (Description2 == "") {$('#txtDescription2-err').html('Description 2 is required');status = false;
+                    if (Description2 == "") {
+                        $('#txtDescription2-err').html('Description 2 is required');
+                        status = false;
                     } else if (Description2.length < 20) {
-                        $('#txtDescription2-err').html('The Description 2 must be greater than 20 characters');status = false;
+                        $('#txtDescription2-err').html('The Description 2 must be greater than 20 characters');
+                        status = false;
                     }
-                    if (Description3 == "") {$('#txtDescription3-err').html('Description 3 is required');status = false;
+                    if (Description3 == "") {
+                        $('#txtDescription3-err').html('Description 3 is required');
+                        status = false;
                     } else if (Description3.length < 20) {
-                        $('#txtDescription3-err').html('The Description 3 must be greater than 20 characters');status = false;
+                        $('#txtDescription3-err').html('The Description 3 must be greater than 20 characters');
+                        status = false;
                     }
-                }else if (page == "Service Images") {
-                    if($('.icon-card.selected').length == 0){$('#lstServiceIcon-err').html('Please select any icon');status = false;}
+                } else if (page == "Service Images") {
+                    if ($('.icon-card.selected').length == 0) {
+                        $('#lstServiceIcon-err').html('Please select any icon');
+                        status = false;
+                    }
                 }
 
                 return status;
@@ -802,7 +889,17 @@
                 $('#lstUOM').select2();
             }
             const getData = async () => {
-                let tmp = await UploadImages();
+
+                let isRemoved = $('#txtCoverImg').attr('data-remove') != undefined ? $('#txtCoverImg').attr(
+                    'data-remove') : 0;
+                let isNew = $('#txtCoverImg').attr('data-is-new') != undefined ? $('#txtCoverImg').attr(
+                    'data-is-new') : 0;
+                let url = $('#txtCoverImg').attr('data-upload-url') != undefined ? $('#txtCoverImg').attr(
+                    'data-upload-url') : "";
+                let fileName = $('#txtCoverImg').attr('data-file-name') != undefined ? $('#txtCoverImg')
+                    .attr(
+                        'data-file-name') : "";
+
                 let formData = new FormData();
                 formData.append('ServiceName', $('#txtServiceName').val());
                 formData.append('HSNSAC', $('#txtHSNSAC').val());
@@ -818,21 +915,31 @@
                 formData.append('Description1', $('#txtDescription1').val());
                 formData.append('Description2', $('#txtDescription2').val());
                 formData.append('Description3', $('#txtDescription3').val());
+                formData.append('profileImage', $('#txtCoverImg').data('upload-url'));
 
                 // Append dynamically added images
-                /* $('.gallery-item input[type="file"]').each(function(index, element) {
-                    var files = $(element)[0].files;
-                    if (files.length > 0) {
-                        $.each(files, function(i, file) {
-                            formData.append('gallery_images[]', file);
-                        });
+                $('.gallery-item input[type="file"]').each(function(index, element) {
+                    var $element = $(element);
+                    var uploadUrl = $element.data('upload-url');
+                    var slno = $element.data('slno');
+
+                    if (uploadUrl) {
+                        var imageData = {
+                            url: uploadUrl,
+                            slno: slno
+                        };
+                        formData.append('gallery_images[]', JSON.stringify(imageData));
                     }
-                }); */
+                });
 
-                formData.append('Images', JSON.stringify(tmp));
+                formData.append('profileImage', JSON.stringify({
+                    url,
+                    isRemoved,
+                    isNew,
+                    fileName
+                }));
+
                 formData.append('DeletedGalleryImg', JSON.stringify(DeletedGalleryImg));
-                console.log("Deleted Gallery Images:", DeletedGalleryImg);
-
                 return formData;
             }
 
@@ -960,122 +1067,121 @@
                     });
                 });
             }
-            const UploadImages = async () => {
-                let uploadImages = await new Promise((resolve, reject) => {
-                    ajaxIndicatorStart(
-                        "% Completed. Please wait until the upload process is complete.");
-                    setTimeout(() => {
-                        let count = $("input.imageScrop").length;
-                        let completed = 0;
-                        let rowIndex = 0;
-                        let images = {
-                            coverImg: {
-                                uploadPath: "",
-                                fileName: ""
-                            },
-                            gallery: [],
-                            serviceIcon: {
-                                uploadPath: "", // Assuming serviceIcon upload path
-                                fileName: "" // Assuming serviceIcon file name
-                            }
-                        };
+            // const UploadImages = async () => {
+            //     let uploadImages = await new Promise((resolve, reject) => {
+            //         ajaxIndicatorStart(
+            //             "% Completed. Please wait until the upload process is complete.");
+            //         setTimeout(() => {
+            //             let count = $("input.imageScrop").length;
+            //             let completed = 0;
+            //             let rowIndex = 0;
+            //             let images = {
+            //                 coverImg: {
+            //                     uploadPath: "",
+            //                     fileName: ""
+            //                 },
+            //                 gallery: [],
+            //                 serviceIcon: {
+            //                     uploadPath: "", // Assuming serviceIcon upload path
+            //                     fileName: "" // Assuming serviceIcon file name
+            //                 }
+            //             };
 
-                        const uploadComplete = async (e, x, settings, exception) => {
-                            completed++;
-                            let percentage = (100 * completed) / count;
-                            $('#divProcessText').html(percentage +
-                                '% Completed. Please wait until the upload process is complete.'
-                            );
-                            checkUploadCompleted();
-                        };
+            //             const uploadComplete = async (e, x, settings, exception) => {
+            //                 completed++;
+            //                 let percentage = (100 * completed) / count;
+            //                 $('#divProcessText').html(percentage +
+            //                     '% Completed. Please wait until the upload process is complete.'
+            //                 );
+            //                 checkUploadCompleted();
+            //             };
 
-                        const checkUploadCompleted = async () => {
-                            if (count <= completed) {
-                                ajaxIndicatorStop();
-                                resolve(images);
-                            }
-                        };
+            //             const checkUploadCompleted = async () => {
+            //                 if (count <= completed) {
+            //                     ajaxIndicatorStop();
+            //                     resolve(images);
+            //                 }
+            //             };
 
-                        const upload = async (formData) => {
-                            $.ajax({
-                                type: "post",
-                                url: "{{ url('/') }}/admin/tmp/upload-image",
-                                headers: {
-                                    'X-CSRF-Token': $('meta[name=_token]')
-                                        .attr('content')
-                                },
-                                data: formData,
-                                dataType: "json",
-                                error: function(e, x, settings, exception) {
-                                    ajaxErrors(e, x, settings,
-                                        exception);
-                                },
-                                complete: uploadComplete,
-                                success: function(response) {
-                                    if (response.referData
-                                        .isCoverImage == 1) {
-                                        images.coverImg = {
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName
-                                        };
-                                    } else if (response.referData
-                                        .isServiceIcon == 1
-                                    ) { // Check if it's service icon
-                                        images.serviceIcon = {
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName
-                                        };
-                                    } else {
-                                        images.gallery.push({
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName,
-                                            slno: response
-                                                .referData.slno
-                                        });
-                                    }
-                                    console.log(images);
-                                }
-                            });
-                        };
+            //             const upload = async (formData) => {
+            //                 $.ajax({
+            //                     type: "post",
+            //                     url: "{{ url('/') }}/admin/tmp/upload-image",
+            //                     headers: {
+            //                         'X-CSRF-Token': $('meta[name=_token]')
+            //                             .attr('content')
+            //                     },
+            //                     data: formData,
+            //                     dataType: "json",
+            //                     error: function(e, x, settings, exception) {
+            //                         ajaxErrors(e, x, settings,
+            //                             exception);
+            //                     },
+            //                     complete: uploadComplete,
+            //                     success: function(response) {
+            //                         if (response.referData
+            //                             .isCoverImage == 1) {
+            //                             images.coverImg = {
+            //                                 uploadPath: response
+            //                                     .uploadPath,
+            //                                 fileName: response
+            //                                     .fileName
+            //                             };
+            //                         } else if (response.referData
+            //                             .isServiceIcon == 1
+            //                         ) { // Check if it's service icon
+            //                             images.serviceIcon = {
+            //                                 uploadPath: response
+            //                                     .uploadPath,
+            //                                 fileName: response
+            //                                     .fileName
+            //                             };
+            //                         } else {
+            //                             images.gallery.push({
+            //                                 uploadPath: response
+            //                                     .uploadPath,
+            //                                 fileName: response
+            //                                     .fileName,
+            //                                 slno: response
+            //                                     .referData.slno
+            //                             });
+            //                         }
+            //                         console.log(images);
+            //                     }
+            //                 });
+            //             };
 
-                        // Loop through each imageScrop input
-                        $("input.imageScrop").each(function(index) {
-                            let id = $(this).attr('id');
-                            if ($('#' + id).val() != "") {
-                                rowIndex++;
-                                let formData = {};
-                                formData.image = $('#' + id).attr('src');
-                                formData.referData = {
-                                    index: rowIndex,
-                                    id: id,
-                                    slno: $('#' + id).attr('data-slno'),
-                                    isCoverImage: $('#' + id).attr(
-                                        'data-is-cover-image'),
-                                    isServiceIcon: $('#' + id).attr(
-                                        'data-is-service-icon'
-                                    ) // Add attribute for service icon
-                                };
-                                upload(formData);
-                            } else {
-                                completed++;
-                                let percentage = (100 * completed) / count;
-                                $('#divProcessText').html(percentage +
-                                    '% Completed. Please wait until the upload process is complete.'
-                                );
-                                checkUploadCompleted();
-                            }
-                        });
-                    }, 200);
-                });
-                return uploadImages;
-            };
-
+            //             // Loop through each imageScrop input
+            //             $("input.imageScrop").each(function(index) {
+            //                 let id = $(this).attr('id');
+            //                 if ($('#' + id).val() != "") {
+            //                     rowIndex++;
+            //                     let formData = {};
+            //                     formData.image = $('#' + id).attr('src');
+            //                     formData.referData = {
+            //                         index: rowIndex,
+            //                         id: id,
+            //                         slno: $('#' + id).attr('data-slno'),
+            //                         isCoverImage: $('#' + id).attr(
+            //                             'data-is-cover-image'),
+            //                         isServiceIcon: $('#' + id).attr(
+            //                             'data-is-service-icon'
+            //                         ) // Add attribute for service icon
+            //                     };
+            //                     upload(formData);
+            //                 } else {
+            //                     completed++;
+            //                     let percentage = (100 * completed) / count;
+            //                     $('#divProcessText').html(percentage +
+            //                         '% Completed. Please wait until the upload process is complete.'
+            //                     );
+            //                     checkUploadCompleted();
+            //                 }
+            //             });
+            //         }, 200);
+            //     });
+            //     return uploadImages;
+            // };
 
             const checkServiceName = async (serviceName) => {
                 $.ajax({
@@ -1294,28 +1400,24 @@
                 //alert("count is :"+galleryCount);
             });
 
-
-            // Event handler for removing input box
-            // Attach the event handler to a static parent element of the dynamically generated gallery items
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
-                // Get the input element associated with the clicked dropify clear button
                 const inputElement = $(this).closest('.dropify-wrapper').find('input[type="file"]')[0];
-
-                // Get the value of the data-slno attribute
                 const dataSlno = inputElement.getAttribute('data-slno');
-
-                // Log the data-slno value to the console
-                console.log("data-slno:", dataSlno);
-
-                // Assuming DeletedGalleryImg is defined elsewhere in your code
                 DeletedGalleryImg.push(dataSlno);
-                console.log("DeletedGalleryImg:", DeletedGalleryImg); // Ensure it's getting populated
             });
+
+            // $(document).on('click', '.dropify-clear', function(e) {
+            //     var $element = $(this).closest('.dropify-wrapper').find('input[type="file"]');
+            //     if ($element.data('is-cover-image') == 1) {
+            //         var dataPath = $element.data('default-file');
+            //         DeletedProfileImg.push(dataPath);
+            //     }
+            // });
 
             $(document).on('click', '.btnRemoveGallery', function() {
                 var indexToRemove = $(this).data('index');
                 $('#galleryItem' + indexToRemove).remove();
-                initializeDropify(); // Reinitialize Dropify after removal
+                initializeDropify();
             });
 
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
@@ -1335,7 +1437,6 @@
             });
         });
 
-       
         $(document).on('click', '#divGallery .dropify-clear', function(event) {
             var parentDiv = $(this).closest('.col-sm-3.p-10.text-center');
             parentDiv.remove();

@@ -168,9 +168,15 @@ class serviceController extends Controller
     {
         $sql = "SELECT P.ServiceID, P.ServiceName, P.Slug, P.ServiceImage,P.ServiceIcon, P.CID, C.CName, P.Price, P.UOM as UID, U.UCode, U.UName, P.Decimals, P.TaxID, P.TaxType, P.HSNSAC, P.Title, P.Description1, P.Description2, P.Description3, P.ActiveStatus FROM tbl_services as P LEFT JOIN tbl_category as C ON C.CID=P.CID LEFT JOIN tbl_uom as U ON U.UID=P.UOM LEFT JOIN tbl_tax as T ON T.TaxID=P.TaxID Where P.DFlag=0 ";
         if (is_array($data)) {
-            if (array_key_exists("ServiceID", $data)) {$sql .= " and P.ServiceID='" . $data['ServiceID'] . "'";}
-            if (array_key_exists("Slug", $data)) {$sql .= " and P.Slug='" . $data['Slug'] . "'";}
-            if (array_key_exists("CID", $data)) {$sql .= " and P.CID='" . $data['CID'] . "'";}
+            if (array_key_exists("ServiceID", $data)) {
+                $sql .= " and P.ServiceID='" . $data['ServiceID'] . "'";
+            }
+            if (array_key_exists("Slug", $data)) {
+                $sql .= " and P.Slug='" . $data['Slug'] . "'";
+            }
+            if (array_key_exists("CID", $data)) {
+                $sql .= " and P.CID='" . $data['CID'] . "'";
+            }
 
         }
         $result = DB::Select($sql);
@@ -180,7 +186,8 @@ class serviceController extends Controller
         return $result;
     }
 
-    public function Save(Request $req){
+    public function Save(Request $req)
+    {
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -242,12 +249,12 @@ class serviceController extends Controller
                         $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
                         $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
                         $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                    
+
                         copy($UploadedImage, $defaultImage);
                         $webImage = Helper::compressImageToWebp($defaultImage);
-                        if($webImage['status']){
+                        if ($webImage['status']) {
                             $ServiceImage = $webImage['path'];
-                        }else{
+                        } else {
                             return $webImage;
                         }
                         unlink($UploadedImage);
@@ -260,12 +267,12 @@ class serviceController extends Controller
                             $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
                             $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
                             $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                        
+
                             copy($UploadedImage, $defaultImage);
                             $webImage = Helper::compressImageToWebp($defaultImage);
-                            if($webImage['status']){
+                            if ($webImage['status']) {
                                 $tmp = $webImage['path'];
-                            }else{
+                            } else {
                                 return $webImage;
                             }
                             unlink($UploadedImage);
@@ -317,10 +324,10 @@ class serviceController extends Controller
                 DB::commit();
                 $this->DocNum->updateDocNum("Services");
                 $NewData = $this->getServices(array("ServiceID" => $ServiceID));
-                $logData = array( "Description" => "New Service Created ","ModuleName" => $this->ActiveMenuName,"Action" => cruds::ADD,"ReferID" => $ServiceID,"OldData" => $OldData,"NewData" => $NewData,"UserID" => $this->UserID,"IP" => $req->ip(),);
+                $logData = array("Description" => "New Service Created ", "ModuleName" => $this->ActiveMenuName, "Action" => cruds::ADD, "ReferID" => $ServiceID, "OldData" => $OldData, "NewData" => $NewData, "UserID" => $this->UserID, "IP" => $req->ip(), );
                 $this->logs->Store($logData);
 
-                return ['status' => true,'message' => "Service Create Successfully"];
+                return ['status' => true, 'message' => "Service Create Successfully"];
             } else {
                 if ($ServiceImage && file_exists($ServiceImage)) {
                     unlink($ServiceImage);
@@ -331,16 +338,18 @@ class serviceController extends Controller
                     }
                 }
                 DB::rollback();
-                return [ 'status' => false, 'message' => "Service Create Failed"];
+                return ['status' => false, 'message' => "Service Create Failed"];
             }
         } else {
             return response()->json(['status' => false, 'message' => "Access Denied"], 403);
         }
     }
 
-    public function Update(Request $req, $ServiceID){
+    public function Update(Request $req, $ServiceID)
+    {
+        // dd($req->all());
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
-            $img = json_decode($req->Images, true);
+
             $OldData = $NewData = array();
 
             $ValidDB = array();
@@ -381,13 +390,14 @@ class serviceController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if (array_key_exists("coverImg", $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    unlink($img['coverImg']['uploadPath']);
+                if (!empty($req->profileImage) && $req->profileImage !== "undefined") {
+                    unlink($req->profileImage);
                 }
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $gallery) {
-                        if (file_exists($gallery['uploadPath'])) {
-                            unlink($gallery['uploadPath']);
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            unlink($galleryImages['url']);
                         }
                     }
                 }
@@ -399,46 +409,51 @@ class serviceController extends Controller
             $ServiceImage = "";
             $SImage = "";
             $galleryUrls = [];
+            $profileImage = json_decode($req->profileImage, true);
             try {
                 $OldData = $this->getServices(array("ServiceID" => $ServiceID));
                 $dir = "uploads/admin/master/services/" . $ServiceID . "/";
-                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                
-                if (array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        $UploadedImage = $img['coverImg']['uploadPath'];
-                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
-                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0777, true);
+                }
+
+
+                if (array_key_exists("url", $profileImage)) {
+                    if (file_exists($profileImage['url'])) {
+                        $UploadedImage = $profileImage['url'];
+                        $originalFileName = pathinfo($profileImage['url'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($profileImage['url'], PATHINFO_EXTENSION));
                         $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                    
+
                         copy($UploadedImage, $defaultImage);
                         $webImage = Helper::compressImageToWebp($defaultImage);
-                        if($webImage['status']){
+                        if ($webImage['status']) {
                             $ServiceImage = $webImage['path'];
-                        }else{
+                        } else {
                             return $webImage;
                         }
                         unlink($UploadedImage);
                         $SImage = $OldData[0]->ServiceImage;
                     }
                 }
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $pg) {
-                        if (file_exists($pg['uploadPath'])) {
-                            $UploadedImage = $pg['uploadPath'];
-                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
-                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            $UploadedImage = $galleryImages['url'];
+                            $originalFileName = pathinfo($galleryImages['url'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($galleryImages['url'], PATHINFO_EXTENSION));
                             $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                        
+
                             copy($UploadedImage, $defaultImage);
                             $webImage = Helper::compressImageToWebp($defaultImage);
-                            if($webImage['status']){
+                            if ($webImage['status']) {
                                 $tmp = $webImage['path'];
-                            }else{
+                            } else {
                                 return $webImage;
                             }
                             unlink($UploadedImage);
-                            $galleryUrls[] = array("slno" => $pg['slno'], "ServiceID" => $ServiceID, "ImageUrl" => $tmp);
+                            $galleryUrls[] = array("slno" => $galleryImages['slno'], "ServiceID" => $ServiceID, "ImageUrl" => $tmp);
                         }
                     }
                 }
@@ -512,6 +527,15 @@ class serviceController extends Controller
                         unlink($SImage);
                     }
                 }
+
+                if ($profileImage['isRemoved']) {
+                    if ($profileImage['url'] === null || $profileImage['url'] == '') {
+                        $updatedProfileImage = DB::Table('tbl_services')
+                            ->where('ServiceID', $ServiceID)
+                            ->update(['ServiceImage' => '']);
+                    }
+                }
+
                 $NewData = $this->getServices(array("ServiceID" => $ServiceID));
                 $logData = array("Description" => "Service updated ", "ModuleName" => $this->ActiveMenuName, "Action" => cruds::UPDATE, "ReferID" => $ServiceID, "OldData" => $OldData, "NewData" => $NewData, "UserID" => $this->UserID, "IP" => $req->ip());
                 $this->logs->Store($logData);
@@ -602,14 +626,24 @@ class serviceController extends Controller
             );
 
             $columns1 = array(
-                array('db' => 'ServiceName', 'dt' => '0',
+                array(
+                    'db' => 'ServiceName',
+                    'dt' => '0',
                     'formatter' => function ($d, $row) {
                         return '<a target="_blank" href="' . url('/') . '/services/' . $row['Slug'] . '">' . $d . '</a>';
                     }
                 ),
                 array('db' => 'CName', 'dt' => '1'),
-                array('db' => 'Price', 'dt' => '2', 'formatter' => function ($d, $row) {return Helper::NumberFormat($d, $this->Settings['price-decimals']);}),
-                array('db' => 'ActiveStatus', 'dt' => '3',
+                array(
+                    'db' => 'Price',
+                    'dt' => '2',
+                    'formatter' => function ($d, $row) {
+                        return Helper::NumberFormat($d, $this->Settings['price-decimals']);
+                    }
+                ),
+                array(
+                    'db' => 'ActiveStatus',
+                    'dt' => '3',
                     'formatter' => function ($d, $row) {
                         return $d == "1" ? "<span class='badge badge-success m-1'>Active</span>" : "<span class='badge badge-danger m-1'>Inactive</span>";
                     },
@@ -646,7 +680,8 @@ class serviceController extends Controller
         }
     }
 
-    public function RestoreTableView(Request $request){
+    public function RestoreTableView(Request $request)
+    {
         if ($this->general->isCrudAllow($this->CRUD, "view") == true) {
             $ServerSideProcess = new ServerSideProcess();
 
@@ -680,9 +715,21 @@ class serviceController extends Controller
             );
 
             $columns1 = array(
-                array('db' => 'ServiceName', 'dt' => '0', 'formatter' => function ($d, $row) {return '<a target="_blank" href="' . url('/') . '/services/' . $row['Slug'] . '">' . $d . '</a>';}),
+                array(
+                    'db' => 'ServiceName',
+                    'dt' => '0',
+                    'formatter' => function ($d, $row) {
+                        return '<a target="_blank" href="' . url('/') . '/services/' . $row['Slug'] . '">' . $d . '</a>';
+                    }
+                ),
                 array('db' => 'CName', 'dt' => '1'),
-                array('db' => 'Price', 'dt' => '2', 'formatter' => function ($d, $row) {return Helper::NumberFormat($d, $this->Settings['price-decimals']);}),
+                array(
+                    'db' => 'Price',
+                    'dt' => '2',
+                    'formatter' => function ($d, $row) {
+                        return Helper::NumberFormat($d, $this->Settings['price-decimals']);
+                    }
+                ),
                 array(
                     'db' => 'ActiveStatus',
                     'dt' => '3',
@@ -723,9 +770,8 @@ class serviceController extends Controller
         }
     }
 
-    public function getServiceIcons(){
-        return ['blueprint-1','blueprint','crane','left-arrow','parquet','briefing','checked','close','coffee-cup','concept','email','execution','furniture','graphic-designer','happy','home','interior-design','login','loupe','maps-and-location','parquet','phone-call','pin','placeholder','play','plus','project-management','quotation','quote','right-arrow','support','telephone'];
+    public function getServiceIcons()
+    {
+        return ['blueprint-1', 'blueprint', 'crane', 'left-arrow', 'parquet', 'briefing', 'checked', 'close', 'coffee-cup', 'concept', 'email', 'execution', 'furniture', 'graphic-designer', 'happy', 'home', 'interior-design', 'login', 'loupe', 'maps-and-location', 'parquet', 'phone-call', 'pin', 'placeholder', 'play', 'plus', 'project-management', 'quotation', 'quote', 'right-arrow', 'support', 'telephone'];
     }
-
-
 }
