@@ -347,7 +347,6 @@ class serviceController extends Controller
 
     public function Update(Request $req, $ServiceID)
     {
-        // dd($req->all());
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
 
             $OldData = $NewData = array();

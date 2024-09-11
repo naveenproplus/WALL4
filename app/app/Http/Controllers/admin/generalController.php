@@ -18,7 +18,8 @@ class generalController extends Controller
     private $Settings;
     private $Menus;
     private $DocNum;
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
         $this->DocNum = new DocNum();
         $this->support = new support();
@@ -30,14 +31,17 @@ class generalController extends Controller
             return $next($request);
         });
     }
-    public function getMenus(Request $req){
+    public function getMenus(Request $req)
+    {
         return $this->Menus;
     }
-    public function getMenuData(request $req){
+    public function getMenuData(request $req)
+    {
         return $this->general->getMenus(array("Level" => "L001"));
     }
 
-    public function ThemeUpdate(Request $req){
+    public function ThemeUpdate(Request $req)
+    {
         try {
             $Theme = json_decode($req->Theme, true);
             if (is_array($Theme)) {
@@ -56,14 +60,18 @@ class generalController extends Controller
 
         }
     }
-    public function RoleData(){
+    public function RoleData()
+    {
         $data = DB::Table('tbl_user_roles')->Where("DFlag", 0)->get();
 
         return $data;
     }
-    public function tmpUploadImage(Request $req){
+    public function tmpUploadImage(Request $req)
+    {
         $dir = "uploads/admin/tmp/" . date("Ymd") . "/";
-        if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
         if ($req->hasFile('image')) {
             $file = $req->file('image');
             $name = md5($file->getClientOriginalName() . time());
@@ -72,28 +80,33 @@ class generalController extends Controller
             $file->move($dir, $fileName1);
             return array("uploadPath" => $dir . $fileName1, "fileName" => $fileName, "referData" => $req->referData);
         } else if ($req->image != "") {
+            $file = $req->image;
 
             $rnd = $this->support->RandomString(10) . "_" . date("YmdHis");
-            $fileName = $rnd . ".png";
-            $fileName1 = $rnd . "-tmp.png";
-
+            $fileName = $rnd . "." . pathinfo($file, PATHINFO_EXTENSION);
+            $fileName1 = $rnd . "-tmp." . pathinfo($file, PATHINFO_EXTENSION);
             $imgData = $this->getImageData($req->image);
             file_put_contents($dir . $fileName1, $imgData);
             return array("uploadPath" => $dir . $fileName1, "fileName" => $fileName, "referData" => $req->referData);
         }
     }
-    private function getImageData($base64){
+    private function getImageData($base64)
+    {
         $base64_str = substr($base64, strpos($base64, ",") + 1);
         $image = base64_decode($base64_str);
         return $image;
     }
-    public function getCSRFToken(Request $req){
+    public function getCSRFToken(Request $req)
+    {
         return csrf_token();
     }
-    public function uploadImageCKEditor(request $req){
+    public function uploadImageCKEditor(request $req)
+    {
         if ($req->hasFile('file')) {
             $dir = "uploads/ckeditor/" . date("Y-m-d") . "/";
-            if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
+            }
             $file = $req->file('file');
             $fileName = $file->getClientOriginalName();
             $fileName1 = $fileName;
@@ -101,7 +114,9 @@ class generalController extends Controller
             return array("default" => url('/') . "/" . $dir . $fileName1);
         } elseif ($req->hasFile('upload')) {
             $dir = "uploads/ckeditor/" . date("Y-m-d") . "/";
-            if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
+            }
             $file = $req->file('upload');
             $fileName = $file->getClientOriginalName();
             $fileName1 = $fileName;
@@ -114,21 +129,25 @@ class generalController extends Controller
         }
         return array();
     }
-    public function tempUpload(Request $req){
-		if($req->hasFile('image')){
-			$tempPath = 'uploads/temp/'.date("Ymd")."/";
-			if (!file_exists($tempPath)) {
-				mkdir($tempPath, 0755, true);
-			}
-			$file = $req->file('image');
-			$fileName1=$file->getClientOriginalName();
-			if($file->move($tempPath, $fileName1)){
-				return ['status' => true, 'message' => 'File uploaded successfully',"referData"=>$req->referData,"uploadDir"=>$tempPath,"fileName"=>$fileName1,"uploadURL"=>$tempPath.$fileName1];
-			}else{
-				return ['status' => false, 'message' => 'File upload failed'];
-			}
-		}else{
-			return ['status' => false, 'message' => 'File upload failed'];
-		}
-	}
+    public function tempUpload(Request $req)
+    {
+        if ($req->hasFile('image')) {
+            $tempPath = 'uploads/temp/' . date("Ymd") . "/";
+            if (!file_exists($tempPath)) {
+                mkdir($tempPath, 0755, true);
+            }
+            $file = $req->file('image');
+
+            $fileName1 = $file->getClientOriginalName();
+            $fileExtension = $file->getClientOriginalExtension();
+            $customFileName = $this->support->RandomString(6) . '_' . date("YmdHis") . "." . $fileExtension;
+            if ($file->move($tempPath, $customFileName)) {
+                return ['status' => true, 'message' => 'File uploaded successfully', "referData" => $req->referData, "uploadDir" => $tempPath, "OriginalFileName" => $fileName1, "fileName" => $customFileName, "uploadURL" => $tempPath . $customFileName];
+            } else {
+                return ['status' => false, 'message' => 'File upload failed'];
+            }
+        } else {
+            return ['status' => false, 'message' => 'File upload failed'];
+        }
+    }
 }
