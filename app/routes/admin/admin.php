@@ -10,6 +10,7 @@ Route::controller(generalController::class)->group(function () {
     Route::post('/tmp/upload-image','tmpUploadImage');
     Route::get('/get/csrf-token','getCSRFToken');
     Route::POST('/ckeditor/upload-image','uploadImageCKEditor');
+    Route::post('/temp/upload', 'tempUpload')->name('temp.upload');
 });
 
 Route::controller(dashboardController::class)->group(function () {
