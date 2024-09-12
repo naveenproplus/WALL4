@@ -131,9 +131,9 @@ class ProjectAreaController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if ($img && array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        unlink($img['coverImg']['uploadPath']);
+                if ($img && array_key_exists("url", $img)) {
+                    if (file_exists($img['url'])) {
+                        unlink($img['url']);
                     }
                 }
                 return array('status' => false, 'message' => "Project Area Create Failed", 'errors' => $validator->errors());
@@ -148,10 +148,10 @@ class ProjectAreaController extends Controller
                     mkdir($dir, 0777, true);
                 }
 
-                if ($img && array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    $UploadedImage = $img['coverImg']['uploadPath'];
-                    $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
-                    $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                if ($img && array_key_exists('url', $img) && file_exists($img['url'])) {
+                    $UploadedImage = $img['url'];
+                    $originalFileName = pathinfo($img['url'], PATHINFO_FILENAME);
+                    $originalExtension = strtolower(pathinfo($img['url'], PATHINFO_EXTENSION));
                     $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
 
                     copy($UploadedImage, $defaultImage);
