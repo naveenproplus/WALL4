@@ -347,6 +347,8 @@ class serviceController extends Controller
 
     public function Update(Request $req, $ServiceID)
     {
+        logger($req);
+        // return $req;
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
 
             $OldData = $NewData = array();
@@ -519,7 +521,6 @@ class serviceController extends Controller
             } catch (Exception $e) {
                 $status = false;
             }
-
             if ($status == true) {
                 DB::commit();
                 if ($SImage != "") {

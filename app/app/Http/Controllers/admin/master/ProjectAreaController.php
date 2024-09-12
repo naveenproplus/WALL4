@@ -144,19 +144,21 @@ class ProjectAreaController extends Controller
                 $ProjectAreaImage = "";
                 $ProjectAreaID = $this->DocNum->getDocNum("Project-Area");
                 $dir = "uploads/admin/master/project-area/";
-                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
-                
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0777, true);
+                }
+
                 if ($img && array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
                     $UploadedImage = $img['coverImg']['uploadPath'];
                     $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
                     $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
                     $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                
+
                     copy($UploadedImage, $defaultImage);
                     $webImage = helper::compressImageToWebp($defaultImage);
-                    if($webImage['status']){
+                    if ($webImage['status']) {
                         $ProjectAreaImage = $webImage['path'];
-                    }else{
+                    } else {
                         return $webImage;
                     }
                     unlink($UploadedImage);
@@ -198,10 +200,12 @@ class ProjectAreaController extends Controller
 
     public function Update(Request $req, $ProjectAreaID)
     {
-        if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
-            
-            $img = json_decode($req->Images, true);
+        logger($req);
+        // return $req;
 
+        if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
+
+            $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
             $OldData = DB::table('tbl_project_area')->where('ProjectAreaID', $ProjectAreaID)->get();
 
@@ -214,9 +218,9 @@ class ProjectAreaController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if ($img && array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        unlink($img['coverImg']['uploadPath']);
+                if ($img && array_key_exists("url", $img)) {
+                    if (file_exists($img['url'])) {
+                        unlink($img['url']);
                     }
                 }
                 return array('status' => false, 'message' => "Project Area Update Failed", 'errors' => $validator->errors());
@@ -228,26 +232,28 @@ class ProjectAreaController extends Controller
                 $OldImage = "";
                 $ProjectAreaImage = "";
                 $dir = "uploads/admin/master/project-area/";
-                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0777, true);
+                }
 
 
-                if ($img && array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    $UploadedImage = $img['coverImg']['uploadPath'];
-                    $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
-                    $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                if ($img && array_key_exists('url', $img) && file_exists($img['url'])) {
+                    $UploadedImage = $img['url'];
+                    $originalFileName = pathinfo($img['url'], PATHINFO_FILENAME);
+                    $originalExtension = strtolower(pathinfo($img['url'], PATHINFO_EXTENSION));
                     $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                
+
                     copy($UploadedImage, $defaultImage);
                     $webImage = helper::compressImageToWebp($defaultImage);
-                    if($webImage['status']){
+                    if ($webImage['status']) {
                         $ProjectAreaImage = $webImage['path'];
-                    }else{
+                    } else {
                         return $webImage;
                     }
                     $OldImage = $OldData[0]->ProjectAreaImage;
                     unlink($UploadedImage);
                 }
-                
+
                 $data = array(
                     "ProjectAreaName" => $req->ProjectAreaName,
                     "ProjectType" => $req->ProjectType,
@@ -264,7 +270,6 @@ class ProjectAreaController extends Controller
             } catch (Exception $e) {
                 $status = false;
             }
-
             if ($status == true) {
                 DB::commit();
 
@@ -445,7 +450,7 @@ class ProjectAreaController extends Controller
         }
     }
 
-    
-    
-    
+
+
+
 }

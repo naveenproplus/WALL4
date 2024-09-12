@@ -15,10 +15,16 @@
             <div class="row">
                 <div class="col-sm-12">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}/admin"><i class="f-16 fa fa-home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}/admin"><i class="f-16 fa fa-home"></i></a>
+                        </li>
                         <li class="breadcrumb-item">Master</li>
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}/admin/master/projects">{{ $PageTitle }}</a></li>
-                        <li class="breadcrumb-item">@if ($isEdit)Update @else Create @endif</li>
+                        <li class="breadcrumb-item"><a
+                                href="{{ url('/') }}/admin/master/projects">{{ $PageTitle }}</a></li>
+                        <li class="breadcrumb-item">
+                            @if ($isEdit)Update
+                            @else
+                                Create @endif
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -73,7 +79,8 @@
 
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="lstProjectType">Project Type <span class="required">*</span></label>
+                                                            <label for="lstProjectType">Project Type <span
+                                                                    class="required">*</span></label>
                                                             <select class="form-control select2" id="lstProjectType">
                                                                 <option value="Commercial"
                                                                     @if ($isEdit == true) @if ($EditData[0]->ProjectType == 'Commercial') selected @endif
@@ -91,7 +98,10 @@
                                                         <div class="form-group">
                                                             <label class="lstProjectArea">Project Area <span
                                                                     class="required">*</span></label>
-                                                            <select class="form-control select2" id="lstProjectArea" data-selected="<?php if ($isEdit) {echo $EditData[0]->ProjectAreaID;} ?>">
+                                                            <select class="form-control select2" id="lstProjectArea"
+                                                                data-selected="<?php if ($isEdit) {
+                                                                    echo $EditData[0]->ProjectAreaID;
+                                                                } ?>">
                                                                 <option value="">Select a Project Area</option>
                                                             </select>
                                                             <div class="errors err-sm ProjectInfo" id="lstProjectArea-err">
@@ -121,7 +131,9 @@
                                                             <select class="form-control select2" id="lstService">
                                                                 <option value="">Select a Service</option>
                                                                 @foreach ($Services as $item)
-                                                                    <option value="{{$item->ServiceID}}" @if($isEdit && $item->ServiceID == $EditData[0]->ServiceID) selected @endif>{{$item->ServiceName}}</option>
+                                                                    <option value="{{ $item->ServiceID }}"
+                                                                        @if ($isEdit && $item->ServiceID == $EditData[0]->ServiceID) selected @endif>
+                                                                        {{ $item->ServiceName }}</option>
                                                                 @endforeach
                                                             </select>
                                                             <div class="errors err-sm ProjectInfo" id="lstServiceID-err">
@@ -133,10 +145,15 @@
                                                         <div class="form-group">
                                                             <label for="lstActiveStatus">Active Status</label>
                                                             <select class="form-control" id="lstActiveStatus">
-                                                                <option value="1" @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active</option>
-                                                                <option value="0" @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif>Inactive</option>
+                                                                <option value="1"
+                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '1') selected @endif>Active
+                                                                </option>
+                                                                <option value="0"
+                                                                    @if ($isEdit && $EditData[0]->ActiveStatus == '0') selected @endif>
+                                                                    Inactive</option>
                                                             </select>
-                                                            <div class="errors err-sm ProjectInfo" id="lstActiveStatus-err">
+                                                            <div class="errors err-sm ProjectInfo"
+                                                                id="lstActiveStatus-err">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -158,16 +175,24 @@
                                                 <div class="row">
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="txtTitle">Short Description <span class="required"> *</span></label>
-                                                            <textarea id="txtTitle" class="form-control" rows="2"><?php if ($isEdit) { echo $EditData[0]->SDesc; } ?></textarea>
-                                                            <div class="errors err-sm Project Descriptions" id="txtTitle-err"></div>
+                                                            <label for="txtTitle">Short Description <span
+                                                                    class="required"> *</span></label>
+                                                            <textarea id="txtTitle" class="form-control" rows="2"><?php if ($isEdit) {
+                                                                echo $EditData[0]->SDesc;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm Project Descriptions"
+                                                                id="txtTitle-err"></div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-12">
                                                         <div class="form-group">
-                                                            <label for="txtDesc">Long Description<span class="required"> *</span></label>
-                                                            <textarea id="txtDesc" class="form-control" rows="5"><?php if ($isEdit) { echo $EditData[0]->LDesc; } ?></textarea>
-                                                            <div class="errors err-sm Project Descriptions" id="txtDesc-err"></div>
+                                                            <label for="txtDesc">Long Description<span class="required">
+                                                                    *</span></label>
+                                                            <textarea id="txtDesc" class="form-control" rows="5"><?php if ($isEdit) {
+                                                                echo $EditData[0]->LDesc;
+                                                            } ?></textarea>
+                                                            <div class="errors err-sm Project Descriptions"
+                                                                id="txtDesc-err"></div>
                                                         </div>
                                                     </div>
 
@@ -374,7 +399,7 @@
                 $('#lstProjectArea option').remove();
                 $('#lstProjectArea').append('<option value="" selected>Select a Project Area</option>');
                 let ProjectType = $('#lstProjectType').val();
-                if(ProjectType){
+                if (ProjectType) {
                     $.ajax({
                         type: "post",
                         url: "{{ url('/') }}/admin/master/projects/get-project-area",
@@ -382,7 +407,9 @@
                             'X-CSRF-Token': $('meta[name=_token]').attr('content')
                         },
                         dataType: "json",
-                        data: {ProjectType: ProjectType},
+                        data: {
+                            ProjectType: ProjectType
+                        },
                         async: true,
                         error: function(e, x, settings, exception) {
                             ajaxErrors(e, x, settings, exception);
@@ -391,10 +418,13 @@
                         success: function(response) {
                             for (let client of response) {
                                 let selected = "";
-                                if (client.ProjectAreaID == $('#lstProjectArea').attr('data-selected')) {
+                                if (client.ProjectAreaID == $('#lstProjectArea').attr(
+                                        'data-selected')) {
                                     selected = "selected";
                                 }
-                                $('#lstProjectArea').append('<option ' + selected + ' value="' +client.ProjectAreaID + '">' + client.ProjectAreaName + '</option>');
+                                $('#lstProjectArea').append('<option ' + selected + ' value="' +
+                                    client.ProjectAreaID + '">' + client.ProjectAreaName +
+                                    '</option>');
                             }
                             // $('#lstProjectArea').select2();
                         }
@@ -493,21 +523,25 @@
                         $('#lstProjectArea-err').html('Project Area is required');
                         status = false;
                     }
-                }else if (page == "Project Descriptions"){
+                } else if (page == "Project Descriptions") {
                     $('.errors.Project Descriptions').html('');
                     let SDesc = $('#txtTitle').val();
                     let LDesc = $('#txtDesc').val();
 
                     if (SDesc == "") {
-                        $('#txtTitle-err').html('Short Description is required');status = false;
-                    }else if (SDesc.length < 5){
-                        $('#txtTitle-err').html('Short Description must be greater than 5 characters');status = false;
+                        $('#txtTitle-err').html('Short Description is required');
+                        status = false;
+                    } else if (SDesc.length < 5) {
+                        $('#txtTitle-err').html('Short Description must be greater than 5 characters');
+                        status = false;
                     }
 
                     if (LDesc == "") {
-                        $('#txtDesc-err').html('Long Description is required');status = false;
-                    }else if (LDesc.length < 10){
-                        $('#txtDesc-err').html('Long Description must be greater than 10 characters');status = false;
+                        $('#txtDesc-err').html('Long Description is required');
+                        status = false;
+                    } else if (LDesc.length < 10) {
+                        $('#txtDesc-err').html('Long Description must be greater than 10 characters');
+                        status = false;
                     }
                 }
                 return status;
@@ -540,7 +574,17 @@
 
 
             const getData = async () => {
-                let tmp = await UploadImages();
+                // let tmp = await UploadImages();
+
+                let isRemoved = $('#txtCoverImg').attr('data-remove') != undefined ? $('#txtCoverImg').attr(
+                    'data-remove') : 0;
+                let isNew = $('#txtCoverImg').attr('data-is-new') != undefined ? $('#txtCoverImg').attr(
+                    'data-is-new') : 0;
+                let url = $('#txtCoverImg').attr('data-upload-url') != undefined ? $('#txtCoverImg').attr(
+                    'data-upload-url') : "";
+                let fileName = $('#txtCoverImg').attr('data-file-name') != undefined ? $('#txtCoverImg')
+                    .attr('data-file-name') : "";
+                    
                 let formData = new FormData();
                 formData.append('ProjectName', $('#txtProjectName').val());
                 formData.append('Address', $('#txtAddress').val());
@@ -548,24 +592,33 @@
                 formData.append('SDesc', $('#txtTitle').val());
                 formData.append('LDesc', $('#txtDesc').val());
 
-
-                // Append dynamically added images
-                $('.gallery-item input[type="file"]').each(function(index, element) {
-                    var files = $(element)[0].files;
-                    if (files.length > 0) {
-                        $.each(files, function(i, file) {
-                            formData.append('gallery_images[]', file);
-                        });
-                    }
-                });
-
                 formData.append('ProjectAreaID', $('#lstProjectArea').val());
                 formData.append('Slug', $('#txtSlug').val());
                 formData.append('ClientID', $('#lstClient').val());
                 formData.append('ServiceID', $('#lstService').val());
-                formData.append('Images', JSON.stringify(tmp));
+
+                $('.gallery-item input[type="file"]').each(function(index, element) {
+                    var $element = $(element);
+                    var uploadUrl = $element.data('upload-url');
+                    var slno = $element.data('slno');
+
+                    if (uploadUrl) {
+                        var imageData = {
+                            url: uploadUrl,
+                            slno: slno
+                        };
+                        formData.append('gallery_images[]', JSON.stringify(imageData));
+                    }
+                });
+
+                formData.append('profileImage', JSON.stringify({
+                    url,
+                    isRemoved,
+                    isNew,
+                    fileName
+                }));
+
                 formData.append('DeletedGalleryImg', JSON.stringify(DeletedGalleryImg));
-                console.log("Deleted Gallery Images:", DeletedGalleryImg);
 
                 return formData;
             }
@@ -691,7 +744,7 @@
                             },
                             gallery: []
                         };
-                        
+
                         const uploadComplete = async (e, x, settings, exception) => {
                             completed++;
                             let percentage = (100 * completed) / count;
@@ -989,15 +1042,17 @@
                 }
             });
         }
-
+    </script>
+    <script>
         $(document).ready(function() {
             var uploadedImageURL;
+            let uploadData = {};
             var URL = window.URL || window.webkitURL;
             var $dataRotate = $('#dataRotate');
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 0,
+                aspectRatio: 9 / 6,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
@@ -1006,13 +1061,31 @@
                 keyboard: false
             });
             $('#ImgCrop').modal('hide');
+
+            const callback = async (response, id, uuid, fileName) => {
+                if (response.uploadURL != undefined) {
+                    $('#' + id).attr('data-upload-url', response.uploadURL);
+                    $('#' + id).attr('src', response.uploadURL);
+                }
+                delete uploadData[uuid];
+                let objKeys = Object.keys(uploadData);
+                let detailID = $('#' + id).attr('data-detail-id');
+                let rowIndex = $('#' + id).attr('data-row-index');
+                if (objKeys.length > 0) {
+                    $('.btnUpdateProductImage[data-detail-id="' + detailID + '"]').attr('data-continue', 0);
+                } else {
+                    $('.btnUpdateProductImage[data-detail-id="' + detailID + '"]').attr('data-continue', 1);
+                }
+                $('.btnRemoveGallery[data-detail-id="' + detailID + '"][data-row-index="' + rowIndex + '"]')
+                    .show();
+            }
             $(document).on('change', '.imageScrop', function() {
+
                 let id = $(this).attr('id');
                 $image.attr('data-id', id);
+                $('#ImgCrop').modal('show');
                 var files = this.files;
                 if (files && files.length) {
-
-                    $('#ImgCrop').modal('show');
                     file = files[0];
                     if (/^image\/\w+$/.test(file.type)) {
                         uploadedImageName = file.name;
@@ -1022,6 +1095,8 @@
                         }
                         uploadedImageURL = URL.createObjectURL(file);
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+                        $('#' + id).attr('data-file-name', uploadedImageName);
+                        $('#' + id).attr('data-file-ext', uploadedImageType);
                     } else {
                         window.alert('Please choose an image file.');
                     }
@@ -1088,6 +1163,7 @@
             $('#inputImage').change(function() {
                 var files = this.files;
                 var file;
+                let id = $image.attr('data-id');
                 if (!$image.data('cropper')) {
                     return;
                 }
@@ -1101,6 +1177,8 @@
                         }
                         uploadedImageURL = URL.createObjectURL(file);
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+                        $('#' + id).attr('data-file-name', uploadedImageName);
+                        $('#' + id).attr('data-file-ext', uploadedImageType);
                         $('#inputImage').val('');
                     } else {
                         window.alert('Please choose an image file.');
@@ -1113,30 +1191,44 @@
             $("#btnCropApply").on('click', function() {
                 btnLoading($('#btnCropApply'));
                 setTimeout(() => {
-                    var base64 = $image.cropper('getCroppedCanvas').toDataURL();
                     var id = $image.attr('data-id');
+                    let uploadedImageName = $('#' + id).attr('data-file-name');
+                    let ext = $('#' + id).attr('data-file-ext');
+                    var base64 = $image.cropper('getCroppedCanvas').toDataURL(ext, 1.0);
                     $('#' + id).attr('src', base64);
+                    $('#' + id).attr('data-is-new', 1);
+                    $('#' + id).attr('data-remove', 0);
                     $('#' + id).parent().find('img').attr('src', base64)
-
+                    let uuid = generateUUID();
+                    uploadData[uuid] = new customFileUpload(base64, uuid, id, uploadedImageName, {
+                        callback,
+                        uploadURL: "{{ route('temp.upload') }}",
+                        csrfToken: "{{ csrf_token() }}"
+                    });
                     $('#ImgCrop').modal('hide');
                     setTimeout(() => {
                         btnReset($('#btnCropApply'));
                     }, 100);
                 }, 100);
             });
-            $('#btnCropCancel').on('click', function() {
+
+            $(document).on('click', '#ImgCrop button[data-dismiss="modal"]', function() {
                 var id = $image.attr('data-id');
                 $('#' + id).val("");
-                $('#' + id).parent().find('button.dropify-clear').trigger('click');
+                $('#' + id).attr('data-is-new', 0);
+                $('#' + id).attr('data-remove', 1);
+                $('#' + id).attr('data-upload-url', '');
+                $('#' + id).attr('src', "");
+                $('#' + id).parent().find('img').attr('src', "");
+                $('#' + id).parent().find('.dropify-clear').trigger('click');
                 $('#ImgCrop').modal('hide');
             });
-        });
-        $(document).on('click', '#divGallery .dropify-clear', function(event) {
-            // Get the parent div of the input element
-            var parentDiv = $(this).closest('.col-sm-3.p-10.text-center');
-            // Remove the entire input section
-            parentDiv.remove();
-        });
 
+            $(document).on('click', '.dropify-clear', function() {
+                $(this).parent().find('input[type="file"]').attr('data-remove', 1);
+                $(this).parent().find('input[type="file"]').attr('data-is-new', 0);
+                $(this).parent().find('input[type="file"]').attr('data-upload-url', '');
+            });
+        });
     </script>
 @endsection

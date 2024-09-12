@@ -32,7 +32,7 @@ class projectsController extends Controller
     private $Settings;
     private $Menus;
     private $addWaterMark;
-    
+
     public function __construct()
     {
         $this->ActiveMenuName = "Projects";
@@ -130,7 +130,9 @@ class projectsController extends Controller
     {
         $sql = "SELECT P.ProjectID, P.ProjectName, P.Slug, P.SDesc, P.LDesc ,P.ProjectAddress ,P.ProjectImage , P.ActiveStatus, P.ProjectAddress,P.ClientID ,P.ServiceID ,P.ProjectAreaID, PA.ProjectType FROM tbl_projects as P left join tbl_project_area as PA on PA.ProjectAreaID = P.ProjectAreaID Where P.DFlag = 0 ";
         if (is_array($data)) {
-            if (array_key_exists("ProjectID", $data)) {$sql .= " and P.ProjectID='" . $data['ProjectID'] . "'";}
+            if (array_key_exists("ProjectID", $data)) {
+                $sql .= " and P.ProjectID='" . $data['ProjectID'] . "'";
+            }
 
         }
         $result = DB::Select($sql);
@@ -140,7 +142,8 @@ class projectsController extends Controller
         return $result;
     }
 
-    public function Save(Request $req){
+    public function Save(Request $req)
+    {
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
             $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
@@ -184,7 +187,9 @@ class projectsController extends Controller
             try {
                 $ProjectID = $this->DocNum->getDocNum("Projects");
                 $dir = "uploads/admin/master/projects/" . $ProjectID . "/";
-                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0777, true);
+                }
 
                 if (array_key_exists("coverImg", $img)) {
                     if (file_exists($img['coverImg']['uploadPath'])) {
@@ -192,17 +197,18 @@ class projectsController extends Controller
                         $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
                         $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
                         $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                    
+
                         copy($UploadedImage, $defaultImage);
                         $webImage = Helper::compressImageToWebp($defaultImage);
-                        if($webImage['status']){
+                        if ($webImage['status']) {
                             $ProjectImage = $webImage['path'];
-                        }else{
+                        } else {
                             return $webImage;
                         }
                         unlink($UploadedImage);
                     }
                 }
+
                 if (array_key_exists("gallery", $img)) {
                     foreach ($img['gallery'] as $pg) {
                         if (file_exists($pg['uploadPath'])) {
@@ -210,12 +216,12 @@ class projectsController extends Controller
                             $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
                             $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
                             $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                        
+
                             copy($UploadedImage, $defaultImage);
                             $webImage = Helper::compressImageToWebp($defaultImage);
-                            if($webImage['status']){
+                            if ($webImage['status']) {
                                 $tmp = $webImage['path'];
-                            }else{
+                            } else {
                                 return $webImage;
                             }
                             unlink($UploadedImage);
@@ -276,6 +282,7 @@ class projectsController extends Controller
                     "UserID" => $this->UserID,
                     "IP" => $req->ip(),
                 );
+
                 $this->logs->Store($logData);
 
                 return [
@@ -295,7 +302,7 @@ class projectsController extends Controller
                 }
                 DB::rollback();
 
-                return [ 'status' => false, 'message' => "Project Create Failed"];
+                return ['status' => false, 'message' => "Project Create Failed"];
             }
         } else {
             return response()->json(['status' => false, 'message' => "Access Denied"], 403);
@@ -304,14 +311,15 @@ class projectsController extends Controller
 
     public function Update(Request $req, $ProjectID)
     {
+        // dd($req->all());
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
-            $img = json_decode($req->Images, true);
+
             $OldData = $NewData = array();
 
             $rules = array(
                 'ProjectName' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_projects", "WHERE" => " ProjectName='" . $req->ProjectName . "' AND ProjectID != '" . $ProjectID . "'"), "This Project Name is already exists.")],
                 'ClientID' => ['required'],
-                'Slug' => ['required','min:3','max:100',new ValidUnique(array("TABLE" => "tbl_projects", "WHERE" => " Slug='" . $req->Slug . "' AND ProjectID != '" . $ProjectID . "'"), "Slug is already exists.")],
+                'Slug' => ['required', 'min:3', 'max:100', new ValidUnique(array("TABLE" => "tbl_projects", "WHERE" => " Slug='" . $req->Slug . "' AND ProjectID != '" . $ProjectID . "'"), "Slug is already exists.")],
             );
 
             $message = array();
@@ -319,15 +327,15 @@ class projectsController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if (array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        unlink($img['coverImg']['uploadPath']);
-                    }
+                if (!empty($req->profileImage) && $req->profileImage !== "undefined") {
+                    $profileImage = json_decode($req->profileImage, true);
+                    unlink($profileImage);
                 }
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $gallery) {
-                        if (file_exists($gallery['uploadPath'])) {
-                            unlink($gallery['uploadPath']);
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            unlink($galleryImages['url']);
                         }
                     }
                 }
@@ -337,25 +345,29 @@ class projectsController extends Controller
             $status = false;
             $ProjectImage = "";
             $gallery = [];
+            $galleryUrls = [];
+            $profileImage = json_decode($req->profileImage, true);
             try {
                 $OldData = $this->getProjects(array("ProjectID" => $ProjectID));
                 $dir = "uploads/admin/master/projects/" . $ProjectID . "/";
-                if (!file_exists($dir)) {mkdir($dir, 0777, true);}
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0777, true);
+                }
                 $newProjectImgPath = '';
 
-                if (array_key_exists('coverImg', $img) && file_exists($img['coverImg']['uploadPath'])) {
+                if (array_key_exists("url", $profileImage)) {
 
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        $UploadedImage = $img['coverImg']['uploadPath'];
-                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
-                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                    if (file_exists($profileImage['url'])) {
+                        $UploadedImage = $profileImage['url'];
+                        $originalFileName = pathinfo($profileImage['url'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($profileImage['url'], PATHINFO_EXTENSION));
                         $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                    
+
                         copy($UploadedImage, $defaultImage);
                         $webImage = Helper::compressImageToWebp($defaultImage);
-                        if($webImage['status']){
+                        if ($webImage['status']) {
                             $newProjectImgPath = $webImage['path'];
-                        }else{
+                        } else {
                             return $webImage;
                         }
                         unlink($UploadedImage);
@@ -363,24 +375,26 @@ class projectsController extends Controller
                     }
                 }
 
+
                 // Store gallery images URLs in the database
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $pg) {
-                        if (file_exists($pg['uploadPath'])) {
-                            $UploadedImage = $pg['uploadPath'];
-                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
-                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            $UploadedImage = $galleryImages['url'];
+                            $originalFileName = pathinfo($galleryImages['url'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($galleryImages['url'], PATHINFO_EXTENSION));
                             $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
-                        
+
                             copy($UploadedImage, $defaultImage);
                             $webImage = Helper::compressImageToWebp($defaultImage);
-                            if($webImage['status']){
+                            if ($webImage['status']) {
                                 $tmp = $webImage['path'];
-                            }else{
+                            } else {
                                 return $webImage;
                             }
                             unlink($UploadedImage);
-                            $gallery[] = array("slno" => $pg['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
+                            $gallery[] = array("slno" => $galleryImages['slno'], "ProjectID" => $ProjectID, "ImageUrl" => $tmp);
                         }
                     }
                 }
@@ -448,6 +462,14 @@ class projectsController extends Controller
                 if ($ProjectImage) {
                     if (file_exists($ProjectImage)) {
                         unlink($ProjectImage);
+                    }
+                }
+
+                if ($profileImage['isRemoved']) {
+                    if ($profileImage['url'] === null || $profileImage['url'] == '') {
+                        $updatedProfileImage = DB::Table('tbl_projects')
+                            ->where('ProjectID', $ProjectID)
+                            ->update(['ProjectImage' => '']);
                     }
                 }
                 $NewData = $this->getProjects(array("ProjectID" => $ProjectID));
@@ -543,7 +565,9 @@ class projectsController extends Controller
                 array('db' => 'ProjectName', 'dt' => '0'),
                 array('db' => 'Name', 'dt' => '1'),
                 array('db' => 'MobileNumber', 'dt' => '2'),
-                array('db' => 'ActiveStatus', 'dt' => '3',
+                array(
+                    'db' => 'ActiveStatus',
+                    'dt' => '3',
                     'formatter' => function ($d, $row) {
                         return $d == "1" ? "<span class='badge badge-success m-1'>Active</span>" : "<span class='badge badge-danger m-1'>Inactive</span>";
                     },
@@ -674,8 +698,9 @@ class projectsController extends Controller
             return response()->json(['error' => 'An error occurred while fetching clients. Please check the logs for more information.'], 500);
         }
     }
-    public static function getServices(){
-        return DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->select('ServiceID','ServiceName')->get();
+    public static function getServices()
+    {
+        return DB::table('tbl_services')->where('DFlag', 0)->where('ActiveStatus', 1)->select('ServiceID', 'ServiceName')->get();
     }
 
     public function checkProjectName(Request $req)
@@ -708,7 +733,7 @@ class projectsController extends Controller
     public static function getProjectArea(Request $req)
     {
         try {
-            $clients = DB::select('SELECT ProjectAreaID, ProjectAreaName FROM tbl_project_area where DFlag = 0 and ActiveStatus = 1 and ProjectType = "'.$req->ProjectType.'"');
+            $clients = DB::select('SELECT ProjectAreaID, ProjectAreaName FROM tbl_project_area where DFlag = 0 and ActiveStatus = 1 and ProjectType = "' . $req->ProjectType . '"');
             return response()->json($clients);
         } catch (\Exception $e) {
             Log::error('Error fetching project area: ' . $e->getMessage());

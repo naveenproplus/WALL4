@@ -1067,121 +1067,6 @@
                     });
                 });
             }
-            // const UploadImages = async () => {
-            //     let uploadImages = await new Promise((resolve, reject) => {
-            //         ajaxIndicatorStart(
-            //             "% Completed. Please wait until the upload process is complete.");
-            //         setTimeout(() => {
-            //             let count = $("input.imageScrop").length;
-            //             let completed = 0;
-            //             let rowIndex = 0;
-            //             let images = {
-            //                 coverImg: {
-            //                     uploadPath: "",
-            //                     fileName: ""
-            //                 },
-            //                 gallery: [],
-            //                 serviceIcon: {
-            //                     uploadPath: "", // Assuming serviceIcon upload path
-            //                     fileName: "" // Assuming serviceIcon file name
-            //                 }
-            //             };
-
-            //             const uploadComplete = async (e, x, settings, exception) => {
-            //                 completed++;
-            //                 let percentage = (100 * completed) / count;
-            //                 $('#divProcessText').html(percentage +
-            //                     '% Completed. Please wait until the upload process is complete.'
-            //                 );
-            //                 checkUploadCompleted();
-            //             };
-
-            //             const checkUploadCompleted = async () => {
-            //                 if (count <= completed) {
-            //                     ajaxIndicatorStop();
-            //                     resolve(images);
-            //                 }
-            //             };
-
-            //             const upload = async (formData) => {
-            //                 $.ajax({
-            //                     type: "post",
-            //                     url: "{{ url('/') }}/admin/tmp/upload-image",
-            //                     headers: {
-            //                         'X-CSRF-Token': $('meta[name=_token]')
-            //                             .attr('content')
-            //                     },
-            //                     data: formData,
-            //                     dataType: "json",
-            //                     error: function(e, x, settings, exception) {
-            //                         ajaxErrors(e, x, settings,
-            //                             exception);
-            //                     },
-            //                     complete: uploadComplete,
-            //                     success: function(response) {
-            //                         if (response.referData
-            //                             .isCoverImage == 1) {
-            //                             images.coverImg = {
-            //                                 uploadPath: response
-            //                                     .uploadPath,
-            //                                 fileName: response
-            //                                     .fileName
-            //                             };
-            //                         } else if (response.referData
-            //                             .isServiceIcon == 1
-            //                         ) { // Check if it's service icon
-            //                             images.serviceIcon = {
-            //                                 uploadPath: response
-            //                                     .uploadPath,
-            //                                 fileName: response
-            //                                     .fileName
-            //                             };
-            //                         } else {
-            //                             images.gallery.push({
-            //                                 uploadPath: response
-            //                                     .uploadPath,
-            //                                 fileName: response
-            //                                     .fileName,
-            //                                 slno: response
-            //                                     .referData.slno
-            //                             });
-            //                         }
-            //                         console.log(images);
-            //                     }
-            //                 });
-            //             };
-
-            //             // Loop through each imageScrop input
-            //             $("input.imageScrop").each(function(index) {
-            //                 let id = $(this).attr('id');
-            //                 if ($('#' + id).val() != "") {
-            //                     rowIndex++;
-            //                     let formData = {};
-            //                     formData.image = $('#' + id).attr('src');
-            //                     formData.referData = {
-            //                         index: rowIndex,
-            //                         id: id,
-            //                         slno: $('#' + id).attr('data-slno'),
-            //                         isCoverImage: $('#' + id).attr(
-            //                             'data-is-cover-image'),
-            //                         isServiceIcon: $('#' + id).attr(
-            //                             'data-is-service-icon'
-            //                         ) // Add attribute for service icon
-            //                     };
-            //                     upload(formData);
-            //                 } else {
-            //                     completed++;
-            //                     let percentage = (100 * completed) / count;
-            //                     $('#divProcessText').html(percentage +
-            //                         '% Completed. Please wait until the upload process is complete.'
-            //                     );
-            //                     checkUploadCompleted();
-            //                 }
-            //             });
-            //         }, 200);
-            //     });
-            //     return uploadImages;
-            // };
 
             const checkServiceName = async (serviceName) => {
                 $.ajax({
@@ -1381,7 +1266,7 @@
                         <div class="col-sm-4 text-center">
                             <label>Gallery Image</label>
                             <input type="file" name="gallery_images[]" id="txtGalleryImg${galleryCount}" class="dropify imageScrop"
-                                data-slno="" data-is-cover-image="0" data-max-file-size="${uploadLimit}"
+                                data-slno="" data-is-cover-image="0" 
                                 data-allowed-file-extensions="jpeg jpg png gif" required />
                             <span class="errors" id="txtGalleryImg${galleryCount}-err"></span>
                             <button type="button" class="btn btn-outline-danger btn-sm btnRemoveGallery mt-2"
@@ -1405,14 +1290,6 @@
                 const dataSlno = inputElement.getAttribute('data-slno');
                 DeletedGalleryImg.push(dataSlno);
             });
-
-            // $(document).on('click', '.dropify-clear', function(e) {
-            //     var $element = $(this).closest('.dropify-wrapper').find('input[type="file"]');
-            //     if ($element.data('is-cover-image') == 1) {
-            //         var dataPath = $element.data('default-file');
-            //         DeletedProfileImg.push(dataPath);
-            //     }
-            // });
 
             $(document).on('click', '.btnRemoveGallery', function() {
                 var indexToRemove = $(this).data('index');

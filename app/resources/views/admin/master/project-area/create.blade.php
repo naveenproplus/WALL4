@@ -45,8 +45,7 @@
                                                     echo url('/') . '/' . $EditData[0]->ProjectAreaImage;
                                                 }
                                             } ?>"
-                                            data-allowed-file-extensions="jpeg jpg png"
-                                            data-is-cover-image="1" />
+                                            data-allowed-file-extensions="jpeg jpg png" data-is-cover-image="1" />
                                         <span class="errors" id="txtProjectAreaImage-err"></span>
                                     </div>
                                 </div>
@@ -187,12 +186,13 @@
     <script>
         $(document).ready(function() {
             var uploadedImageURL;
+            let uploadData = {};
             var URL = window.URL || window.webkitURL;
             var $dataRotate = $('#dataRotate');
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 700/1167,
+                aspectRatio: 700 / 1167,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
@@ -305,14 +305,21 @@
             $(document).on('click', '#btnUploadImage', function() {
                 $('#inputImage').trigger('click')
             });
+
             $("#btnCropApply").on('click', function() {
                 btnLoading($('#btnCropApply'));
                 setTimeout(() => {
                     var base64 = $image.cropper('getCroppedCanvas').toDataURL();
                     var id = $image.attr('data-id');
+                    let fileName = $('.dropify-filename-inner').text();
                     $('#' + id).attr('src', base64);
                     $('#' + id).parent().find('img').attr('src', base64)
-
+                    let uuid = generateUUID();
+                    uploadData[uuid] = new customFileUpload(base64, uuid, id, fileName, {
+                        callback,
+                        uploadURL: "{{ route('temp.upload') }}",
+                        csrfToken: "{{ csrf_token() }}"
+                    });
                     $('#ImgCrop').modal('hide');
                     setTimeout(() => {
                         btnReset($('#btnCropApply'));
@@ -325,16 +332,23 @@
                 $('#' + id).parent().find('button.dropify-clear').trigger('click');
                 $('#ImgCrop').modal('hide');
             });
+
+            const callback = async (response, id, uuid, fileName) => {
+                if (response.uploadURL != undefined) {
+                    $('#txtProjectAreaImage').attr('data-upload-url', response.uploadURL);
+                    $('#txtProjectAreaImage').attr('src', response.uploadURL);
+                }
+                delete uploadData[uuid];
+            };
+
         });
     </script>
     <script>
         $(document).ready(function() {
-
-            
             $('#txtProjectAreaImage').dropify({
                 showRemove: false
             });
-            
+
             const SUploadImages = async () => {
                 let uploadImages = await new Promise((resolve, reject) => {
                     ajaxIndicatorStart("% Completed. Please wait until the upload gets complete.");
@@ -349,11 +363,13 @@
                             },
                             gallery: []
                         };
-                        
+
                         const uploadComplete = async (e, x, settings, exception) => {
                             completed++;
                             let percentage = (100 * completed) / count;
-                            $('#divProcessText').html(percentage +'% Completed. Please wait until the upload gets complete.');
+                            $('#divProcessText').html(percentage +
+                                '% Completed. Please wait until the upload gets complete.'
+                            );
                             checkUploadCompleted();
                         };
 
@@ -368,22 +384,34 @@
                             $.ajax({
                                 type: "post",
                                 url: "{{ url('/') }}/admin/tmp/upload-image",
-                                headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')},
+                                headers: {
+                                    'X-CSRF-Token': $('meta[name=_token]')
+                                        .attr('content')
+                                },
                                 data: formData,
                                 dataType: "json",
-                                error: function(e, x, settings, exception) {ajaxErrors(e, x, settings,exception);},
+                                error: function(e, x, settings, exception) {
+                                    ajaxErrors(e, x, settings,
+                                        exception);
+                                },
                                 complete: uploadComplete,
                                 success: function(response) {
-                                    if (response.referData.isCoverImage == 1) {
+                                    if (response.referData
+                                        .isCoverImage == 1) {
                                         images.coverImg = {
-                                            uploadPath: response.uploadPath,
-                                            fileName: response.fileName
+                                            uploadPath: response
+                                                .uploadPath,
+                                            fileName: response
+                                                .fileName
                                         };
                                     } else {
                                         images.gallery.push({
-                                            uploadPath: response.uploadPath,
-                                            fileName: response.fileName,
-                                            slno: response.referData.slno
+                                            uploadPath: response
+                                                .uploadPath,
+                                            fileName: response
+                                                .fileName,
+                                            slno: response
+                                                .referData.slno
                                         });
                                     }
                                     console.log(images);
@@ -402,12 +430,16 @@
                                     index: rowIndex,
                                     id: id,
                                     slno: $('#' + id).attr('data-slno'),
-                                    isCoverImage: $('#' + id).attr('data-is-cover-image')};
+                                    isCoverImage: $('#' + id).attr(
+                                        'data-is-cover-image')
+                                };
                                 upload(formData);
                             } else {
                                 completed++;
                                 let percentage = (100 * completed) / count;
-                                $('#divProcessText').html(percentage +'% Completed. Please wait until the upload gets complete.');
+                                $('#divProcessText').html(percentage +
+                                    '% Completed. Please wait until the upload gets complete.'
+                                );
                                 checkUploadCompleted();
                             }
                         });
@@ -431,15 +463,28 @@
                 }
                 return status;
             }
-            const getData = async() => {
-                let tmp = await SUploadImages();
+            const getData = async () => {
+                // let tmp = await SUploadImages();
+
+                let isRemoved = $('#txtProjectAreaImage').attr('data-remove') != undefined ? $(
+                    '#txtProjectAreaImage').attr('data-remove') : 0;
+                let isNew = $('#txtProjectAreaImage').attr('data-is-new') != undefined ? $(
+                    '#txtProjectAreaImage').attr('data-is-new') : 0;
+                let url = $('#txtProjectAreaImage').attr('data-upload-url') != undefined ? $(
+                    '#txtProjectAreaImage').attr('data-upload-url') : "";
+                let fileName = $('#txtProjectAreaImage').attr('data-file-name') != undefined ? $(
+                    '#txtProjectAreaImage').attr('data-file-name') : "";
+
                 let formData = new FormData();
                 formData.append('ProjectAreaName', $('#txtProjectAreaName').val());
                 formData.append('ProjectType', $('#lstProjectType').val());
                 formData.append('ActiveStatus', $('#lstActiveStatus').val());
-                if ($('#txtProjectAreaImage').val() != "") {
-                    formData.append('Images', JSON.stringify(tmp));
-                }
+                formData.append('Images', JSON.stringify({
+                    url,
+                    isRemoved,
+                    isNew,
+                    fileName
+                }));
                 return formData;
             }
             $(document).on('click', '#btnSave', async function() {
@@ -463,7 +508,7 @@
                                     "{{ url('/') }}/admin/master/project-area/edit/{{ $ProjectAreaID }}";
                             @else
                                 let posturl =
-                                "{{ url('/') }}/admin/master/project-area/create";
+                                    "{{ url('/') }}/admin/master/project-area/create";
                             @endif
                             $.ajax({
                                 type: "post",
@@ -477,7 +522,7 @@
                                 contentType: false,
                                 success: function(response) {
                                     document.documentElement.scrollTop =
-                                    0; // For Chrome, Firefox, IE and Opera
+                                        0; // For Chrome, Firefox, IE and Opera
                                     if (response.status == true) {
                                         swal({
                                             title: "SUCCESS",
@@ -490,7 +535,8 @@
                                         }, function() {
                                             @if ($isEdit == true)
                                                 window.location.replace(
-                                                    "{{ url('/') }}/admin/master/project-area/");
+                                                    "{{ url('/') }}/admin/master/project-area/"
+                                                );
                                             @else
                                                 window.location.reload();
                                             @endif
