@@ -189,7 +189,6 @@ class serviceController extends Controller
     public function Save(Request $req)
     {
         if ($this->general->isCrudAllow($this->CRUD, "add") == true) {
-            $img = json_decode($req->Images, true);
             $OldData = $NewData = array();
             $ServiceID = "";
 
@@ -221,13 +220,15 @@ class serviceController extends Controller
             $validator = Validator::make($req->all(), $rules, $message);
 
             if ($validator->fails()) {
-                if (array_key_exists("coverImg", $img) && file_exists($img['coverImg']['uploadPath'])) {
-                    unlink($img['coverImg']['uploadPath']);
+                if (!empty($req->profileImage) && $req->profileImage !== "undefined") {
+                    $profileImage = json_decode($req->profileImage, true);
+                    unlink($profileImage);
                 }
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $gallery) {
-                        if (file_exists($gallery['uploadPath'])) {
-                            unlink($gallery['uploadPath']);
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            unlink($galleryImages['url']);
                         }
                     }
                 }
@@ -237,17 +238,18 @@ class serviceController extends Controller
             $status = false;
             $ServiceImage = "";
             $galleryUrls = [];
+            $profileImage = json_decode($req->profileImage, true);
             try {
                 $ServiceID = $this->DocNum->getDocNum("Services");
                 $dir = "uploads/admin/master/services/" . $ServiceID . "/";
                 if (!file_exists($dir)) {
                     mkdir($dir, 0777, true);
                 }
-                if (array_key_exists("coverImg", $img)) {
-                    if (file_exists($img['coverImg']['uploadPath'])) {
-                        $UploadedImage = $img['coverImg']['uploadPath'];
-                        $originalFileName = pathinfo($img['coverImg']['fileName'], PATHINFO_FILENAME);
-                        $originalExtension = strtolower(pathinfo($img['coverImg']['fileName'], PATHINFO_EXTENSION));
+                if (array_key_exists("url", $profileImage)) {
+                    if (file_exists($profileImage['url'])) {
+                        $UploadedImage = $profileImage['url'];
+                        $originalFileName = pathinfo($profileImage['url'], PATHINFO_FILENAME);
+                        $originalExtension = strtolower(pathinfo($profileImage['url'], PATHINFO_EXTENSION));
                         $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
 
                         copy($UploadedImage, $defaultImage);
@@ -260,12 +262,13 @@ class serviceController extends Controller
                         unlink($UploadedImage);
                     }
                 }
-                if (array_key_exists("gallery", $img)) {
-                    foreach ($img['gallery'] as $pg) {
-                        if (file_exists($pg['uploadPath'])) {
-                            $UploadedImage = $pg['uploadPath'];
-                            $originalFileName = pathinfo($pg['fileName'], PATHINFO_FILENAME);
-                            $originalExtension = strtolower(pathinfo($pg['fileName'], PATHINFO_EXTENSION));
+                if (is_array($req->gallery_images) && count($req->gallery_images) > 0) {
+                    foreach ($req->gallery_images as $imageData) {
+                        $galleryImages = json_decode($imageData, true);
+                        if (file_exists($galleryImages['url'])) {
+                            $UploadedImage = $galleryImages['url'];
+                            $originalFileName = pathinfo($galleryImages['url'], PATHINFO_FILENAME);
+                            $originalExtension = strtolower(pathinfo($galleryImages['url'], PATHINFO_EXTENSION));
                             $defaultImage = $dir . $originalFileName . '.' . $originalExtension;
 
                             copy($UploadedImage, $defaultImage);
@@ -314,6 +317,27 @@ class serviceController extends Controller
                         if ($inserted) {
                             $this->DocNum->updateDocNum("Service-Gallery");
                         }
+                    }
+                }
+                if (is_array($req->DeletedGalleryImg) && count($req->DeletedGalleryImg) > 0) {
+                    $DeletedGalleryImg = json_decode($req->DeletedGalleryImg, true);
+                    for ($i = 0; $i < count($DeletedGalleryImg); $i++) {
+                        $t = DB::Table('tbl_services_gallery')->where('SLNO', $DeletedGalleryImg[$i])->get();
+                        if (count($t) > 0) {
+                            if (file_exists($t[0]->ImageUrl)) {
+                                unlink($t[0]->ImageUrl);
+                            }
+                            $status = DB::Table('tbl_services_gallery')->where('SLNO', $DeletedGalleryImg[$i])->delete();
+                        }
+
+                    }
+                }
+                
+                if ($profileImage['isRemoved']) {
+                    if ($profileImage['url'] === null || $profileImage['url'] == '') {
+                        $updatedProfileImage = DB::Table('tbl_services')
+                            ->where('ServiceID', $ServiceID)
+                            ->update(['ServiceImage' => '']);
                     }
                 }
             } catch (Exception $e) {
@@ -519,7 +543,6 @@ class serviceController extends Controller
             } catch (Exception $e) {
                 $status = false;
             }
-
             if ($status == true) {
                 DB::commit();
                 if ($SImage != "") {
