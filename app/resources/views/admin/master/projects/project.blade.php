@@ -435,14 +435,11 @@
 
             getProjectArea();
 
-
-
             let GalleryCount = parseInt("{{ $GalleryCount }}");
             var currentTab = 0;
             showTab(currentTab);
             let isProjectName = false;
             let isSlug = false;
-            // let DeletedGalleryImg = [];
 
             function showTab(n) {
                 var x = document.getElementsByClassName("tab");
@@ -466,6 +463,7 @@
                 let page = x[currentTab].getAttribute('data-page');
                 $('#pageTitle').html(page);
             }
+
             async function nextPrev(n) {
                 var x = document.getElementsByClassName("tab");
                 if (n == 1 && !validateForm()) return false;
@@ -547,7 +545,6 @@
                 return status;
             }
 
-
             function fixStepIndicator(n) {
                 $('#divStepIndicator').html('');
                 var tabs = document.getElementsByClassName("tab");
@@ -567,15 +564,9 @@
             $('#nextBtn').click(function() {
                 nextPrev(1);
             });
-            const appInit = async () => {
-
-            }
-
-
+            const appInit = async () => {}
 
             const getData = async () => {
-                // let tmp = await UploadImages();
-
                 let isRemoved = $('#txtCoverImg').attr('data-remove') != undefined ? $('#txtCoverImg').attr(
                     'data-remove') : 0;
                 let isNew = $('#txtCoverImg').attr('data-is-new') != undefined ? $('#txtCoverImg').attr(
@@ -586,6 +577,7 @@
                     .attr('data-file-name') : "";
 
                 let formData = new FormData();
+
                 formData.append('ProjectName', $('#txtProjectName').val());
                 formData.append('Address', $('#txtAddress').val());
                 formData.append('ActiveStatus', $('#lstActiveStatus').val());
@@ -729,104 +721,6 @@
                     });
                 });
             }
-            const UploadImages = async () => {
-                let uploadImages = await new Promise((resolve, reject) => {
-                    ajaxIndicatorStart(
-                        "% Completed. Please wait until the upload process is complete.");
-                    setTimeout(() => {
-                        let count = $("input.imageScrop").length;
-                        let completed = 0;
-                        let rowIndex = 0;
-                        let images = {
-                            coverImg: {
-                                uploadPath: "",
-                                fileName: ""
-                            },
-                            gallery: []
-                        };
-
-                        const uploadComplete = async (e, x, settings, exception) => {
-                            completed++;
-                            let percentage = (100 * completed) / count;
-                            $('#divProcessText').html(percentage +
-                                '% Completed. Please wait until the upload process is complete.'
-                            );
-                            checkUploadCompleted();
-                        };
-
-                        const checkUploadCompleted = async () => {
-                            if (count <= completed) {
-                                ajaxIndicatorStop();
-                                resolve(images);
-                            }
-                        };
-
-                        const upload = async (formData) => {
-                            $.ajax({
-                                type: "post",
-                                url: "{{ url('/') }}/admin/tmp/upload-image",
-                                headers: {
-                                    'X-CSRF-Token': $('meta[name=_token]')
-                                        .attr('content')
-                                },
-                                data: formData,
-                                dataType: "json",
-                                error: function(e, x, settings, exception) {
-                                    ajaxErrors(e, x, settings,
-                                        exception);
-                                },
-                                complete: uploadComplete,
-                                success: function(response) {
-                                    if (response.referData
-                                        .isCoverImage == 1) {
-                                        images.coverImg = {
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName
-                                        };
-                                    } else {
-                                        images.gallery.push({
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName,
-                                            slno: response
-                                                .referData.slno
-                                        });
-                                    }
-                                }
-                            });
-                        };
-
-                        // Loop through each imageScrop input
-                        $("input.imageScrop").each(function(index) {
-                            let id = $(this).attr('id');
-                            if ($('#' + id).val() != "") {
-                                rowIndex++;
-                                let formData = {};
-                                formData.image = $('#' + id).attr('src');
-                                formData.referData = {
-                                    index: rowIndex,
-                                    id: id,
-                                    slno: $('#' + id).attr('data-slno'),
-                                    isCoverImage: $('#' + id).attr(
-                                        'data-is-cover-image')
-                                };
-                                upload(formData);
-                            } else {
-                                completed++;
-                                let percentage = (100 * completed) / count;
-                                $('#divProcessText').html(percentage +
-                                    '% Completed. Please wait until the upload process is complete.'
-                                );
-                                checkUploadCompleted();
-                            }
-                        });
-                    }, 200);
-                });
-                return uploadImages;
-            };
 
             $(document).on('keyup', '#txtProjectName', async function() {
                 let projectName = $('#txtProjectName').val();
@@ -865,8 +759,6 @@
                     status = false;
                 }
             });
-
-
 
             $(document).on('change', '#lstClient', async function() {
                 let clientID = $('#lstClient').val();

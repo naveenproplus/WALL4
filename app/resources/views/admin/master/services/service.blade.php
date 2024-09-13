@@ -439,8 +439,8 @@
                 $('.btnRemoveGallery[data-detail-id="' + detailID + '"][data-row-index="' + rowIndex + '"]')
                     .show();
             }
-            $(document).on('change', '.imageScrop', function() {
 
+            $(document).on('change', '.imageScrop', function() {
                 let id = $(this).attr('id');
                 $image.attr('data-id', id);
                 $('#ImgCrop').modal('show');
@@ -462,6 +462,7 @@
                     }
                 }
             });
+
             $('.docs-buttons').on('click', '[data-method]', function() {
                 var $this = $(this);
                 var data = $this.data();
@@ -520,6 +521,7 @@
                     }
                 }
             });
+
             $('#inputImage').change(function() {
                 var files = this.files;
                 var file;
@@ -545,9 +547,11 @@
                     }
                 }
             });
+
             $(document).on('click', '#btnUploadImage', function() {
                 $('#inputImage').trigger('click')
             });
+
             $("#btnCropApply").on('click', function() {
                 btnLoading($('#btnCropApply'));
                 setTimeout(() => {
@@ -584,6 +588,13 @@
                 $('#ImgCrop').modal('hide');
             });
 
+            $('#btnCropCancel').on('click', function() {
+                var id = $image.attr('data-id');
+                $('#' + id).val("");
+                $('#' + id).parent().find('.dropify-clear').trigger('click');
+                $('#ImgCrop').modal('hide');
+            });
+
             $(document).on('click', '.dropify-clear', function() {
                 $(this).parent().find('input[type="file"]').attr('data-remove', 1);
                 $(this).parent().find('input[type="file"]').attr('data-is-new', 0);
@@ -601,7 +612,6 @@
             showTab(currentTab);
             let isServiceName = false;
             let isSlug = false;
-            // let DeletedGalleryImg = [];
 
             function showTab(n) {
                 var x = document.getElementsByClassName("tab");
@@ -628,6 +638,7 @@
                 }
                 $('#pageTitle').html(page);
             }
+
             async function nextPrev(n) {
                 var x = document.getElementsByClassName("tab");
                 if (n == 1 && !validateForm()) return false;
@@ -724,7 +735,6 @@
                         status = false;
                     }
                 } else if (page == "Service Descriptions") {
-
                     let Title = $('#txtTitle').val();
                     let Description1 = $('#txtDescription1').val();
                     let Description2 = $('#txtDescription2').val();
@@ -764,9 +774,7 @@
                         status = false;
                     }
                 }
-
                 return status;
-                //return true;
             }
 
             function fixStepIndicator(n) {
@@ -782,17 +790,21 @@
                 }
                 x[n].className += " active";
             }
+
             $('#prevBtn').click(function() {
                 nextPrev(-1);
             });
+
             $('#nextBtn').click(function() {
                 nextPrev(1);
             });
+
             const appInit = async () => {
                 getCategory();
                 getTax();
                 getUOM();
             }
+
             const getCategory = async () => {
                 $('#lstCategory').select2('destroy');
                 $('#lstCategory option').remove();
@@ -859,6 +871,7 @@
                 });
                 $('#lstTax').select2();
             }
+
             const getUOM = async () => {
                 $('#lstUOM').select2('destroy');
                 $('#lstUOM option').remove();
@@ -888,8 +901,8 @@
                 });
                 $('#lstUOM').select2();
             }
-            const getData = async () => {
 
+            const getData = async () => {
                 let isRemoved = $('#txtCoverImg').attr('data-remove') != undefined ? $('#txtCoverImg').attr(
                     'data-remove') : 0;
                 let isNew = $('#txtCoverImg').attr('data-is-new') != undefined ? $('#txtCoverImg').attr(
@@ -897,10 +910,9 @@
                 let url = $('#txtCoverImg').attr('data-upload-url') != undefined ? $('#txtCoverImg').attr(
                     'data-upload-url') : "";
                 let fileName = $('#txtCoverImg').attr('data-file-name') != undefined ? $('#txtCoverImg')
-                    .attr(
-                        'data-file-name') : "";
-
+                    .attr('data-file-name') : "";
                 let formData = new FormData();
+
                 formData.append('ServiceName', $('#txtServiceName').val());
                 formData.append('HSNSAC', $('#txtHSNSAC').val());
                 formData.append('Slug', $('#txtSlug').val());
@@ -931,14 +943,12 @@
                         formData.append('gallery_images[]', JSON.stringify(imageData));
                     }
                 });
-
                 formData.append('profileImage', JSON.stringify({
                     url,
                     isRemoved,
                     isNew,
                     fileName
                 }));
-
                 formData.append('DeletedGalleryImg', JSON.stringify(DeletedGalleryImg));
                 return formData;
             }
@@ -1099,6 +1109,7 @@
                     }
                 });
             }
+            
             const checkSlug = async (Slug) => {
                 $.ajax({
                     type: "post",
@@ -1130,6 +1141,7 @@
                     }
                 });
             }
+
             $(document).on('keyup', '#txtServiceName', async function() {
                 let serviceName = $('#txtServiceName').val();
                 if (serviceName == "") {
@@ -1151,6 +1163,7 @@
                     checkSlug(slug);
                 }
             });
+
             $(document).on('change', '#txtServiceName', async function() {
                 let serviceName = $('#txtServiceName').val();
                 if (serviceName == "") {
@@ -1181,6 +1194,7 @@
                     status = false;
                 }
             });
+
             $(document).on('keyup', '#txtPrice', async function() {
                 let Price = $('#txtPrice').val();
                 $('#txtPrice-err').html('');
@@ -1204,6 +1218,7 @@
                     status = false;
                 }
             });
+
             $(document).on('change', '#lstTax', async function() {
                 let Tax = $('#lstTax').val();
                 $('#lstTax-err').html('');
@@ -1212,6 +1227,7 @@
                     status = false;
                 }
             });
+
             $(document).on('change', '#lstTaxType', async function() {
                 let TaxType = $('#lstTaxType').val();
                 $('#lstTaxType-err').html('');
@@ -1220,6 +1236,7 @@
                     status = false;
                 }
             });
+
             $(document).on('change', '#lstCategory', function() {
                 let Category = $('#lstCategory').val();
                 $('#lstCategory-err').html('');
@@ -1229,36 +1246,19 @@
                 }
 
             });
-
             appInit();
         });
 
         $(document).ready(function() {
-            // Function to initialize Dropify
-            function initializeDropify() {
-                $('.dropify').each(function() {
-                    $(this).dropify({
-                        tpl: {
-                            clearButton: '<button type="button" class="dropify-clear">Remove</button>'
-                        }
-                    });
-                });
-            }
-
-            // Initialize Dropify on page load
             initializeDropify();
-
             var lastInputId = $('#divGallery').find('input[type="file"]').last().attr('id');
-            // Check if lastInputId is not undefined and matches the expected pattern
             if (lastInputId !== undefined && lastInputId.match(/\d+$/)) {
                 var galleryCount = parseInt(lastInputId.match(/\d+$/)[0]) +
-                    1; // Extract the number from the last input ID and increment
+                    1;
             } else {
-                // If lastInputId is undefined or does not match the pattern, set galleryCount to 1
                 var galleryCount = 1;
             }
 
-            // Event handler for adding new input box
             $(document).on('click', '#btnAddImages', function() {
                 var uploadLimit = '{{ $Settings['upload-limit'] }}';
                 var newGalleryItem = `
@@ -1276,13 +1276,11 @@
 
                 $('#galleryContainer').append(newGalleryItem);
 
-                // Initialize Dropify for the newly added input field
                 setTimeout(function() {
                     initializeDropify($('#txtGalleryImg' + galleryCount));
                 }, 0);
 
                 galleryCount++;
-                //alert("count is :"+galleryCount);
             });
 
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
@@ -1298,9 +1296,7 @@
             });
 
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
-                // Remove the corresponding gallery item, but keep the Dropify instance intact
                 $(this).closest('.gallery-item').remove();
-
             });
 
             $(document).on('change', '.GalleryItem', function(e) {
@@ -1314,10 +1310,22 @@
             });
         });
 
+
+        function initializeDropify() {
+            $('.dropify').each(function() {
+                $(this).dropify({
+                    tpl: {
+                        clearButton: '<button type="button" class="dropify-clear">Remove</button>'
+                    }
+                });
+            });
+        }
+
         $(document).on('click', '#divGallery .dropify-clear', function(event) {
             var parentDiv = $(this).closest('.col-sm-3.p-10.text-center');
             parentDiv.remove();
         });
+
         $(document).on('click', '.icon-card', function() {
             $('.icon-card').removeClass('selected');
             $(this).addClass('selected');

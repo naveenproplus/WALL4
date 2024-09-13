@@ -196,11 +196,13 @@
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
+
             $('#ImgCrop').modal({
                 backdrop: 'static',
                 keyboard: false
             });
             $('#ImgCrop').modal('hide');
+
             $(document).on('change', '.imageScrop', function() {
                 let id = $(this).attr('id');
                 $image.attr('data-id', id);
@@ -222,6 +224,7 @@
                     }
                 }
             });
+
             $('.docs-buttons').on('click', '[data-method]', function() {
                 var $this = $(this);
                 var data = $this.data();
@@ -280,6 +283,7 @@
                     }
                 }
             });
+
             $('#inputImage').change(function() {
                 var files = this.files;
                 var file;
@@ -302,6 +306,7 @@
                     }
                 }
             });
+
             $(document).on('click', '#btnUploadImage', function() {
                 $('#inputImage').trigger('click')
             });
@@ -326,6 +331,7 @@
                     }, 100);
                 }, 100);
             });
+
             $('#btnCropCancel').on('click', function() {
                 var id = $image.attr('data-id');
                 $('#' + id).val("");
@@ -349,104 +355,6 @@
                 showRemove: false
             });
 
-            const SUploadImages = async () => {
-                let uploadImages = await new Promise((resolve, reject) => {
-                    ajaxIndicatorStart("% Completed. Please wait until the upload gets complete.");
-                    setTimeout(() => {
-                        let count = $("input.imageScrop").length;
-                        let completed = 0;
-                        let rowIndex = 0;
-                        let images = {
-                            coverImg: {
-                                uploadPath: "",
-                                fileName: ""
-                            },
-                            gallery: []
-                        };
-
-                        const uploadComplete = async (e, x, settings, exception) => {
-                            completed++;
-                            let percentage = (100 * completed) / count;
-                            $('#divProcessText').html(percentage +
-                                '% Completed. Please wait until the upload gets complete.'
-                            );
-                            checkUploadCompleted();
-                        };
-
-                        const checkUploadCompleted = async () => {
-                            if (count <= completed) {
-                                ajaxIndicatorStop();
-                                resolve(images);
-                            }
-                        };
-
-                        const upload = async (formData) => {
-                            $.ajax({
-                                type: "post",
-                                url: "{{ url('/') }}/admin/tmp/upload-image",
-                                headers: {
-                                    'X-CSRF-Token': $('meta[name=_token]')
-                                        .attr('content')
-                                },
-                                data: formData,
-                                dataType: "json",
-                                error: function(e, x, settings, exception) {
-                                    ajaxErrors(e, x, settings,
-                                        exception);
-                                },
-                                complete: uploadComplete,
-                                success: function(response) {
-                                    if (response.referData
-                                        .isCoverImage == 1) {
-                                        images.coverImg = {
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName
-                                        };
-                                    } else {
-                                        images.gallery.push({
-                                            uploadPath: response
-                                                .uploadPath,
-                                            fileName: response
-                                                .fileName,
-                                            slno: response
-                                                .referData.slno
-                                        });
-                                    }
-                                    console.log(images);
-                                }
-                            });
-                        };
-
-                        // Loop through each imageScrop input
-                        $("input.imageScrop").each(function(index) {
-                            let id = $(this).attr('id');
-                            if ($('#' + id).val() != "") {
-                                rowIndex++;
-                                let formData = {};
-                                formData.image = $('#' + id).attr('src');
-                                formData.referData = {
-                                    index: rowIndex,
-                                    id: id,
-                                    slno: $('#' + id).attr('data-slno'),
-                                    isCoverImage: $('#' + id).attr(
-                                        'data-is-cover-image')
-                                };
-                                upload(formData);
-                            } else {
-                                completed++;
-                                let percentage = (100 * completed) / count;
-                                $('#divProcessText').html(percentage +
-                                    '% Completed. Please wait until the upload gets complete.'
-                                );
-                                checkUploadCompleted();
-                            }
-                        });
-                    }, 200);
-                });
-                return uploadImages;
-            };
             const formValidation = () => {
                 $('.errors').html('')
                 let ProjectAreaName = $('#txtProjectAreaName').val();
@@ -464,8 +372,6 @@
                 return status;
             }
             const getData = async () => {
-                // let tmp = await SUploadImages();
-
                 let isRemoved = $('#txtProjectAreaImage').attr('data-remove') != undefined ? $(
                     '#txtProjectAreaImage').attr('data-remove') : 0;
                 let isNew = $('#txtProjectAreaImage').attr('data-is-new') != undefined ? $(
@@ -474,8 +380,8 @@
                     '#txtProjectAreaImage').attr('data-upload-url') : "";
                 let fileName = $('#txtProjectAreaImage').attr('data-file-name') != undefined ? $(
                     '#txtProjectAreaImage').attr('data-file-name') : "";
-
                 let formData = new FormData();
+
                 formData.append('ProjectAreaName', $('#txtProjectAreaName').val());
                 formData.append('ProjectType', $('#lstProjectType').val());
                 formData.append('ActiveStatus', $('#lstActiveStatus').val());
@@ -487,6 +393,7 @@
                 }));
                 return formData;
             }
+
             $(document).on('click', '#btnSave', async function() {
                 let status = formValidation();
                 if (status) {
