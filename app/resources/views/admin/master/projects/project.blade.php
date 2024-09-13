@@ -204,6 +204,7 @@
                                                         <label>Cover Image</label>
                                                         <input type="file" id="txtCoverImg" class="dropify imageScrop"
                                                             data-slno="" data-is-cover-image="1"
+                                                            data-ratio=0.5998286203941731
                                                             data-max-file-size="{{ $Settings['upload-limit'] }}"
                                                             data-default-file="<?php if ($isEdit == true) {
                                                                 if ($EditData[0]->ProjectImage != '') {
@@ -463,7 +464,6 @@
                 }
                 fixStepIndicator(n);
                 let page = x[currentTab].getAttribute('data-page');
-                console.log(page)
                 $('#pageTitle').html(page);
             }
             async function nextPrev(n) {
@@ -584,7 +584,7 @@
                     'data-upload-url') : "";
                 let fileName = $('#txtCoverImg').attr('data-file-name') != undefined ? $('#txtCoverImg')
                     .attr('data-file-name') : "";
-                    
+
                 let formData = new FormData();
                 formData.append('ProjectName', $('#txtProjectName').val());
                 formData.append('Address', $('#txtAddress').val());
@@ -795,7 +795,6 @@
                                                 .referData.slno
                                         });
                                     }
-                                    console.log(images);
                                 }
                             });
                         };
@@ -940,32 +939,23 @@
                 setTimeout(function() {
                     initializeDropify($('#txtGalleryImg' + galleryCount));
                 }, 0);
-
                 galleryCount++;
-                //alert("count is :"+galleryCount);
             });
 
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
                 const inputElement = $(this).closest('.dropify-wrapper').find('input[type="file"]')[0];
-
                 const dataSlno = inputElement.getAttribute('data-slno');
-
-                console.log("data-slno:", dataSlno);
-
                 DeletedGalleryImg.push(dataSlno);
-                console.log("DeletedGalleryImg:", DeletedGalleryImg);
             });
 
             $(document).on('click', '.btnRemoveGallery', function() {
                 var indexToRemove = $(this).data('index');
                 $('#galleryItem' + indexToRemove).remove();
-                initializeDropify(); // Reinitialize Dropify after removal
+                initializeDropify();
             });
 
             $(document).on('click', '#divGallery .dropify-clear', function(e) {
-                // Remove the corresponding gallery item, but keep the Dropify instance intact
                 $(this).closest('.gallery-item').remove();
-
             });
 
             $(document).on('change', '.GalleryItem', function(e) {
@@ -1052,7 +1042,7 @@
             var $dataScaleX = $('#dataScaleX');
             var $dataScaleY = $('#dataScaleY');
             var options = {
-                aspectRatio: 9 / 6,
+                aspectRatio: 0,
                 preview: '.img-preview'
             };
             var $image = $('#ImageCrop').cropper(options);
@@ -1079,12 +1069,13 @@
                 $('.btnRemoveGallery[data-detail-id="' + detailID + '"][data-row-index="' + rowIndex + '"]')
                     .show();
             }
-            $(document).on('change', '.imageScrop', function() {
 
+            $(document).on('change', '.imageScrop', function() {
                 let id = $(this).attr('id');
+                let aspectRatioData = $(this).attr('data-ratio');
+                var files = this.files;
                 $image.attr('data-id', id);
                 $('#ImgCrop').modal('show');
-                var files = this.files;
                 if (files && files.length) {
                     file = files[0];
                     if (/^image\/\w+$/.test(file.type)) {
@@ -1094,6 +1085,8 @@
                             URL.revokeObjectURL(uploadedImageURL);
                         }
                         uploadedImageURL = URL.createObjectURL(file);
+                        uploadedImageURL = URL.createObjectURL(file);
+                        options.aspectRatio = aspectRatioData ? aspectRatioData : NaN;
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
                         $('#' + id).attr('data-file-name', uploadedImageName);
                         $('#' + id).attr('data-file-ext', uploadedImageType);
@@ -1102,6 +1095,7 @@
                     }
                 }
             });
+
             $('.docs-buttons').on('click', '[data-method]', function() {
                 var $this = $(this);
                 var data = $this.data();
@@ -1160,34 +1154,11 @@
                     }
                 }
             });
-            $('#inputImage').change(function() {
-                var files = this.files;
-                var file;
-                let id = $image.attr('data-id');
-                if (!$image.data('cropper')) {
-                    return;
-                }
-                if (files && files.length) {
-                    file = files[0];
-                    if (/^image\/\w+$/.test(file.type)) {
-                        uploadedImageName = file.name;
-                        uploadedImageType = file.type;
-                        if (uploadedImageURL) {
-                            URL.revokeObjectURL(uploadedImageURL);
-                        }
-                        uploadedImageURL = URL.createObjectURL(file);
-                        $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
-                        $('#' + id).attr('data-file-name', uploadedImageName);
-                        $('#' + id).attr('data-file-ext', uploadedImageType);
-                        $('#inputImage').val('');
-                    } else {
-                        window.alert('Please choose an image file.');
-                    }
-                }
-            });
+
             $(document).on('click', '#btnUploadImage', function() {
                 $('#inputImage').trigger('click')
             });
+
             $("#btnCropApply").on('click', function() {
                 btnLoading($('#btnCropApply'));
                 setTimeout(() => {
@@ -1221,6 +1192,13 @@
                 $('#' + id).attr('src', "");
                 $('#' + id).parent().find('img').attr('src', "");
                 $('#' + id).parent().find('.dropify-clear').trigger('click');
+                $('#ImgCrop').modal('hide');
+            });
+
+            $('#btnCropCancel').on('click', function() {
+                var id = $image.attr('data-id');
+                $('#' + id).val("");
+                $('#' + id).parent().find('button.dropify-clear').trigger('click');
                 $('#ImgCrop').modal('hide');
             });
 
