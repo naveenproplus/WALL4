@@ -1109,7 +1109,7 @@
                     }
                 });
             }
-            
+
             const checkSlug = async (Slug) => {
                 $.ajax({
                     type: "post",
