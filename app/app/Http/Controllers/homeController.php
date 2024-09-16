@@ -94,7 +94,7 @@ class homeController extends Controller
         $FormData['PageTitle'] = "Projects";
         return view('home.projects', $FormData);
     }
-    public function getProjectImages(Request $request)
+    public function getProjectImage(Request $request)
     {
         try {
             $FormData = $this->FormData;
@@ -138,6 +138,16 @@ class homeController extends Controller
         } catch (\Exception $e) {
             return response()->json(["error" => "An error occurred while processing your request. Please try again later."], 500);
         }
+    }
+    public function getProjectImages(Request $request)
+    {
+        $projectAreaId = $request->projectAreaId;
+
+        $allImageUrls=DB::table('tbl_projects_gallery as PG')->leftjoin('tbl_projects as P','P.ProjectID','PG.ProjectID')->where('P.ProjectAreaID', $projectAreaId)->pluck('PG.ImageUrl');
+
+        $allImageUrls[] = DB::table('tbl_project_area')->where('ProjectAreaID', $projectAreaId)->value('ProjectAreaImage');
+
+        return response()->json(['images' => $allImageUrls]);
     }
 
     public function ProjectDetailsView(Request $req, $Slug)
