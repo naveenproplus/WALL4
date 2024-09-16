@@ -977,7 +977,6 @@
                             URL.revokeObjectURL(uploadedImageURL);
                         }
                         uploadedImageURL = URL.createObjectURL(file);
-                        uploadedImageURL = URL.createObjectURL(file);
                         options.aspectRatio = aspectRatioData ? aspectRatioData : NaN;
                         $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
                         $('#' + id).attr('data-file-name', uploadedImageName);

@@ -14,46 +14,50 @@ class homeController extends Controller
     private $support;
     private $DocNum;
     private $FormData;
-    public function __construct(){
+    public function __construct()
+    {
         $this->DocNum = new DocNum();
         $this->support = new support();
-        
+
         $this->FormData = [
             "Settings" => $this->getSettings(),
             "Company" => $this->getCompanySettings(),
             // "Gallery" => $this->getGallery(),
             "Gallery" => [],
             "isEdit" => false,
-            "Contents" =>$this->getHomeContents(),
-            "Projects" => DB::table('tbl_projects as P')->leftJoin('tbl_project_area as PA','PA.ProjectAreaID','P.ProjectAreaID')->leftJoin('tbl_services as S','S.ServiceID','P.ServiceID')->where('P.DFlag',0)->where('P.ActiveStatus',1)->where('S.DFlag',0)->where('S.ActiveStatus',1)->where('PA.DFlag',0)->where('PA.ActiveStatus',1)->select('P.*','S.ServiceName','PA.ProjectAreaName','PA.ProjectType')->orderBy('P.CreatedOn')->get(),
-            "ProjectArea" => DB::table('tbl_project_area')->where('DFlag',0)->where('ActiveStatus',1)->get(),
-            "TopClients" => DB::table('tbl_client')->where('DFlag', 0)->where('ActiveStatus',1)->where('ClientType','Company')->get(),
-            "TestimonialClients" => DB::table('tbl_client as C')->leftJoin('tbl_cities as CI','CI.CityID','C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus',1)->where('C.Testimonial','!=',NULL)->inRandomOrder()->take(5)->get(),
-            "Services" => DB::table('tbl_services')->where('DFlag',0)->where('ActiveStatus',1)->get(),
-            "FAQ" => DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus',1)->get(),
+            "Contents" => $this->getHomeContents(),
+            "Projects" => DB::table('tbl_projects as P')->leftJoin('tbl_project_area as PA', 'PA.ProjectAreaID', 'P.ProjectAreaID')->leftJoin('tbl_services as S', 'S.ServiceID', 'P.ServiceID')->where('P.DFlag', 0)->where('P.ActiveStatus', 1)->where('S.DFlag', 0)->where('S.ActiveStatus', 1)->where('PA.DFlag', 0)->where('PA.ActiveStatus', 1)->select('P.*', 'S.ServiceName', 'PA.ProjectAreaName', 'PA.ProjectType')->orderBy('P.CreatedOn')->get(),
+            "ProjectArea" => DB::table('tbl_project_area')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
+            "TopClients" => DB::table('tbl_client')->where('DFlag', 0)->where('ActiveStatus', 1)->where('ClientType', 'Company')->get(),
+            "TestimonialClients" => DB::table('tbl_client as C')->leftJoin('tbl_cities as CI', 'CI.CityID', 'C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus', 1)->where('C.Testimonial', '!=', NULL)->inRandomOrder()->take(5)->get(),
+            "Services" => DB::table('tbl_services')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
+            "FAQ" => DB::table('tbl_faq')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
             "Employees" => DB::table('tbl_user_info as UI')->leftJoin('users AS U', 'U.UserID', '=', 'UI.UserID')->leftJoin('tbl_dept AS D', 'D.DeptID', '=', 'UI.DeptID')
-                            ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
-                            ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus' ,DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
-                            ->inRandomOrder()->get(),
+                ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
+                ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus', DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
+                ->inRandomOrder()->get(),
 
         ];
     }
 
-    public function HomeView(Request $req){
+    public function HomeView(Request $req)
+    {
         $FormData = $this->FormData;
         return view('home.home', $FormData);
     }
-    
-    public function AboutUsView(Request $req){
+
+    public function AboutUsView(Request $req)
+    {
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "About Us";
         return view('home.about-us', $FormData);
     }
-    
-    public function TeamsView(Request $req){
+
+    public function TeamsView(Request $req)
+    {
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Teams";
-        $FormData['CEO'] = $FormData['Employees']->where('Dept','CEO')->first();
+        $FormData['CEO'] = $FormData['Employees']->where('Dept', 'CEO')->first();
         $FormattedEmployees = [];
         foreach ($FormData['Employees']->sortBy('Level') as $item) {
             $FormattedEmployees[$item->Dept][] = $item;
@@ -63,79 +67,138 @@ class homeController extends Controller
         return view('home.teams', $FormData);
     }
 
-    public function ServicesView(Request $req){
+    public function ServicesView(Request $req)
+    {
 
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Our Services";
         return view('home.services', $FormData);
     }
-    public function ServicesDetailsView(Request $req,$Slug){
+    public function ServicesDetailsView(Request $req, $Slug)
+    {
         $FormData = $this->FormData;
-        $ServiceData = $FormData['Services']->where('Slug',$Slug)->first();
-        if($ServiceData){
+        $ServiceData = $FormData['Services']->where('Slug', $Slug)->first();
+        if ($ServiceData) {
             $FormData['PageTitle'] = "Services Details";
-            $ServiceData->ServiceGallery = DB::table('tbl_services_gallery')->where('ServiceID',$ServiceData->ServiceID)->inRandomOrder()->pluck('ImageUrl');
+            $ServiceData->ServiceGallery = DB::table('tbl_services_gallery')->where('ServiceID', $ServiceData->ServiceID)->inRandomOrder()->pluck('ImageUrl');
             $FormData['Service'] = $ServiceData;
-            return view('home.service-details',$FormData);
-        }else{
+            return view('home.service-details', $FormData);
+        } else {
             return view('errors.400');
         }
     }
 
-    public function ProjectsView(Request $req){
+    public function ProjectsView(Request $req)
+    {
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Projects";
-        foreach($FormData['Projects'] as $project){
-            $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$project->ProjectID)->pluck('ImageUrl');
-        }
-        // return $FormData['Projects'];
         return view('home.projects', $FormData);
     }
+    public function getProjectImage(Request $request)
+    {
+        try {
+            $FormData = $this->FormData;
+            $projectAreaId = $request->input('projectAreaId');
 
-    public function ProjectDetailsView(Request $req,$Slug){
+            $particularProjects = $FormData['Projects']->filter(function ($project) use ($projectAreaId) {
+                return $project->ProjectAreaID === $projectAreaId;
+            })->map(function ($project) {
+                return [
+                    'ProjectImage' => $project->ProjectImage,
+                    'ProjectID' => $project->ProjectID
+                ];
+            });
+
+            $projectAreaCoverImage = $FormData['ProjectArea']->filter(function ($projectArea) use ($projectAreaId) {
+                return $projectArea->ProjectAreaID === $projectAreaId;
+            })->map(function ($projectArea) {
+                return ['ProjectAreaImage' => $projectArea->ProjectAreaImage];
+            })->first();
+
+            $allImageUrls = collect();
+
+            if ($projectAreaCoverImage) {
+                $allImageUrls->push($projectAreaCoverImage['ProjectAreaImage']);
+            }
+
+            foreach ($particularProjects as $projectImages) {
+                $allImageUrls->push($projectImages['ProjectImage']);
+
+                $projectImageUrls = DB::table('tbl_projects_gallery')
+                    ->where('ProjectID', $projectImages['ProjectID'])
+                    ->pluck('ImageUrl');
+                $allImageUrls = $allImageUrls->concat($projectImageUrls);
+            }
+
+            $projectImagesArray = $allImageUrls->toArray();
+
+            return response()->json([
+                'images' => $projectImagesArray
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "An error occurred while processing your request. Please try again later."], 500);
+        }
+    }
+    public function getProjectImages(Request $request)
+    {
+        $projectAreaId = $request->projectAreaId;
+
+        $allImageUrls=DB::table('tbl_projects_gallery as PG')->leftjoin('tbl_projects as P','P.ProjectID','PG.ProjectID')->where('P.ProjectAreaID', $projectAreaId)->pluck('PG.ImageUrl');
+
+        $allImageUrls[] = DB::table('tbl_project_area')->where('ProjectAreaID', $projectAreaId)->value('ProjectAreaImage');
+
+        return response()->json(['images' => $allImageUrls]);
+    }
+
+    public function ProjectDetailsView(Request $req, $Slug)
+    {
         $FormData = $this->FormData;
-        $ProjectData = $FormData['Projects']->where('Slug',$Slug)->first();
-        if($ProjectData){
+        $ProjectData = $FormData['Projects']->where('Slug', $Slug)->first();
+        if ($ProjectData) {
             $FormData['PageTitle'] = "Projects Details";
-            $ProjectData->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$ProjectData->ProjectID)->pluck('ImageUrl');
+            $ProjectData->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID', $ProjectData->ProjectID)->pluck('ImageUrl');
             $FormData['Project'] = $ProjectData;
 
-            return view('home.project-details',$FormData);
-        }else{
+            return view('home.project-details', $FormData);
+        } else {
             return view('errors.400');
         }
     }
 
-    public function ContactUsView(Request $req){
+    public function ContactUsView(Request $req)
+    {
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "Contact Us";
         return view('home.contact-us', $FormData);
     }
 
-    public function FAQView(Request $req){
+    public function FAQView(Request $req)
+    {
         $FormData = $this->FormData;
         $FormData['PageTitle'] = "FAQs";
         return view('home.faq', $FormData);
     }
 
-    public function EditView(Request $req,$Slug){
+    public function EditView(Request $req, $Slug)
+    {
         $FormData = $this->FormData;
         $FormData['isEdit'] = true;
-        $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug',$Slug)->value('PageName');
+        $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug', $Slug)->value('PageName');
         if ($FormData['PageTitle']) {
-            if ($FormData['PageTitle'] == 'Projects'){
-                foreach($FormData['Projects'] as $project){
-                    $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID',$project->ProjectID)->pluck('ImageUrl');
+            if ($FormData['PageTitle'] == 'Projects') {
+                foreach ($FormData['Projects'] as $project) {
+                    $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID', $project->ProjectID)->pluck('ImageUrl');
                 }
             }
-            return view('home.'.$Slug, $FormData);
+            return view('home.' . $Slug, $FormData);
         } else {
             return view('errors.404');
         }
     }
-    public function PrivacyPolicyView(Request $req){
+    public function PrivacyPolicyView(Request $req)
+    {
         $FormData = $this->FormData;
-        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->select('PageName','PageContent')->first();
+        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'privacy-policy')->select('PageName', 'PageContent')->first();
         if ($FormData['Page']) {
             $FormData['PageTitle'] = $FormData['Page']->PageName;
             return view('home.privacy-policy', $FormData);
@@ -143,9 +206,10 @@ class homeController extends Controller
             return view('errors.404');
         }
     }
-    public function TermsAndConditionsView(Request $req){
+    public function TermsAndConditionsView(Request $req)
+    {
         $FormData = $this->FormData;
-        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->select('PageName','PageContent')->first();
+        $FormData['Page'] = DB::Table('tbl_page_content')->where('DFlag', 0)->Where('Slug', 'terms-and-conditions')->select('PageName', 'PageContent')->first();
         if ($FormData['Page']) {
             $FormData['PageTitle'] = $FormData['Page']->PageName;
             return view('home.terms-and-conditions', $FormData);
@@ -154,7 +218,8 @@ class homeController extends Controller
         }
     }
 
-    public function ContactEnquirySave(Request $req){
+    public function ContactEnquirySave(Request $req)
+    {
         DB::beginTransaction();
         $status = false;
         try {
@@ -164,7 +229,7 @@ class homeController extends Controller
             $data = array(
                 "TranNo" => $CID,
                 "TranDate" => date("Y-m-d"),
-                "Name" => $Name ,
+                "Name" => $Name,
                 "Email" => $req->Email,
                 "MobileNumber" => $req->MobileNumber,
                 "Subject" => $req->Subject,
@@ -175,11 +240,13 @@ class homeController extends Controller
             if ($this->FormData['Company']['enable-mail-contact-us'] == true) {
                 if ($this->FormData['Company']["contact-us-email"] != "") {
                     try {
-                        
+
                         $email = $req->Email;
                         $messageData = DB::table('tbl_company_settings')->select('KeyName', 'KeyValue')->get()->pluck('KeyValue', 'KeyName')->toArray();
                         $messageData['UserName'] = $req->FName;
-                        Mail::send('emails.contacts', $messageData, function ($message) use ($email) {$message->to($email)->subject('Contact Enquiry');});
+                        Mail::send('emails.contacts', $messageData, function ($message) use ($email) {
+                            $message->to($email)->subject('Contact Enquiry');
+                        });
                     } catch (Exception $e) {
                         DB::rollback();
                         return array('status' => false, 'message' => 'E-Mail has been not sent due to SMTP configuration !!!');
@@ -199,7 +266,8 @@ class homeController extends Controller
         }
     }
 
-    public function ServiceEnquirySave(Request $req){
+    public function ServiceEnquirySave(Request $req)
+    {
         $rules = array(
             'Name' => 'required',
             'MobileNumber' => 'required',
@@ -238,7 +306,8 @@ class homeController extends Controller
         }
     }
 
-    private function getSettings(){
+    private function getSettings()
+    {
         $settings = array("isEnabledTermsConditions" => false, "isEnabledPrivacyPolicy" => false, "isEnabledHelp" => false);
         $result = DB::Table('tbl_settings')->get();
         for ($i = 0; $i < count($result); $i++) {
@@ -253,7 +322,8 @@ class homeController extends Controller
         return $settings;
     }
 
-    private function getCompanySettings(){
+    private function getCompanySettings()
+    {
         $settings = array("FullAddress" => "", "CountryName" => "", "CallCode" => "", "StateName" => "", "CityName" => "", "PostalCode" => "", "BankName" => "", "BankBranchName" => "", "IFSCCode" => "", "MICR" => "", "AccountType" => "");
         $result = DB::Table('tbl_company_settings')->get();
         for ($i = 0; $i < count($result); $i++) {
@@ -269,29 +339,39 @@ class homeController extends Controller
                 $settings[$result[$i]->KeyName] = $result[$i]->KeyValue;
             }
         }
-        $settings['Logo'] = url('/').'/'.$settings['Logo'];
+        $settings['Logo'] = url('/') . '/' . $settings['Logo'];
         $Address = "";
         if (array_key_exists("CountryID", $settings)) {
             $tmp = $this->support->getCountry(array("CountryID" => $settings["CountryID"]));
-            if (count($tmp) > 0) {$settings['CountryName'] = $tmp[0]->CountryName;
-                $settings['CallCode'] = $tmp[0]->PhoneCode;}
+            if (count($tmp) > 0) {
+                $settings['CountryName'] = $tmp[0]->CountryName;
+                $settings['CallCode'] = $tmp[0]->PhoneCode;
+            }
         }
         if (array_key_exists("StateID", $settings)) {
             $tmp = $this->support->getState(array("StateID" => $settings["StateID"]));
-            if (count($tmp) > 0) {$settings['StateName'] = $tmp[0]->StateName;}
+            if (count($tmp) > 0) {
+                $settings['StateName'] = $tmp[0]->StateName;
+            }
         }
         if (array_key_exists("CityID", $settings)) {
             $tmp = $this->support->getCity(array("CityID" => $settings["CityID"]));
-            if (count($tmp) > 0) {$settings['CityName'] = $tmp[0]->CityName;}
+            if (count($tmp) > 0) {
+                $settings['CityName'] = $tmp[0]->CityName;
+            }
         }
         if (array_key_exists("PostalCodeID", $settings)) {
             $tmp = $this->support->getPostalCode(array("PostalCodeID" => $settings["PostalCodeID"]));
-            if (count($tmp) > 0) {$settings['PostalCode'] = $tmp[0]->PostalCode;}
+            if (count($tmp) > 0) {
+                $settings['PostalCode'] = $tmp[0]->PostalCode;
+            }
         }
         if (array_key_exists("BankName", $settings)) {
             $settings["BankID"] = $settings['BankName'];
             $tmp = $this->support->getBanks(array("BankID" => $settings["BankID"]));
-            if (count($tmp) > 0) {$settings['BankName'] = $tmp[0]->NameOfBanks;}
+            if (count($tmp) > 0) {
+                $settings['BankName'] = $tmp[0]->NameOfBanks;
+            }
         }
         if (array_key_exists("BankBranchName", $settings)) {
             $settings["BankBranchID"] = $settings['BankBranchName'];
@@ -305,28 +385,54 @@ class homeController extends Controller
         if (array_key_exists("BankAccountType", $settings)) {
             $settings["BankAccountTypeID"] = $settings['BankAccountType'];
             $tmp = $this->support->getBankAccountType(array("AccountTypeID" => $settings["BankAccountTypeID"]));
-            if (count($tmp) > 0) {$settings['BankAccountType'] = $tmp[0]->AccountType;}
+            if (count($tmp) > 0) {
+                $settings['BankAccountType'] = $tmp[0]->AccountType;
+            }
         }
 
-        if ($settings['Address'] != "") {$Address = $settings['Address'];}
-        if ($settings['CityName'] != "") {if ($Address != "") {$Address .= ", ";}$Address .= $settings['CityName'];}
-        if ($settings['StateName'] != "") {if ($Address != "") {$Address .= ", ";}$Address .= $settings['StateName'];}
-        if ($settings['CountryName'] != "") {if ($Address != "") {$Address .= ", ";}$Address .= $settings['CountryName'];}
-        if ($settings['PostalCode'] != "") {if ($Address != "") {$Address .= " - ";}$Address .= $settings['PostalCode'];}
+        if ($settings['Address'] != "") {
+            $Address = $settings['Address'];
+        }
+        if ($settings['CityName'] != "") {
+            if ($Address != "") {
+                $Address .= ", ";
+            }
+            $Address .= $settings['CityName'];
+        }
+        if ($settings['StateName'] != "") {
+            if ($Address != "") {
+                $Address .= ", ";
+            }
+            $Address .= $settings['StateName'];
+        }
+        if ($settings['CountryName'] != "") {
+            if ($Address != "") {
+                $Address .= ", ";
+            }
+            $Address .= $settings['CountryName'];
+        }
+        if ($settings['PostalCode'] != "") {
+            if ($Address != "") {
+                $Address .= " - ";
+            }
+            $Address .= $settings['PostalCode'];
+        }
         $settings['FullAddress'] = $Address;
         return $settings;
     }
 
-    public function getGallery() {
-        return DB::Table('tbl_gallery_images as GI')->leftJoin('tbl_gallery_master as GM','GM.GalleryID','GI.GalleryID')->where('GI.DFlag', 0)->get();
+    public function getGallery()
+    {
+        return DB::Table('tbl_gallery_images as GI')->leftJoin('tbl_gallery_master as GM', 'GM.GalleryID', 'GI.GalleryID')->where('GI.DFlag', 0)->get();
     }
 
-    private function getHomeContents(){
-        $result = DB::Table('tbl_home_contents')->select('Slug','Content')->get();
+    private function getHomeContents()
+    {
+        $result = DB::Table('tbl_home_contents')->select('Slug', 'Content')->get();
 
         $content = [];
-        foreach ($result as $row){
-            $content[$row->Slug]=$row->Content;
+        foreach ($result as $row) {
+            $content[$row->Slug] = $row->Content;
         }
         return $content;
     }

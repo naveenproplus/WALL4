@@ -46,8 +46,7 @@ class customFileUpload {
         return blob;
     }
     upload() {
-
-        const updateUploadPercentage =  async(percentage) => {
+        const updateUploadPercentage = async (percentage) => {
             //let percentage = (completedRequests*100)/this.totalChunks;
             const circleProgress = document.querySelector('.upload-progress[data-id="' + this.id + '"] .circle-progress');
             const loaderText = document.querySelector('.upload-progress[data-id="' + this.id + '"] .loader-text');
@@ -59,14 +58,14 @@ class customFileUpload {
                 loaderText.textContent = parseFloat(percentage).toFixed(2) + '%';
             }
         }
-        const uploadImage =  async () => {
-            var blob =  this.getBlob();
+        const uploadImage = async () => {
+            var blob = this.getBlob();
             var formData = new FormData();
             formData.append('image', blob, this.fileName);
-           let response= await new Promise(async(resolve,reject)=>{
+            let response = await new Promise(async (resolve, reject) => {
                 $.ajax({
                     url: this.options.uploadURL,
-                    type:this.options.uploadMethod,
+                    type: this.options.uploadMethod,
                     headers: { 'X-CSRF-Token': $('meta[name=_token]').attr('content') },
                     data: formData,
                     processData: false,
@@ -79,8 +78,8 @@ class customFileUpload {
                                 percentComplete = parseFloat(percentComplete).toFixed(2);
                                 updateUploadPercentage(percentComplete);
                                 //$('#divProcessText').html(percentComplete+'% Completed.<br> Please wait for until upload process complete.');
-    
-    
+
+
                                 //Do something with upload progress here
                             }
                         }, false);
@@ -92,7 +91,7 @@ class customFileUpload {
                     success: function (response) {
                         resolve(response);
                     },
-                    error: function (error) {resolve({},"","","");}
+                    error: function (error) { resolve({}, "", "", ""); }
                 });
             });
             this.removeLoader();

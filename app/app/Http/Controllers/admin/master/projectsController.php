@@ -192,7 +192,7 @@ class projectsController extends Controller
                 if (!file_exists($dir)) {
                     mkdir($dir, 0777, true);
                 }
-
+                // dd($req->all());
                 if (array_key_exists("url", $profileImage)) {
                     if (file_exists($profileImage['url'])) {
                         $UploadedImage = $profileImage['url'];
@@ -332,7 +332,7 @@ class projectsController extends Controller
 
     public function Update(Request $req, $ProjectID)
     {
-        // dd($req->all());
+        //  dd($req->all());
         if ($this->general->isCrudAllow($this->CRUD, "edit") == true) {
 
             $OldData = $NewData = array();
