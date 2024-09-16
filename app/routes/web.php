@@ -28,7 +28,8 @@ Route::controller(homeController::class)->group(function () {
     Route::get('/about-us', 'AboutUsView');
     Route::get('/faq', 'FAQView');
     Route::get('/projects', 'ProjectsView');
-    Route::get('/projects/{Slug}', 'ProjectDetailsView');
+    // Route::get('/projects/{Slug}', 'ProjectDetailsView');
+    Route::get('/projects/images', 'getProjectImages')->name('getProjectImages');
     Route::get('/get/faq', 'getFaq');
     Route::get('/services/{Slug}', 'ServicesDetailsView');
     Route::get('/terms-and-conditions', 'TermsAndConditionsView');
@@ -46,6 +47,7 @@ Route::controller(homeController::class)->group(function () {
     Route::post('/save/service-enquiry', 'ServiceEnquirySave');
     Route::post('/save/contact-enquiry', 'ContactEnquirySave');
 });
+
 Route::controller(supportController::class)->group(function () {
     Route::post('/get/country', 'GetCountry');
     Route::post('/get/states', 'GetState');
