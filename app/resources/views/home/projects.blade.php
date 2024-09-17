@@ -1,15 +1,81 @@
 @extends('home.home-layout')
-@section('home-content')
-    {{-- loder --}}
-    <div id="loading-area" class="loading-page-1">
-        <div class="loading-area">
-            <img loading="lazy" src="{{ $Company['Logo'] }}" alt="">
-            <span></span>
-        </div>
-    </div>
-    {{-- loder end --}}
 
-    <!-- Banner  -->
+@section('home-content')
+    <style>
+        #loading-area.loading-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            background: transparent
+        }
+
+        #loading-area.loading-image .loading-area {
+            width: 130px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: #a3cc02;
+            width: 75px;
+            height: 50px;
+            z-index: 9999
+        }
+
+        .loader {
+            border: 7px solid #fff;
+            border-top: 8px solid #a3cc02;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            animation: spin 1s linear infinite
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg)
+            }
+
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        @keyframes text {
+            0% {
+                opacity: 0
+            }
+
+            50% {
+                opacity: 1
+            }
+
+            100% {
+                opacity: 0
+            }
+        }
+
+        @media (max-width: 767px) {
+            #loading-area.loading-image .loading-area {
+                width: 50px;
+                height: 35px
+            }
+
+            .loader {
+                width: 35px;
+                height: 35px;
+                border-width: 6px
+            }
+
+            .loading-image .loading-area p {
+                font-size: 18px
+            }
+        }
+    </style>
+
+    <!-- Banner -->
     <div class="slidearea bannerside">
         <div class="side-contact-info">
             <ul>
@@ -36,7 +102,7 @@
     </div>
     <!-- Banner End -->
 
-    {{-- <!-- {{ $PageTitle }} --> --}}
+    <!-- {{ $PageTitle }} -->
     <section class="content-inner line-img overflow-hidden">
         <div class="container">
             <div class="site-filters style-1 clearfix center">
@@ -54,7 +120,7 @@
         </div>
         <div class="container" id="divProjectArea">
             <ul id="masonry" class="row projectButton">
-                @foreach ($ProjectArea /*->filter(function ($item) {return strpos($item->ProjectAreaName, 'Other') !== 0;}) */ as $key => $item)
+                @foreach ($ProjectArea as $key => $item)
                     <li class="card-container col-xl-4 col-md-6 col-sm-6 {{ $item->ProjectType }} m-b30 project-area projectButton"
                         id="liProjectArea{{ $key }}" data-ProjectAreaID="{{ $item->ProjectAreaID }}">
                         <div class="dz-box overlay style-1">
@@ -69,7 +135,12 @@
                                     class="view-btn lightimg{{ $key }}" title="{{ $item->ProjectAreaName }}"
                                     style="cursor: pointer">
                                 </span>
-                                {{-- ajax gen --}}
+                                <div id="loading-area" class="loading-image">
+                                    <div class="loading-area">
+                                        <div class="loader"></div>
+                                    </div>
+                                </div>
+                                <!-- Loaded via AJAX -->
                                 <h6 class="sub-title">{{ $item->ProjectAreaName }}</h6>
                                 <h4 class="title m-b15"><a href="javascript:void(0);">{{ $item->ProjectAreaName }}</a>
                                 </h4>
@@ -80,6 +151,7 @@
             </ul>
         </div>
     </section>
+
     <!-- Map & FAQs -->
     <section class="section-full content-inner overflow-hidden"
         style="background-image:url({{ url('/') }}/assets/home/images/background/bg1.png); background-position:left top; background-size:100%; background-repeat:no-repeat;">
@@ -139,7 +211,8 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            $('.loading-page-1').hide();
+            $('.loading-image').hide();
+
             var ProjectTypeTrigger = setInterval(function() {
                 if ($('#divProjectArea .project-area').length > 0) {
                     $('li[data-filter=".Residential"] input[type="radio"]').trigger('click');
@@ -153,9 +226,10 @@
             $('.projectButton').on('click', function(event) {
                 event.preventDefault();
                 var projectAreaId = $(this).attr('data-ProjectAreaID');
+                var loader = $(this).find('#loading-area');
 
                 if (projectAreaId) {
-                    $('.loading-page-1').show();
+                    loader.show();
                     $.ajax({
                         url: "{{ route('getProjectImages') }}",
                         type: 'GET',
@@ -163,7 +237,6 @@
                             projectAreaId: projectAreaId
                         },
                         success: function(response) {
-
                             var images = response.images;
                             var dynamicGallery = [];
 
@@ -174,7 +247,7 @@
                                 });
                             });
 
-                            $('.loading-page-1').hide();
+                            loader.hide();
 
                             $('#masonry').lightGallery({
                                 dynamic: true,
@@ -184,12 +257,11 @@
                                 download: false,
                                 share: false
                             });
-
-                            $('#masonry').data('lightGallery').openGallery();
+                            $('#masonry').data('lightGallery');
                         },
                         error: function(xhr, status, error) {
                             console.error("Error fetching project images:", error);
-                            $('.loading-page-1').hide();
+                            loader.hide();
                         }
                     });
                 }
