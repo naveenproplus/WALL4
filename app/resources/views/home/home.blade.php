@@ -188,8 +188,8 @@
 										<img loading="lazy" src="{{url('/')}}/{{$item->ProjectImage}}" alt="{{$item->Slug}}">
 									</div>
 									<div class="dz-info">
-										<span data-exthumbimage="{{url('/')}}/{{$item->ProjectImage}}" data-src="{{url('/')}}/{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ServiceName}}"></span>
-										<h6 class="sub-title">{{$item->ServiceName}}</h6>
+										<span data-exthumbimage="{{url('/')}}/{{$item->ProjectImage}}" data-src="{{url('/')}}/{{$item->ProjectImage}}" class="view-btn lightimg" title="{{$item->ProjectAreaName}}"></span>
+										<h6 class="sub-title">{{$item->ProjectAreaName}}</h6>
 										<h4 class="title m-b15"><a href="{{-- {{url('/')}}/projects/{{$item->Slug}} --}} javascript:void(0);">{{$item->ProjectName}} <span>{{$item->ProjectAddress}}</span></a></h4>
 									</div>
 								</div>

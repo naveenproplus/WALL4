@@ -68,7 +68,7 @@
     <section class="content-inner-1 pt-0">
         @if($Company['google-map-status']==true)
             <div class="map-iframe">
-                <iframe src="{{$Company['google-embed-map']}}&z=10" class="align-self-stretch radius-sm" style="border:0; width:100%; min-height:100%;" allowfullscreen></iframe>
+                <iframe src="{{$Company['google-embed-map']}}&z=12" class="align-self-stretch radius-sm" style="border:0; width:100%; min-height:100%;" allowfullscreen></iframe>
             </div>
         @else
             <div style="height: 300px;">

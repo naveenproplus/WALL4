@@ -49,6 +49,25 @@
 
 </head>
 <body id="bg" class="scrollbar">
+	<style>
+		@keyframes zoom {
+			0% {
+				transform: scale(1);
+			}
+			50% {
+				transform: scale(1.05);
+			}
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		.zoom {
+			animation: zoom 0.4s ease-in-out;
+		}
+
+
+	</style>
 <div id="loading-area" class="loading-page-1">
 	<div class="loading-area">
 		{{-- <p>Loading</p> --}}
@@ -333,7 +352,7 @@
 		<button class="free-quote" type="button">FREE QUOTE</button>
 		<div id="free-quote-modal" class="modal">
 			<div class="modal-content">
-				<div class="modal-title"><h4>Book a Free Consultation</h4></div>
+				<div class="modal-title"><h4>Book a Free Consultation<span class="close" style="position: relative;top: -3px;">×</span></h4></div>
 				<form id="quoteForm">
 					<div class="form-group">
 						<label for="txtMName">Name *</label>
@@ -728,9 +747,15 @@
 			});
 			$(window).on('click', function(event) {
 				if ($(event.target).is(modal)) {
-					modal.hide();
+					modal.removeClass('zoom');
+
+					setTimeout(function() {
+						modal.addClass('zoom');
+					}, 10);
 				}
 			});
+
+
 
 			const isMValidEMail=(email)=>{
 				var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;

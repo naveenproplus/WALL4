@@ -1,5 +1,4 @@
 @extends('home.home-layout')
-
 @section('home-content')
     <style>
         #loading-area.loading-image {
@@ -231,11 +230,10 @@
                 if (projectAreaId) {
                     loader.show();
                     $.ajax({
-                        url: "{{ route('getProjectImages') }}",
-                        type: 'GET',
-                        data: {
-                            projectAreaId: projectAreaId
-                        },
+                        type: "post",
+                        headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')},
+                        data:{projectAreaId},
+                        url: "{{ route('get-project-images') }}",
                         success: function(response) {
                             var images = response.images;
                             var dynamicGallery = [];
@@ -247,8 +245,6 @@
                                 });
                             });
 
-                            loader.hide();
-
                             $('#masonry').lightGallery({
                                 dynamic: true,
                                 dynamicEl: dynamicGallery,
@@ -258,6 +254,8 @@
                                 share: false
                             });
                             $('#masonry').data('lightGallery');
+                            
+                            loader.hide();
                         },
                         error: function(xhr, status, error) {
                             console.error("Error fetching project images:", error);

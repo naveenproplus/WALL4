@@ -26,7 +26,7 @@ class homeController extends Controller
             "Gallery" => [],
             "isEdit" => false,
             "Contents" => $this->getHomeContents(),
-            "Projects" => DB::table('tbl_projects as P')->leftJoin('tbl_project_area as PA', 'PA.ProjectAreaID', 'P.ProjectAreaID')->leftJoin('tbl_services as S', 'S.ServiceID', 'P.ServiceID')->where('P.DFlag', 0)->where('P.ActiveStatus', 1)->where('S.DFlag', 0)->where('S.ActiveStatus', 1)->where('PA.DFlag', 0)->where('PA.ActiveStatus', 1)->select('P.*', 'S.ServiceName', 'PA.ProjectAreaName', 'PA.ProjectType')->orderBy('P.CreatedOn')->get(),
+            "Projects" => DB::table('tbl_projects as P')->leftJoin('tbl_project_area as PA', 'PA.ProjectAreaID', 'P.ProjectAreaID')->leftJoin('tbl_services as S', 'S.ServiceID', 'P.ServiceID')->where('P.DFlag', 0)->where('P.ActiveStatus', 1)->where('S.DFlag', 0)->where('S.ActiveStatus', 1)->where('PA.DFlag', 0)->where('PA.ActiveStatus', 1)->select('P.*', 'S.ServiceName', 'PA.ProjectAreaName', 'PA.ProjectType')->orderBy('P.CreatedOn','desc')->get(),
             "ProjectArea" => DB::table('tbl_project_area')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
             "TopClients" => DB::table('tbl_client')->where('DFlag', 0)->where('ActiveStatus', 1)->where('ClientType', 'Company')->get(),
             "TestimonialClients" => DB::table('tbl_client as C')->leftJoin('tbl_cities as CI', 'CI.CityID', 'C.CityID')->where('C.DFlag', 0)->where('C.ActiveStatus', 1)->where('C.Testimonial', '!=', NULL)->inRandomOrder()->take(5)->get(),
@@ -43,12 +43,14 @@ class homeController extends Controller
     public function HomeView(Request $req)
     {
         $FormData = $this->FormData;
-        return view('home.home', $FormData);
+        $FormData['Projects'] = $this->FormData['Projects']->take(8)->shuffle();
+            return view('home.home', $FormData);
     }
 
     public function AboutUsView(Request $req)
     {
         $FormData = $this->FormData;
+        $FormData['Projects'] = $this->FormData['Projects']->shuffle()->take(8);
         $FormData['PageTitle'] = "About Us";
         return view('home.about-us', $FormData);
     }
@@ -94,58 +96,16 @@ class homeController extends Controller
         $FormData['PageTitle'] = "Projects";
         return view('home.projects', $FormData);
     }
-    public function getProjectImage(Request $request)
-    {
-        try {
-            $FormData = $this->FormData;
-            $projectAreaId = $request->input('projectAreaId');
-
-            $particularProjects = $FormData['Projects']->filter(function ($project) use ($projectAreaId) {
-                return $project->ProjectAreaID === $projectAreaId;
-            })->map(function ($project) {
-                return [
-                    'ProjectImage' => $project->ProjectImage,
-                    'ProjectID' => $project->ProjectID
-                ];
-            });
-
-            $projectAreaCoverImage = $FormData['ProjectArea']->filter(function ($projectArea) use ($projectAreaId) {
-                return $projectArea->ProjectAreaID === $projectAreaId;
-            })->map(function ($projectArea) {
-                return ['ProjectAreaImage' => $projectArea->ProjectAreaImage];
-            })->first();
-
-            $allImageUrls = collect();
-
-            if ($projectAreaCoverImage) {
-                $allImageUrls->push($projectAreaCoverImage['ProjectAreaImage']);
-            }
-
-            foreach ($particularProjects as $projectImages) {
-                $allImageUrls->push($projectImages['ProjectImage']);
-
-                $projectImageUrls = DB::table('tbl_projects_gallery')
-                    ->where('ProjectID', $projectImages['ProjectID'])
-                    ->pluck('ImageUrl');
-                $allImageUrls = $allImageUrls->concat($projectImageUrls);
-            }
-
-            $projectImagesArray = $allImageUrls->toArray();
-
-            return response()->json([
-                'images' => $projectImagesArray
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(["error" => "An error occurred while processing your request. Please try again later."], 500);
-        }
-    }
     public function getProjectImages(Request $request)
     {
         $projectAreaId = $request->projectAreaId;
 
-        $allImageUrls=DB::table('tbl_projects_gallery as PG')->leftjoin('tbl_projects as P','P.ProjectID','PG.ProjectID')->where('P.ProjectAreaID', $projectAreaId)->pluck('PG.ImageUrl');
+        $allImageUrls=DB::table('tbl_projects_gallery as PG')->leftjoin('tbl_projects as P','P.ProjectID','PG.ProjectID')->where('P.ProjectAreaID', $projectAreaId)->pluck('PG.ImageUrl')
+        ->toArray();
 
-        $allImageUrls[] = DB::table('tbl_project_area')->where('ProjectAreaID', $projectAreaId)->value('ProjectAreaImage');
+        $ProjectAreaImage = DB::table('tbl_project_area')->where('ProjectAreaID', $projectAreaId)->value('ProjectAreaImage');
+
+        array_unshift($allImageUrls, $ProjectAreaImage);
 
         return response()->json(['images' => $allImageUrls]);
     }
@@ -185,11 +145,6 @@ class homeController extends Controller
         $FormData['isEdit'] = true;
         $FormData['PageTitle'] = DB::Table('tbl_website_pages')->where('Slug', $Slug)->value('PageName');
         if ($FormData['PageTitle']) {
-            if ($FormData['PageTitle'] == 'Projects') {
-                foreach ($FormData['Projects'] as $project) {
-                    $project->ProjectGallery = DB::table('tbl_projects_gallery')->where('ProjectID', $project->ProjectID)->pluck('ImageUrl');
-                }
-            }
             return view('home.' . $Slug, $FormData);
         } else {
             return view('errors.404');
