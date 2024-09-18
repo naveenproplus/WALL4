@@ -122,8 +122,8 @@ jQuery(document).ready(function() {
 	}
 	
 	// Swiper Portfolio
-	if(jQuery('.swiper-team').length > 0){
-		var teamsSwiper = new Swiper('.swiper-team', {
+	if(jQuery('.about-page-swiper-team').length > 0){
+		var teamsSwiper = new Swiper('.about-page-swiper-team', {
 			slidesPerView: 4,
 			spaceBetween: 30,
 			speed: 1500,
@@ -151,10 +151,38 @@ jQuery(document).ready(function() {
 			}
 		});
 		setInterval(function() {
-			if(jQuery('.swiper-team').length > 0){
+			if(jQuery('.about-page-swiper-team').length > 0){
 				teamsSwiper.slideNext();
 			}
 		}, 1500);
+	}
+	if(jQuery('.team-page-swiper-team').length > 0){
+		var teamsSwiper = new Swiper('.team-page-swiper-team', {
+			spaceBetween: 30,
+			slidesPerView: 4,
+			speed: 1500,
+			navigation: {
+				nextEl: '.swiper-button-next3',
+				prevEl: '.swiper-button-prev3',
+			},
+			breakpoints: {
+				1500: {
+					slidesPerView: 5,
+				},
+				1200: {
+					slidesPerView: 4,
+				},
+				991: {
+					slidesPerView: 3,
+				},
+				576: {
+					slidesPerView: 2,
+				},
+				100: {
+					slidesPerView: 1,
+				},
+			}
+		});
 	}
 	
 	// Swiper Portfolio

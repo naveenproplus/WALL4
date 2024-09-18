@@ -123,7 +123,7 @@ class employeesController extends Controller{
         return DB::Table('tbl_dept')->where('ActiveStatus',1)->where('DFlag',0)->get();
     }
 	public function getDesignation(request $req){
-        return DB::Table('tbl_user_info')->distinct('Designation')->select('Designation','ProfileImage')->get();
+        return DB::Table('tbl_user_info')->distinct('Designation')->select('Designation')->get();
     }
 	public function Save(Request $req){
 		if($this->general->isCrudAllow($this->CRUD,"add")==true){

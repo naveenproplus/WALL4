@@ -210,7 +210,7 @@
         </div>
     </div>
     <div class="container-fluid">
-        <div class="swiper-container swiper-team">
+        <div class="swiper-container swiper-team about-page-swiper-team">
             <div class="swiper-wrapper">
                 @foreach($Employees->where('Designation','!=',"CEO") as $emp)
                     <div class="swiper-slide">

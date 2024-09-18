@@ -1,78 +1,5 @@
 @extends('home.home-layout')
 @section('home-content')
-    <style>
-        #loading-area.loading-image {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9998;
-            background: transparent
-        }
-
-        #loading-area.loading-image .loading-area {
-            width: 130px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background: #a3cc02;
-            width: 75px;
-            height: 50px;
-            z-index: 9999
-        }
-
-        .loader {
-            border: 7px solid #fff;
-            border-top: 8px solid #a3cc02;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            margin: 0 auto;
-            animation: spin 1s linear infinite
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg)
-            }
-
-            100% {
-                transform: rotate(360deg)
-            }
-        }
-
-        @keyframes text {
-            0% {
-                opacity: 0
-            }
-
-            50% {
-                opacity: 1
-            }
-
-            100% {
-                opacity: 0
-            }
-        }
-
-        @media (max-width: 767px) {
-            #loading-area.loading-image .loading-area {
-                width: 50px;
-                height: 35px
-            }
-
-            .loader {
-                width: 35px;
-                height: 35px;
-                border-width: 6px
-            }
-
-            .loading-image .loading-area p {
-                font-size: 18px
-            }
-        }
-    </style>
 
     <!-- Banner -->
     <div class="slidearea bannerside">
@@ -106,6 +33,10 @@
         <div class="container">
             <div class="site-filters style-1 clearfix center">
                 <ul class="filters" data-toggle="buttons">
+                    <li data-filter="" class="btn">
+                        <input type="radio">
+                        <a href="javascript:void(0);">All</a>
+                    </li>
                     <li data-filter=".Residential" class="btn">
                         <input type="radio">
                         <a href="javascript:void(0);">Residential</a>
@@ -121,7 +52,7 @@
             <ul id="masonry" class="row projectButton">
                 @foreach ($ProjectArea as $key => $item)
                     <li class="card-container col-xl-4 col-md-6 col-sm-6 {{ $item->ProjectType }} m-b30 project-area projectButton"
-                        id="liProjectArea{{ $key }}" data-ProjectAreaID="{{ $item->ProjectAreaID }}">
+                        id="liProjectArea{{ $key }}" data-project-area-id="{{ $item->ProjectAreaID }}">
                         <div class="dz-box overlay style-1">
                             <div class="dz-media">
                                 <img loading="lazy" src="{{ url('/') }}/{{ $item->ProjectAreaImage }}"
@@ -134,11 +65,6 @@
                                     class="view-btn lightimg{{ $key }}" title="{{ $item->ProjectAreaName }}"
                                     style="cursor: pointer">
                                 </span>
-                                <div id="loading-area" class="loading-image">
-                                    <div class="loading-area">
-                                        <div class="loader"></div>
-                                    </div>
-                                </div>
                                 <!-- Loaded via AJAX -->
                                 <h6 class="sub-title">{{ $item->ProjectAreaName }}</h6>
                                 <h4 class="title m-b15"><a href="javascript:void(0);">{{ $item->ProjectAreaName }}</a>
@@ -210,9 +136,8 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            $('.loading-image').hide();
 
-            var ProjectTypeTrigger = setInterval(function() {
+            /* var ProjectTypeTrigger = setInterval(function() {
                 if ($('#divProjectArea .project-area').length > 0) {
                     $('li[data-filter=".Residential"] input[type="radio"]').trigger('click');
                     if ($('#divProjectArea .project-area').length > 0 && $('.project-area.Commercial').css(
@@ -220,15 +145,13 @@
                         clearInterval(ProjectTypeTrigger);
                     }
                 }
-            }, 100);
+            }, 100); */
 
             $('.projectButton').on('click', function(event) {
                 event.preventDefault();
-                var projectAreaId = $(this).attr('data-ProjectAreaID');
-                var loader = $(this).find('#loading-area');
+                var projectAreaId = $(this).attr('data-project-area-id');
 
                 if (projectAreaId) {
-                    loader.show();
                     $.ajax({
                         type: "post",
                         headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')},
@@ -255,11 +178,9 @@
                             });
                             $('#masonry').data('lightGallery');
                             
-                            loader.hide();
                         },
                         error: function(xhr, status, error) {
                             console.error("Error fetching project images:", error);
-                            loader.hide();
                         }
                     });
                 }

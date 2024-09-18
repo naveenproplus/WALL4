@@ -41,7 +41,7 @@
         </div>
     @endif
         <div class="container-fluid">
-            <div class="swiper-container swiper-team">
+            <div class="swiper-container swiper-team team-page-swiper-team">
                 <div class="swiper-wrapper justify-content-center">
                     @foreach($item as $emp)
                         <div class="swiper-slide w-auto">
@@ -69,17 +69,7 @@
     @endforeach
 </section>
 
-
-
 @endsection
 @section('scripts')
-<script>
-        $(document).ready(function(){
-            
-            $('.swiper-slide-duplicate').remove();
-
-        });
-
-</script>
 @endsection
 
