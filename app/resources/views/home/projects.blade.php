@@ -152,7 +152,7 @@
     </section>
 
     <!-- Map & FAQs -->
-    <section class="section-full content-inner overflow-hidden"
+    {{-- <section class="section-full content-inner overflow-hidden"
         style="background-image:url({{ url('/') }}/assets/home/images/background/bg1.png); background-position:left top; background-size:100%; background-repeat:no-repeat;">
         <div class="container">
             <div class="row align-items-center">
@@ -205,7 +205,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 @endsection
 @section('scripts')
     <script>
