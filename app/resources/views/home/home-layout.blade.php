@@ -8,7 +8,6 @@
 	<meta name="author" content="DexignZone">
 	<meta name="robots" content="index, follow">
 	<meta name="keywords" content="">
-	<meta name="description" content="">
 	<meta property="og:title" content="">
 	<meta property="og:description" content="">
 	<meta name="format-detection" content="telephone=no">
@@ -20,8 +19,15 @@
 	
 	<meta http-equiv="Permissions-Policy" content="accelerometer=(self)">
 	
-	<!-- Title -->
-	<title>{{ $Company['Name'] }}</title>
+	
+    @php
+		$metaDescription = isset($PageTitle) ? $MetaData->where('Title', $PageTitle)->value('Description') : null;
+		$metaTitle = isset($PageTitle) ? $MetaData->where('Title', $PageTitle)->value('MetaTitle') : null;
+	@endphp
+
+	<meta name="description" content="{{ $metaDescription ?: $Company['Name'] }}">
+	<title>{{ $metaTitle ?: $Company['Name'] }}</title>
+
 	
 	<!-- Favicon icon -->
     <link rel="icon" type="image/png" href="{{ url('/') }}/assets/images/logo/icon.png">
@@ -416,7 +422,7 @@
 			if ($('.DZ-bt-buy-now').length || $('.DZ-bt-support-now').length) {
 				$('.DZ-bt-buy-now').remove();
 				$('.DZ-bt-support-now').remove();
-				@if(!$isEdit && !isset($PageTitle))
+				@if(!$isEdit && $PageTitle == "Home")
 					/* var video = $('#IntroVideo');
 					video.play(); */
 					setTimeout(() => {$('.free-quote').click();}, 2000);

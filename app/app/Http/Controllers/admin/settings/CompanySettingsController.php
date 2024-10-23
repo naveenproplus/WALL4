@@ -59,18 +59,17 @@ class CompanySettingsController extends Controller{
 		}
 	}
 	public function Update(Request $req){
-		
-		if($req->PostalCode==$req->PostalCodeID){
-			$req->merge(['PostalCodeID' => $this->general->Check_and_Create_PostalCode($req->PostalCode,$req->CountryID,$req->StateID,$this->DocNum)]);
-		}
-		$data=(array)$req->all();
-		unset($data['sType']);
-		unset($data['PostalCode']);
-		DB::beginTransaction();
-		$status=true;
-		try{
-			foreach($data as $KeyName=>$KeyValue){
-				if($status){
+		if($this->general->isCrudAllow($this->CRUD,"edit")==true){
+			if($req->PostalCode==$req->PostalCodeID){
+				$req->merge(['PostalCodeID' => $this->general->Check_and_Create_PostalCode($req->PostalCode,$req->CountryID,$req->StateID,$this->DocNum)]);
+			}
+			$data=(array)$req->all();
+			unset($data['sType']);
+			unset($data['PostalCode']);
+			DB::beginTransaction();
+			$status=true;
+			try{
+				foreach($data as $KeyName=>$KeyValue){
 					if($KeyName=="Logo"){
 						if($req->hasFile('Logo')){
 							$dir="uploads/settings/company/logo/";
@@ -105,17 +104,18 @@ class CompanySettingsController extends Controller{
 					$sql="Update tbl_company_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
 					$status=DB::Update($sql);
 				}
+			}catch(Exception $e) {
+				$status=false;
 			}
-		}catch(Exception $e) {
-			$status=false;
-		}
-		if($status==true){
-			DB::commit();
-			return array('status'=>true,'message'=>"Company Info updated successfully");
+			if($status==true){
+				DB::commit();
+				return array('status'=>true,'message'=>"Company Info updated successfully");
+			}else{
+				DB::rollback();
+				return array('status'=>false,'message'=>"Company Info update failed");
+			}
 		}else{
-			DB::rollback();
-			return array('status'=>false,'message'=>"Company Info update failed");
+			return view('errors.403');
 		}
-		return $data;
 	}
 }

@@ -36,6 +36,7 @@ class homeController extends Controller
                 ->where('D.DFlag', 0)->where('D.ActiveStatus', 1)->where('UI.DFlag', 0)->where('UI.ActiveStatus', 1)->where('U.isShow', 1)
                 ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus', DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
                 ->inRandomOrder()->get(),
+            "MetaData" => DB::table('tbl_meta_data')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
 
         ];
     }
@@ -44,7 +45,8 @@ class homeController extends Controller
     {
         $FormData = $this->FormData;
         $FormData['Projects'] = $this->FormData['Projects']->take(8)->shuffle();
-            return view('home.home', $FormData);
+        $FormData['PageTitle'] = "Home";
+        return view('home.home', $FormData);
     }
 
     public function AboutUsView(Request $req)

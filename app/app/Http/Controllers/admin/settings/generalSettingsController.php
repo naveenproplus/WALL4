@@ -56,6 +56,7 @@ class generalSettingsController extends Controller{
 			$FormData['crud']=$this->CRUD;
 			$FormData['DateFormats']=DB::Table("tbl_formats")->where('FType','date')->get();
 			$FormData['TimeFormats']=DB::Table("tbl_formats")->where('FType','time')->get();
+			$FormData['MetaData']=DB::table('tbl_meta_data')->where('DFlag', 0)->where('ActiveStatus', 1)->get();
 			return view('admin.settings.general.index',$FormData);
 		}else{
 			return view('errors.403');
@@ -63,53 +64,71 @@ class generalSettingsController extends Controller{
 	}
 	
 	public function Update(Request $req){
-		$sType=$req->sType;
 		
-		$data=(array)$req->all();
-		unset($data['sType']);
-		unset($data['PostalCode']);
-		DB::beginTransaction();
-		$status=true;
-		try{
-			foreach($data as $KeyName=>$KeyValue){
-				if($status){
-					$Rnd=$this->support->OTPGenerator(1);
-					$Rnd1=$this->support->OTPGenerator(2);
-					$UKey=$this->support->RandomString($Rnd1);
-					if($sType=="social-media-links"){
-						$sql="Update tbl_company_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
-						$status=DB::Update($sql);
-					}elseif($sType=="map"){
-						$sql="Update tbl_company_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
-						$status=DB::Update($sql);
-					}else{
-						$sql="Update tbl_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
-						$status=DB::Update($sql);
+		if($this->general->isCrudAllow($this->CRUD,"view")==true){
+			DB::beginTransaction();
+			$status=true;
+			try{
+				$sType=$req->sType;
+				if($sType == "meta"){
+					$MetaData = json_decode($req->MetaData);
+					foreach($MetaData as $item){
+						$updateData = (array) $item;
+						$updateData['UpdatedOn'] = now();
+						$updateData['UpdatedBy'] = $this->UserID;
+						$status = DB::table('tbl_meta_data')->where('Slug', $item->Slug)->update($updateData);
+					}					
+				}else{
+					$data=(array)$req->all();
+					unset($data['sType']);
+					unset($data['PostalCode']);
+					foreach($data as $KeyName=>$KeyValue){
+						if($status){
+							$Rnd=$this->support->OTPGenerator(1);
+							$Rnd1=$this->support->OTPGenerator(2);
+							$UKey=$this->support->RandomString($Rnd1);
+							if($sType=="social-media-links"){
+								$sql="Update tbl_company_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
+								$status=DB::Update($sql);
+							}elseif($sType=="map"){
+								$sql="Update tbl_company_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
+								$status=DB::Update($sql);
+							}else{
+								$sql="Update tbl_settings Set KeyValue='".$KeyValue."',UKey='".$UKey."',UpdatedBy='".$this->UserID."',UpdatedOn='".date('Y-m-d H:i:s',strtotime($Rnd." min "))."' Where KeyName='".$KeyName."'";
+								$status=DB::Update($sql);
+							}
+						}
 					}
 				}
+			}catch(Exception $e) {
+				$status=false;
 			}
-		}catch(Exception $e) {
-			$status=false;
-		}
-		if($status==true){
-			DB::commit();
-			if($sType=="company"){
-				return array('status'=>true,'message'=>"Social media links updated successfully");
-			}elseif($sType=="map"){
-				return array('status'=>true,'message'=>"Map  updated successfully");
+			if($status==true){
+				DB::commit();
+				if($sType=="company"){
+					return array('status'=>true,'message'=>"Social media links updated successfully");
+				}elseif($sType=="map"){
+					return array('status'=>true,'message'=>"Map  updated successfully");
+				}elseif($sType=="meta"){
+					return array('status'=>true,'message'=>"Meta Data updated successfully");
+				}else{
+					return array('status'=>true,'message'=>"General settings updated successfully");
+				}
 			}else{
-				return array('status'=>true,'message'=>"General settings updated successfully");
+				DB::rollback();
+				if($sType=="company"){
+					return array('status'=>false,'message'=>"Company Info update failed");
+				}elseif($sType=="map"){
+					return array('status'=>false,'message'=>"Map update failed");
+				}elseif($sType=="meta"){
+					return array('status'=>false,'message'=>"Meta Data update failed");
+				}else{
+					return array('status'=>false,'message'=>"General settings update failed");
+				}
 			}
 		}else{
-			DB::rollback();
-			if($sType=="company"){
-				return array('status'=>false,'message'=>"Company Info update failed");
-			}elseif($sType=="map"){
-				return array('status'=>false,'message'=>"Map  update failed");
-			}else{
-				return array('status'=>false,'message'=>"General settings update failed");
-			}
+			return view('errors.403');
 		}
-		return $data;
+		
 	}
 }

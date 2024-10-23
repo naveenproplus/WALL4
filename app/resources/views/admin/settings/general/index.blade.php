@@ -1,4 +1,8 @@
 @extends('layouts.app')
+
+@section('css')
+@endsection
+
 @section('content')
 <div class="container-fluid">
 	<div class="page-header">
@@ -16,7 +20,7 @@
 
 <div class="container-fluid ">
 	<div class="row d-flex justify-content-center">
-		<div class="col-12 col-sm-5">
+		<div class="col-12 col-sm-6">
 			<div class="card m-b-30">
 				<div class="card-body">
 					<div class="form-row">
@@ -25,6 +29,7 @@
                                 <li class="nav-item"><a class="nav-link active" id="pills-general-tab" data-toggle="pill" href="#pills-general" role="tab" aria-controls="pills-general" aria-selected="false" data-original-title="" title=""><i class="fa fa-cogs" aria-hidden="true"></i> General</a></li>
                                 <li class="nav-item"><a class="nav-link " id="pills-map-tab" data-toggle="pill" href="#pills-map" role="tab" aria-controls="pills-map" aria-selected="false" data-original-title="" title=""><i class="fa fa-map-marker" aria-hidden="true"></i> Map</a></li>
 								<li class="nav-item"><a class="nav-link " id="pills-social-media-links-tab" data-toggle="pill" href="#pills-social-media-links" role="tab" aria-controls="pills-social-media-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-facebook-square" aria-hidden="true"></i> Social Media Links</a></li>
+								<li class="nav-item"><a class="nav-link " id="pills-meta-links-tab" data-toggle="pill" href="#pills-meta-links" role="tab" aria-controls="pills-meta-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-check" aria-hidden="true"></i> Meta Data</a></li>
                             </ul>
                             <div class="tab-content m-t-30" id="pills-icontabContent">
                                 <div class="tab-pane fade active show" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
@@ -126,8 +131,7 @@
 										</div>
 									</div> --}}
                                 </div>
-                                
-                                <div class="tab-pane fade " id="pills-map" role="tabpanel" aria-labelledby="pills-map-tab">
+                                <div class="tab-pane fade" id="pills-map" role="tabpanel" aria-labelledby="pills-map-tab">
                                     <div class="row d-flex justify-content-center mb-10">
                                         <div class="col-sm-3 col-11">
                                             <div class="checkbox checkbox-info"><input @if($Company['google-map-status']) checked @endif id="chkEmbedMap" type="checkbox" ><label for="chkEmbedMap">Show Google Map</label></div>
@@ -149,8 +153,7 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="tab-pane fade  " id="pills-social-media-links" role="tabpanel" aria-labelledby="pills-social-media-links-tab">
+                                <div class="tab-pane fade" id="pills-social-media-links" role="tabpanel" aria-labelledby="pills-social-media-links-tab">
                                     
 									<div class="form-row">
 										<div class="col-sm-4 pt-15"><b>Facebook :</b></div>
@@ -207,6 +210,43 @@
 										</div>
 									</div>
                                 </div>
+                                <div class="tab-pane fade" id="pills-meta-links" role="tabpanel" aria-labelledby="pills-meta-links-tab">
+									@foreach ($MetaData as $item)
+										<div class="accordion" id="accordionExample{{$item->Slug}}" data-slug="{{$item->Slug}}">
+											<div class="accordion-item my-2">
+												<h2 class="accordion-header" id="heading{{$item->Slug}}">
+													<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$item->Slug}}" aria-expanded="false" aria-controls="collapse{{$item->Slug}}">
+														{{$item->Title}}
+													</button>
+												</h2>
+												<div id="collapse{{$item->Slug}}" class="accordion-collapse collapse" aria-labelledby="heading{{$item->Slug}}" data-bs-parent="#accordionExample{{$item->Slug}}">
+													<div class="accordion-body">
+														<!-- Title input -->
+														<div class="form-row">
+															<div class="col-sm-4 pt-15"><b>Title :</b></div>
+															<div class="col-sm-8">
+																<div class="form-group">
+																	<input type="text" class="form-control txtTitle" id="title{{$item->Slug}}" value="{{ $item->MetaTitle }}" placeholder="Enter Title">
+																	<div class="errors err-sm" id="title{{$item->Slug}}-err"></div>
+																</div>
+															</div>
+														</div>
+														<!-- Meta Description input -->
+														<div class="form-row mt-3">
+															<div class="col-sm-4 pt-15"><b>Meta Description :</b></div>
+															<div class="col-sm-8">
+																<div class="form-group">
+																	<textarea class="form-control txtDescription" id="description{{$item->Slug}}" rows="3" placeholder="Enter Meta Description">{{ $item->Description }}</textarea>
+																	<div class="errors err-sm" id="description{{$item->Slug}}-err"></div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									@endforeach
+                                </div>
                             </div>
                         </div>
 					</div>
@@ -224,11 +264,15 @@
 		</div>
 	</div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function(){
         const appInit=()=>{
         }
-        const getData=()=>{
+        const getData=async ()=>{
+			$('.errors').html('');
+			let status = true;
             let activeTab=$('ul.settings li.nav-item a.nav-link.active').attr('id');
             let formData=new FormData();
             if(activeTab=="pills-map-tab"){
@@ -244,7 +288,7 @@
                 formData.append('youtube',$('#txtYoutube ').val());
                 formData.append('linkedin',$('#txtLinkedIn ').val());
                 formData.append('3d-map-link',$('#txt3dMapLink ').val());
-            }else{
+            }else if(activeTab=="pills-general-tab"){
                 formData.append('sType','general');
 				formData.append('date-format',$('#lstDateFormat').val());
 				formData.append('time-format',$('#lstTimeFormat').val());
@@ -253,8 +297,62 @@
 				formData.append('upload-limit',$('#txtImgUploadSize').val()+$('#lstImgUploadSizeType').val());
 				formData.append('home-page-loading-text',$('#txtLoadingText').val());
 				formData.append('home-page-loading-text-font-size',$('#lstLoadingTextSize').val());
+            }else if(activeTab=="pills-meta-links-tab"){
+				let MetaData = [];
+
+				$('.accordion').each(function () {
+					let slug = $(this).data('slug');
+					let title = $(this).find('.txtTitle').val().trim();
+					let description = $(this).find('.txtDescription').val().trim();
+					let accordionCollapse = $(this).find('.accordion-collapse');
+					let isTitle = true;
+					let isDesc = true;
+
+					/* if (!title) {
+						$(this).find('.txtTitle').next('.errors').text('Title is required');isTitle = false;status = false;
+					} else if (title.length < 3) {
+						$(this).find('.txtTitle').next('.errors').text('Title must be at least 3 characters');isTitle = false;status = false;
+					} else if (title.length > 50) {
+						$(this).find('.txtTitle').next('.errors').text('Title must be below 50 characters');isTitle = false;status = false;
+					}
+
+					if (!description) {
+						$(this).find('.txtDescription').next('.errors').text('Description is required');isDesc = false;status = false;
+					} else if (description.length < 3) {
+						$(this).find('.txtDescription').next('.errors').text('Description must be at least 3 characters');isDesc = false;status = false;
+					} else if (description.length > 100) {
+						$(this).find('.txtDescription').next('.errors').text('Description must be below 100 characters');isDesc = false;status = false;
+					}
+					
+					if(!isTitle){
+						accordionCollapse.collapse('show');
+						$(this).find('.txtTitle').focus();
+						return false;
+					}else if(!isDesc){
+						accordionCollapse.collapse('show');
+						$(this).find('.txtDescription').focus();
+						return false;
+					}else if(isTitle && isDesc){
+						let Data = {
+							Slug: slug,
+							MetaTitle: title,
+							Description: description
+						};
+						MetaData.push(Data);
+					} */
+					status = true;
+					let Data = {
+						Slug: slug,
+						MetaTitle: title,
+						Description: description
+					};
+					MetaData.push(Data);
+				});
+				
+                formData.append('sType','meta');
+                formData.append('MetaData',JSON.stringify(MetaData));
             }
-            return formData;
+            return { status, formData};
         }
         $(document).on('change','#txtMapEmbedUrl',function(){
             $('#google-map').attr('src',$('#txtMapEmbedUrl').val());
@@ -269,54 +367,56 @@
                 $('.mapStatus').hide(1000);
             }
         });
-        $(document).on('click','#btnUpdate',function(){
+        $(document).on('click','#btnUpdate',async function(){
             
-			let formData= getData();
-			swal({
-				title: "Are you sure?",
-				text: "do want update this settings!",
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonClass: "btn-outline-success",
-				confirmButtonText: "Yes, Update it!",
-				closeOnConfirm: false
-			},
-			function(){
-				swal.close();
-				btnLoading($('#btnUpdate'));
-				$.ajax({
-					type:"post",
-					url:"{{url('/')}}/admin/settings/general",
-					headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') },
-					data:formData,
-					cache: false,
-					processData: false,
-					contentType: false,
-					error:function(e, x, settings, exception){ajaxErrors(e, x, settings, exception);},
-					complete: function(e, x, settings, exception){btnReset($('#btnUpdate'));ajaxIndicatorStop();},
-					success:function(response){
-						document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-						if(response.status==true){
-							
-							toastr.success(response.message, "Success", {
-								positionClass: "toast-top-right",
-								containerId: "toast-top-right",
-								showMethod: "slideDown",
-								hideMethod: "slideUp",
-								progressBar: !0
-							})   
-						}else{
-							toastr.error(response.message, "Failed", {
-								positionClass: "toast-top-right",
-								containerId: "toast-top-right",
-								showMethod: "slideDown",
-								hideMethod: "slideUp",
-								progressBar: !0
-							})
+			let { status, formData} = await getData();
+			if(status){
+				swal({
+					title: "Are you sure?",
+					text: "do want update this settings!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonClass: "btn-outline-success",
+					confirmButtonText: "Yes, Update it!",
+					closeOnConfirm: false
+				},
+				function(){
+					swal.close();
+					btnLoading($('#btnUpdate'));
+					$.ajax({
+						type:"post",
+						url:"{{url('/')}}/admin/settings/general",
+						headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') },
+						data:formData,
+						cache: false,
+						processData: false,
+						contentType: false,
+						error:function(e, x, settings, exception){ajaxErrors(e, x, settings, exception);},
+						complete: function(e, x, settings, exception){btnReset($('#btnUpdate'));ajaxIndicatorStop();},
+						success:function(response){
+							document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+							if(response.status==true){
+								
+								toastr.success(response.message, "Success", {
+									positionClass: "toast-top-right",
+									containerId: "toast-top-right",
+									showMethod: "slideDown",
+									hideMethod: "slideUp",
+									progressBar: !0
+								})   
+							}else{
+								toastr.error(response.message, "Failed", {
+									positionClass: "toast-top-right",
+									containerId: "toast-top-right",
+									showMethod: "slideDown",
+									hideMethod: "slideUp",
+									progressBar: !0
+								})
+							}
 						}
-					}
+					});
 				});
-			});
+			}
         });
         appInit();
     });
