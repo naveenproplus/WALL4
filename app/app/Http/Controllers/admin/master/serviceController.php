@@ -508,6 +508,7 @@ class serviceController extends Controller
                 }
 
                 $status = DB::table('tbl_services')->where('ServiceID', $ServiceID)->update($data);
+                DB::table('tbl_meta_data')->where('Slug', $ServiceID)->update(['Title'=>$req->ServiceName]);
                 if ($status) {
                     foreach ($galleryUrls as $pg) {
                         if ($status) {

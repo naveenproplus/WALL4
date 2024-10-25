@@ -20,16 +20,16 @@
 
 <div class="container-fluid ">
 	<div class="row d-flex justify-content-center">
-		<div class="col-12 col-sm-6">
+		<div class="col-12 col-sm-8">
 			<div class="card m-b-30">
 				<div class="card-body">
 					<div class="form-row">
                         <div class="col-sm-12">
                             <ul class="nav nav-pills justify-content-center settings" id="pills-icontab" role="tablist">
-                                <li class="nav-item"><a class="nav-link active" id="pills-general-tab" data-toggle="pill" href="#pills-general" role="tab" aria-controls="pills-general" aria-selected="false" data-original-title="" title=""><i class="fa fa-cogs" aria-hidden="true"></i> General</a></li>
-                                <li class="nav-item"><a class="nav-link " id="pills-map-tab" data-toggle="pill" href="#pills-map" role="tab" aria-controls="pills-map" aria-selected="false" data-original-title="" title=""><i class="fa fa-map-marker" aria-hidden="true"></i> Map</a></li>
-								<li class="nav-item"><a class="nav-link " id="pills-social-media-links-tab" data-toggle="pill" href="#pills-social-media-links" role="tab" aria-controls="pills-social-media-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-facebook-square" aria-hidden="true"></i> Social Media Links</a></li>
-								<li class="nav-item"><a class="nav-link " id="pills-meta-links-tab" data-toggle="pill" href="#pills-meta-links" role="tab" aria-controls="pills-meta-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-check" aria-hidden="true"></i> Meta Data</a></li>
+                                <li class="nav-item mx-3"><a class="nav-link active" id="pills-general-tab" data-toggle="pill" href="#pills-general" role="tab" aria-controls="pills-general" aria-selected="false" data-original-title="" title=""><i class="fa fa-cogs" aria-hidden="true"></i> General</a></li>
+                                <li class="nav-item mx-3"><a class="nav-link " id="pills-map-tab" data-toggle="pill" href="#pills-map" role="tab" aria-controls="pills-map" aria-selected="false" data-original-title="" title=""><i class="fa fa-map-marker" aria-hidden="true"></i> Map</a></li>
+								<li class="nav-item mx-3"><a class="nav-link " id="pills-social-media-links-tab" data-toggle="pill" href="#pills-social-media-links" role="tab" aria-controls="pills-social-media-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-facebook-square" aria-hidden="true"></i> Social Media Links</a></li>
+								<li class="nav-item mx-3"><a class="nav-link " id="pills-meta-links-tab" data-toggle="pill" href="#pills-meta-links" role="tab" aria-controls="pills-meta-links" aria-selected="false" data-original-title="" title=""><i class="fa fa-check" aria-hidden="true"></i> Meta Data</a></li>
                             </ul>
                             <div class="tab-content m-t-30" id="pills-icontabContent">
                                 <div class="tab-pane fade active show" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
@@ -212,7 +212,7 @@
                                 </div>
                                 <div class="tab-pane fade" id="pills-meta-links" role="tabpanel" aria-labelledby="pills-meta-links-tab">
 									@foreach ($MetaData as $item)
-										<div class="accordion" id="accordionExample{{$item->Slug}}" data-slug="{{$item->Slug}}">
+										<div class="accordion" id="accordionExample{{$item->Slug}}" data-slug="{{$item->Slug}}" data-title="{{$item->Title}}">
 											<div class="accordion-item my-2">
 												<h2 class="accordion-header" id="heading{{$item->Slug}}">
 													<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$item->Slug}}" aria-expanded="false" aria-controls="collapse{{$item->Slug}}">
@@ -223,20 +223,24 @@
 													<div class="accordion-body">
 														<!-- Title input -->
 														<div class="form-row">
-															<div class="col-sm-4 pt-15"><b>Title :</b></div>
+															<div class="col-sm-4 pt-15"><b>{{ ($item->Slug == 'google-analytics') ? "Header" : "Title"}} :</b></div>
 															<div class="col-sm-8">
 																<div class="form-group">
-																	<input type="text" class="form-control txtTitle" id="title{{$item->Slug}}" value="{{ $item->MetaTitle }}" placeholder="Enter Title">
+																	@if ($item->Slug == 'google-analytics')
+																		<textarea class="form-control txtTitle" id="title{{$item->Slug}}" rows="5">{{ $item->MetaTitle }}</textarea>
+																	@else
+																		<input type="text" class="form-control txtTitle" id="title{{$item->Slug}}" value="{{ $item->MetaTitle }}" placeholder="Enter Title">
+																	@endif
 																	<div class="errors err-sm" id="title{{$item->Slug}}-err"></div>
 																</div>
 															</div>
 														</div>
 														<!-- Meta Description input -->
 														<div class="form-row mt-3">
-															<div class="col-sm-4 pt-15"><b>Meta Description :</b></div>
+															<div class="col-sm-4 pt-15"><b>{{ ($item->Slug == 'google-analytics') ? "Footer" : "Meta Description"}} :</b></div>
 															<div class="col-sm-8">
 																<div class="form-group">
-																	<textarea class="form-control txtDescription" id="description{{$item->Slug}}" rows="3" placeholder="Enter Meta Description">{{ $item->Description }}</textarea>
+																	<textarea class="form-control txtDescription" id="description{{$item->Slug}}" rows="{{ ($item->Slug == 'google-analytics') ? 5 : 3}}" @if ($item->Slug !== 'google-analytics') placeholder="Enter Meta Description" @endif >{{ $item->Description }}</textarea>
 																	<div class="errors err-sm" id="description{{$item->Slug}}-err"></div>
 																</div>
 															</div>
@@ -302,17 +306,18 @@
 
 				$('.accordion').each(function () {
 					let slug = $(this).data('slug');
-					let title = $(this).find('.txtTitle').val().trim();
+					let title = $(this).data('title');
+					let Mtitle = $(this).find('.txtTitle').val().trim();
 					let description = $(this).find('.txtDescription').val().trim();
 					let accordionCollapse = $(this).find('.accordion-collapse');
 					let isTitle = true;
 					let isDesc = true;
 
-					/* if (!title) {
+					/* if (!Mtitle) {
 						$(this).find('.txtTitle').next('.errors').text('Title is required');isTitle = false;status = false;
-					} else if (title.length < 3) {
+					} else if (Mtitle.length < 3) {
 						$(this).find('.txtTitle').next('.errors').text('Title must be at least 3 characters');isTitle = false;status = false;
-					} else if (title.length > 50) {
+					} else if (Mtitle.length > 50) {
 						$(this).find('.txtTitle').next('.errors').text('Title must be below 50 characters');isTitle = false;status = false;
 					}
 
@@ -335,7 +340,7 @@
 					}else if(isTitle && isDesc){
 						let Data = {
 							Slug: slug,
-							MetaTitle: title,
+							MetaTitle: Mtitle,
 							Description: description
 						};
 						MetaData.push(Data);
@@ -343,7 +348,8 @@
 					status = true;
 					let Data = {
 						Slug: slug,
-						MetaTitle: title,
+						Title: title,
+						MetaTitle: Mtitle,
 						Description: description
 					};
 					MetaData.push(Data);

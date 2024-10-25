@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	
+	{!!$MetaData->where('Slug', 'google-analytics')->value('MetaTitle')!!}
+
 	<!-- Meta -->
 	<meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -55,6 +56,7 @@
 
 </head>
 <body id="bg" class="scrollbar">
+	{!! $MetaData->where('Slug', 'google-analytics')->value('Description') !!}
 	<style>
 		@keyframes zoom {
 			0% {
@@ -74,6 +76,7 @@
 
 
 	</style>
+
 <div id="loading-area" class="loading-page-1">
 	<div class="loading-area">
 		{{-- <p>Loading</p> --}}
@@ -831,5 +834,6 @@
 </script>
 
 @yield('scripts')
+
 </body>
 </html>

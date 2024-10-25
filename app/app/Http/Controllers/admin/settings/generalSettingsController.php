@@ -56,7 +56,29 @@ class generalSettingsController extends Controller{
 			$FormData['crud']=$this->CRUD;
 			$FormData['DateFormats']=DB::Table("tbl_formats")->where('FType','date')->get();
 			$FormData['TimeFormats']=DB::Table("tbl_formats")->where('FType','time')->get();
-			$FormData['MetaData']=DB::table('tbl_meta_data')->where('DFlag', 0)->where('ActiveStatus', 1)->get();
+
+			$MetaData = DB::table('tbl_meta_data as M')
+				->leftJoin('tbl_services as S', function ($join) { $join->on('S.ServiceID', '=', 'M.Slug'); })
+				->where('M.DFlag', 0)->where('M.ActiveStatus', 1)
+				->where(function ($query) {
+					$query->where('S.DFlag', 0)
+						->where('S.ActiveStatus', 1)
+						->orWhereNull('S.ServiceID');
+				})
+				->select('M.Slug', 'M.Title', 'M.MetaTitle', 'M.Description')->get()->toArray();
+
+			$ServiceData = DB::table('tbl_services')->where('DFlag', 0)->where('ActiveStatus', 1)
+			->select(DB::raw('ServiceID as Slug'),DB::raw('ServiceName as Title'),DB::raw('"" as MetaTitle'),DB::raw('"" as Description'))
+			->get()->toArray();
+			
+			$existingSlugs = array_column($MetaData, 'Slug');
+			foreach ($ServiceData as $service) {
+				if (!in_array($service->Slug, $existingSlugs)) {
+					$MetaData[] = $service;
+				}
+			}
+			
+			$FormData['MetaData'] = (object) $MetaData;
 			return view('admin.settings.general.index',$FormData);
 		}else{
 			return view('errors.403');
@@ -65,19 +87,32 @@ class generalSettingsController extends Controller{
 	
 	public function Update(Request $req){
 		
-		if($this->general->isCrudAllow($this->CRUD,"view")==true){
+		if($this->general->isCrudAllow($this->CRUD,"edit")==true){
 			DB::beginTransaction();
 			$status=true;
 			try{
 				$sType=$req->sType;
 				if($sType == "meta"){
 					$MetaData = json_decode($req->MetaData);
-					foreach($MetaData as $item){
+					$Slugs = [];
+					foreach($MetaData as $item) {
+						$isSlugExists = DB::table('tbl_meta_data')->where('Slug', $item->Slug)->exists();
+						
 						$updateData = (array) $item;
 						$updateData['UpdatedOn'] = now();
 						$updateData['UpdatedBy'] = $this->UserID;
-						$status = DB::table('tbl_meta_data')->where('Slug', $item->Slug)->update($updateData);
-					}					
+					
+						if ($isSlugExists) {
+							$status = DB::table('tbl_meta_data')->where('Slug', $item->Slug)->update($updateData);
+						} else {
+							$updateData['CreatedOn'] = now();
+							$updateData['CreatedBy'] = $this->UserID;
+							$status = DB::table('tbl_meta_data')->insert($updateData);
+						}
+						$Slugs[]=$item->Slug;
+					}
+					// DB::table('tbl_meta_data')->whereNotIn('Slug', $Slugs)->update(['DFlag' =>1, 'DeletedBy' =>$this->UserID, 'DeletedOn' =>now()]);
+									
 				}else{
 					$data=(array)$req->all();
 					unset($data['sType']);

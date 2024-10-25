@@ -37,7 +37,6 @@ class homeController extends Controller
                 ->select('UI.UserID', 'UI.FirstName', 'UI.LastName', 'UI.DOB', 'UI.Designation', 'D.Dept', 'D.Level', 'UI.GenderID', 'UI.Address', 'UI.CityID', 'UI.StateID', 'UI.CountryID', 'UI.PostalCodeID', 'UI.EMail', 'UI.MobileNumber', 'U.RoleID', 'U.isLogin', 'UI.ActiveStatus', DB::raw('CONCAT("' . url('/') . '/", COALESCE(NULLIF(ProfileImage, ""), "assets/images/male-icon.png")) AS ProfileImage'))
                 ->inRandomOrder()->get(),
             "MetaData" => DB::table('tbl_meta_data')->where('DFlag', 0)->where('ActiveStatus', 1)->get(),
-
         ];
     }
 
@@ -98,6 +97,7 @@ class homeController extends Controller
         $FormData['PageTitle'] = "Projects";
         return view('home.projects', $FormData);
     }
+
     public function getProjectImages(Request $request)
     {
         $projectAreaId = $request->projectAreaId;
@@ -152,6 +152,7 @@ class homeController extends Controller
             return view('errors.404');
         }
     }
+    
     public function PrivacyPolicyView(Request $req)
     {
         $FormData = $this->FormData;
@@ -163,6 +164,7 @@ class homeController extends Controller
             return view('errors.404');
         }
     }
+
     public function TermsAndConditionsView(Request $req)
     {
         $FormData = $this->FormData;
