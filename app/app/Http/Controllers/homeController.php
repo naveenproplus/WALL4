@@ -82,7 +82,7 @@ class homeController extends Controller
         $FormData = $this->FormData;
         $ServiceData = $FormData['Services']->where('Slug', $Slug)->first();
         if ($ServiceData) {
-            $FormData['PageTitle'] = "Services Details";
+            $FormData['PageTitle'] = $ServiceData->ServiceName;
             $ServiceData->ServiceGallery = DB::table('tbl_services_gallery')->where('ServiceID', $ServiceData->ServiceID)->inRandomOrder()->pluck('ImageUrl');
             $FormData['Service'] = $ServiceData;
             return view('home.service-details', $FormData);

@@ -171,6 +171,9 @@
 									<a href="{{ url('/') }}/services">Services</a>
 								</li>
 								<li>
+									<a href="{{ url('/') }}/our-blog">Blog</a>
+								</li>
+								<li>
 									<a href="{{ url('/') }}/contact-us">Contact Us</a>
 								</li>
 							</ul>
@@ -255,7 +258,7 @@
 											<li><a href="{{ url('/') }}/about-us">About Us</a></li>
 											<li><a href="{{ url('/') }}/services">Services</a></li>
 											<li><a href="{{ url('/') }}/projects">Projects</a></li>
-											{{-- <li><a href="{{ url('/') }}/blogs">Blogs</a></li> --}}
+											<li><a href="{{ url('/') }}/our-blog">Blog</a></li>
 											<li><a href="{{ url('/') }}/contact-us">Contact Us</a></li>
 										</ul>
 									</div>
